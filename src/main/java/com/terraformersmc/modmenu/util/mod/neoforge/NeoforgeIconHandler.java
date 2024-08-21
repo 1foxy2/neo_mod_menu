@@ -1,67 +1,82 @@
 package com.terraformersmc.modmenu.util.mod.neoforge;
 
 import com.mojang.blaze3d.platform.NativeImage;
-import net.minecraft.client.Minecraft;
+import com.terraformersmc.modmenu.ModMenu;
 import net.minecraft.client.renderer.texture.DynamicTexture;
-import net.minecraft.client.renderer.texture.TextureManager;
-import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.packs.PackLocationInfo;
-import net.minecraft.server.packs.PackResources;
-import net.minecraft.server.packs.repository.Pack;
-import net.minecraft.server.packs.repository.PackSource;
-import net.minecraft.server.packs.resources.IoSupplier;
 import net.neoforged.fml.ModContainer;
-import net.neoforged.neoforge.resource.ResourcePackLoader;
+import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.awt.*;
 import java.io.Closeable;
-import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
+import java.util.Objects;
 
 public class NeoforgeIconHandler implements Closeable {
-	private static final Logger LOGGER = LoggerFactory.getLogger("Mod Menu | FabricIconHandler");
+	private static final Logger LOGGER = LoggerFactory.getLogger("Mod Menu | NeoforgeIconHandler");
 
-	private final Map<String, ResourceLocation> modIconCache = new HashMap<>();
+	private final Map<Path, DynamicTexture> modIconCache = new HashMap<>();
 
 	public DynamicTexture createIcon(ModContainer iconSource, String iconPath) {
+		try {
+			Path path = iconSource.getModInfo().getOwningFile().getFile().findResource(iconPath);
+			DynamicTexture cachedIcon = getCachedModIcon(path);
+			if (cachedIcon != null) {
+				return cachedIcon;
+			}
+			cachedIcon = getCachedModIcon(path);
+			if (cachedIcon != null) {
+				return cachedIcon;
+			}
+			try (InputStream inputStream = Files.newInputStream(path)) {
+				NativeImage image = NativeImage.read(Objects.requireNonNull(inputStream));
+				Validate.validState(image.getHeight() == image.getWidth(), "Must be square icon");
+				DynamicTexture tex =new DynamicTexture(image);
+				cacheModIcon(path, tex);
+				return tex;
+			}
 
-		return (DynamicTexture) iconSource.getModInfo().getLogoFile().map(logoFile -> {
-			TextureManager tm = Minecraft.getInstance().getTextureManager();
-			if (modIconCache.containsKey(iconPath)) return tm.getTexture(modIconCache.get(iconPath));
-			final Pack.ResourcesSupplier resourcePack = ResourcePackLoader.getPackFor(iconSource.getModId())
-					.orElse(ResourcePackLoader.getPackFor("neoforge").orElseThrow(() -> new RuntimeException("Can't find neoforge, WHAT!")));
-			try (PackResources packResources = resourcePack.openPrimary(new PackLocationInfo("mod/" + iconSource.getModId(), Component.empty(), PackSource.BUILT_IN, Optional.empty()))) {
-				NativeImage logo = null;
-				IoSupplier<InputStream> logoResource = packResources.getRootResource(logoFile.split("[/\\\\]"));
-				if (logoResource != null)
-					logo = NativeImage.read(logoResource.get());
-				if (logo != null) {
+		} catch (IllegalStateException e) {
+			if (e.getMessage().equals("Must be square icon")) {
+				LOGGER.error("Mod icon must be a square for icon source {}: {}",
+						iconSource.getModId(),
+						iconPath,
+						e
+				);
+			}
 
-					modIconCache.put(iconPath, tm.register("modlogo", new DynamicTexture(logo) {
-						@Override
-						public void upload() {
-							this.bind();
-							NativeImage td = this.getPixels();
-							// Use custom "blur" value which controls texture filtering (nearest-neighbor vs linear)
-							this.getPixels().upload(0, 0, 0, 0, 0, td.getWidth(), td.getHeight(), iconSource.getModInfo().getLogoBlur(), false, false, false);
-						}
-					}));
-
-				}
-			} catch (IOException | IllegalArgumentException e) {}
-			return tm.getTexture(modIconCache.get(iconPath));
-		}).orElse(null);
+			return null;
+		} catch (Throwable t) {
+			if (!iconPath.equals("assets/" + iconSource.getModId() + "/icon.png") && !iconPath.equals("icon.png")) {
+				LOGGER.error("Invalid mod icon for icon source {}: {}", iconSource.getModId(), iconPath, t);
+			}
+			return null;
+		}
 	}
 
 	@Override
 	public void close() {
-		for (ResourceLocation tex : modIconCache.values()) {
-			Minecraft.getInstance().getTextureManager().getTexture(tex).close();
+		for (DynamicTexture tex : modIconCache.values()) {
+			tex.close();
 		}
+	}
+
+	DynamicTexture getCachedModIcon(Path path) {
+		return modIconCache.get(path);
+	}
+
+	void cacheModIcon(Path path, DynamicTexture tex) {
+		modIconCache.put(path, tex);
+	}
+
+	private Dimension calculateImageUv(int width, int height) {
+		if (width == height) return new Dimension();
+		if (width < height) return new Dimension(0, height / 2 - width / 2);
+		else return new Dimension(width / 2 - height / 2, 0);
 	}
 }

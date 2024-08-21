@@ -14,6 +14,7 @@ import com.terraformersmc.modmenu.util.ModMenuScreenTexts;
 import com.terraformersmc.modmenu.util.TranslationUtil;
 import com.terraformersmc.modmenu.util.mod.Mod;
 import com.terraformersmc.modmenu.util.mod.ModBadgeRenderer;
+import com.terraformersmc.modmenu.util.mod.neoforge.NeoforgeMod;
 import net.minecraft.ChatFormatting;
 import net.minecraft.SharedConstants;
 import net.minecraft.Util;
@@ -33,7 +34,9 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.CommonLinks;
+import net.neoforged.fml.ModList;
 import net.neoforged.fml.loading.FMLPaths;
+import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -110,8 +113,8 @@ public class ModsScreen extends Screen {
 			String id = mod.getId();
 			if (!modHasConfigScreen.containsKey(id)) {
 				try {
-					Screen configScreen = ModMenu.getConfigScreen(id, this);
-					modHasConfigScreen.put(id, configScreen != null);
+					Screen screen = ModMenu.getConfigScreen(id, this);
+					modHasConfigScreen.put(id, screen != null);
 				} catch (NoClassDefFoundError e) {
 					LOGGER.warn(
 						"The '" + id + "' mod config screen is not available because " + e.getLocalizedMessage() +

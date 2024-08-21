@@ -12,7 +12,9 @@ import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.layouts.LayoutElement;
+import net.minecraft.client.gui.screens.PauseScreen;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.TitleScreen;
 import net.minecraft.network.chat.Component;
@@ -29,7 +31,6 @@ import net.neoforged.neoforge.client.settings.KeyConflictContext;
 import net.neoforged.neoforge.common.util.Lazy;
 import org.lwjgl.glfw.GLFW;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -40,38 +41,35 @@ public class ModMenuEventHandler {
 			KeyConflictContext.IN_GAME, InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_X, "key.categories.misc"));;
 
 	@SubscribeEvent
-	public static void onClientTick(ClientTickEvent.Post event) {
-		onClientEndTick(Minecraft.getInstance());
-	}
-
-	@SubscribeEvent
 	public static void onScreenInit(ScreenEvent.Init.Post event) {
 		Screen screen = event.getScreen();
-		afterScreenInit(screen.getMinecraft(), screen, screen.width, screen.height);
-	}
-
-	public static void afterScreenInit(Minecraft client, Screen screen, int scaledWidth, int scaledHeight) {
+		//if (screen instanceof PauseScreen) {
+		//	removeModsButton(screen);
+	//	}
 		if (screen instanceof TitleScreen) {
+			removeModsButton(screen);
 			afterTitleScreenInit(screen);
 		}
 	}
 
+	private static void removeModsButton(Screen screen) {
+		screen.renderables.removeIf(button -> buttonHasText((LayoutElement) button, "fml.menu.mods"));
+		screen.narratables.removeIf(button -> buttonHasText((LayoutElement) button, "fml.menu.mods"));
+		screen.children.removeIf(button -> buttonHasText((LayoutElement) button, "fml.menu.mods"));
+	}
+
 	private static void afterTitleScreenInit(Screen screen) {
-		final List<AbstractWidget> buttons = new ArrayList<>();
-		screen.renderables.stream().forEach(widget -> {
-			if (widget instanceof AbstractWidget abstractWidget)
-				buttons.add(abstractWidget);
-		});
+		final List<Renderable> buttons = screen.renderables;
+
 		if (ModMenuConfig.MODIFY_TITLE_SCREEN.getValue()) {
 			int modsButtonIndex = -1;
 			final int spacing = 24;
 			int buttonsY = screen.height / 4 + 48;
 			for (int i = 0; i < buttons.size(); i++) {
-				AbstractWidget widget = buttons.get(i);
+				Renderable widget = buttons.get(i);
 				if (widget instanceof Button button) {
 					if (ModMenuConfig.MODS_BUTTON_STYLE.getValue() == ModMenuConfig.TitleMenuButtonStyle.CLASSIC) {
 						if (button.visible) {
-							shiftButtons(button, modsButtonIndex == -1, spacing);
 							if (modsButtonIndex == -1) {
 								buttonsY = button.getY();
 							}
@@ -80,13 +78,14 @@ public class ModMenuEventHandler {
 					if (buttonHasText(button, "menu.online")) {
 						if (ModMenuConfig.MODS_BUTTON_STYLE.getValue() ==
 							ModMenuConfig.TitleMenuButtonStyle.REPLACE_REALMS) {
-							buttons.set(i, new ModMenuButtonWidget(button.getX(),
-								button.getY(),
-								button.getWidth(),
-								button.getHeight(),
-								ModMenuApi.createModsButtonText(),
-								screen
-							));
+							set(screen, modsButtonIndex, new ModMenuButtonWidget(button.getX(),
+											button.getY() + spacing,
+											button.getWidth(),
+											button.getHeight(),
+											ModMenuApi.createModsButtonText(),
+											screen));
+							buttons.remove(i);
+							screen.children().remove(buttons.get(i));
 						} else {
 							if (ModMenuConfig.MODS_BUTTON_STYLE.getValue() ==
 								ModMenuConfig.TitleMenuButtonStyle.SHRINK) {
@@ -103,7 +102,7 @@ public class ModMenuEventHandler {
 			}
 			if (modsButtonIndex != -1) {
 				if (ModMenuConfig.MODS_BUTTON_STYLE.getValue() == ModMenuConfig.TitleMenuButtonStyle.CLASSIC) {
-					buttons.add(modsButtonIndex, new ModMenuButtonWidget(screen.width / 2 - 100,
+					add(screen, modsButtonIndex, new ModMenuButtonWidget(screen.width / 2 - 100,
 						buttonsY + spacing,
 						200,
 						20,
@@ -111,8 +110,8 @@ public class ModMenuEventHandler {
 						screen
 					));
 				} else if (ModMenuConfig.MODS_BUTTON_STYLE.getValue() == ModMenuConfig.TitleMenuButtonStyle.SHRINK) {
-					buttons.add(modsButtonIndex,
-						new ModMenuButtonWidget(screen.width / 2 + 2,
+					add(screen, modsButtonIndex,
+							new ModMenuButtonWidget(screen.width / 2 + 2,
 							buttonsY,
 							98,
 							20,
@@ -121,7 +120,7 @@ public class ModMenuEventHandler {
 						)
 					);
 				} else if (ModMenuConfig.MODS_BUTTON_STYLE.getValue() == ModMenuConfig.TitleMenuButtonStyle.ICON) {
-					buttons.add(modsButtonIndex, new UpdateCheckerTexturedButtonWidget(screen.width / 2 + 104,
+					add(screen, modsButtonIndex, new UpdateCheckerTexturedButtonWidget(screen.width / 2 + 104,
 						buttonsY,
 						20,
 						20,
@@ -140,9 +139,10 @@ public class ModMenuEventHandler {
 		UpdateCheckerUtil.triggerV2DeprecatedToast();
 	}
 
-	private static void onClientEndTick(Minecraft client) {
+	@SubscribeEvent
+	public static void onClientTick(ClientTickEvent.Post event) {
 		while (MENU_KEY_BIND.get().consumeClick()) {
-			client.setScreen(new ModsScreen(client.screen));
+			Minecraft.getInstance().setScreen(new ModsScreen(Minecraft.getInstance().screen));
 		}
 	}
 
@@ -165,6 +165,61 @@ public class ModMenuEventHandler {
 		)) {
 			element.setY(element.getY() + spacing / 2);
 		}
+	}
+
+	public static AbstractWidget set(Screen screen, int index, AbstractWidget element) {
+		final int drawableIndex = translateIndex(screen.renderables, index, false);
+		screen.renderables.set(drawableIndex, element);
+
+		final int selectableIndex = translateIndex(screen.narratables, index, false);
+		screen.narratables.set(selectableIndex, element);
+
+		final int childIndex = translateIndex(screen.children, index, false);
+		return (AbstractWidget) screen.children.set(childIndex, element);
+	}
+
+	public static void add(Screen screen, int index, AbstractWidget element) {
+		// ensure no duplicates
+		final int duplicateIndex = screen.renderables.indexOf(element);
+
+		if (duplicateIndex >= 0) {
+			screen.renderables.remove(element);
+			screen.narratables.remove(element);
+			screen.children.remove(element);
+
+			if (duplicateIndex <= translateIndex(screen.renderables, index, true)) {
+				index--;
+			}
+		}
+
+		final int drawableIndex = translateIndex(screen.renderables, index, true);
+		screen.renderables.add(drawableIndex, element);
+
+		final int selectableIndex = translateIndex(screen.narratables, index, true);
+		screen.narratables.add(selectableIndex, element);
+
+		final int childIndex = translateIndex(screen.children, index, true);
+		screen.children.add(childIndex, element);
+	}
+
+	private static int translateIndex(List<?> list, int index, boolean allowAfter) {
+		int remaining = index;
+
+		for (int i = 0, max = list.size(); i < max; i++) {
+			if (list.get(i) instanceof AbstractWidget) {
+				if (remaining == 0) {
+					return i;
+				}
+
+				remaining--;
+			}
+		}
+
+		if (allowAfter && remaining == 0) {
+			return list.size();
+		}
+
+		throw new IndexOutOfBoundsException(String.format("Index: %d, Size: %d", index, index - remaining));
 	}
 
 	@EventBusSubscriber(modid = ModMenu.MOD_ID, bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)

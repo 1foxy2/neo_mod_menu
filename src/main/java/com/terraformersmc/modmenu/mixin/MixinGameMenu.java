@@ -52,7 +52,7 @@ public abstract class MixinGameMenu extends Screen {
 					}
 					boolean isShortFeedback = ModMenuEventHandler.buttonHasText(widget, "menu.feedback");
 					boolean isLongFeedback = ModMenuEventHandler.buttonHasText(widget, "menu.sendFeedback");
-
+					if (ModMenuEventHandler.buttonHasText(widget, "menu.returnToMenu")) widget.setY(widget.getY() - spacing);
 					if (isShortFeedback || isLongFeedback) {
 						modsButtonIndex = i + 1;
 						vanillaButtonsY = widget.getY();
@@ -108,6 +108,7 @@ public abstract class MixinGameMenu extends Screen {
 						));
 					}
 				}
+				buttons.removeIf(button -> ModMenuEventHandler.buttonHasText(button, "fml.menu.mods"));
 			}
 		}
 	}

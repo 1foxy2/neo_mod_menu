@@ -15,13 +15,23 @@ import com.terraformersmc.modmenu.util.UpdateCheckerUtil;
 import com.terraformersmc.modmenu.util.mod.Mod;
 import com.terraformersmc.modmenu.util.mod.neoforge.NeoforgeDummyParentMod;
 import com.terraformersmc.modmenu.util.mod.neoforge.NeoforgeMod;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.options.OptionsScreen;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.ModList;
+import net.neoforged.fml.config.ModConfig;
+import net.neoforged.fml.event.IModBusEvent;
+import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
+import net.neoforged.fml.javafmlmod.FMLJavaModLanguageProvider;
 import net.neoforged.fml.loading.FMLEnvironment;
+import net.neoforged.fml.loading.FMLLoader;
+import net.neoforged.neoforge.client.gui.ConfigurationScreen;
+import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,7 +59,7 @@ public class ModMenu {
 	public static final Map<String, Mod> ROOT_MODS = new HashMap<>();
 	public static final LinkedListMultimap<Mod, Mod> PARENT_MAP = LinkedListMultimap.create();
 
-	private static final Map<String, ConfigScreenFactory<?>> configScreenFactories = new HashMap<>();
+	private static final Map<String, IConfigScreenFactory> configScreenFactories = new HashMap<>();
 	private static final List<ModMenuApi> apiImplementations = new ArrayList<>();
 
 	private static int cachedDisplayedModCount = -1;
@@ -58,30 +68,29 @@ public class ModMenu {
 	public static final boolean TEXT_PLACEHOLDER_COMPAT = ModList.get().isLoaded("placeholder_api");
 
 	public static Screen getConfigScreen(String modid, Screen menuScreen) {
-		for (ModMenuApi api : apiImplementations) {
-			var factoryProviders = api.getProvidedConfigScreenFactories();
-			if (!factoryProviders.isEmpty()) {
-				factoryProviders.forEach(configScreenFactories::putIfAbsent);
-			}
-		}
+		configScreenFactories.putIfAbsent("minecraft", (modContainer, screen) -> new OptionsScreen(screen, Minecraft.getInstance().options));
+
 		if (ModMenuConfig.HIDDEN_CONFIGS.getValue().contains(modid)) {
 			return null;
 		}
-		ConfigScreenFactory<?> factory = configScreenFactories.get(modid);
+		IConfigScreenFactory factory = configScreenFactories.get(modid);
 		if (factory != null) {
-			return factory.create(menuScreen);
+			return factory.createScreen(ModList.get().getModContainerById(modid).get(), menuScreen);
 		}
 		return null;
 	}
 
-	public ModMenu() {
+	public ModMenu(IEventBus event, ModContainer container) {
 		ModMenuConfigManager.initializeConfig();
 		Set<String> modpackMods = new HashSet<>();
 		Map<String, UpdateChecker> updateCheckers = new HashMap<>();
 		Map<String, UpdateChecker> providedUpdateCheckers = new HashMap<>();
 
+		event.addListener(this::onClientSetup);
+
+		container.registerConfig(ModConfig.Type.CLIENT, com.terraformersmc.modmenu.ModMenuConfig.SPEC);
+		container.registerExtensionPoint(IConfigScreenFactory.class, ConfigurationScreen::new);
 		// Ignore deprecations, they're from Quilt Loader being in the dev env
-		//noinspection deprecation
 		/*FabricLoader.getInstance().getEntrypointContainers("modmenu", ModMenuApi.class).forEach(entrypoint -> {
 			//noinspection deprecation
 			ModMetadata metadata = entrypoint.getProvider().getMetadata();
@@ -99,7 +108,6 @@ public class ModMenu {
 		});*/
 
 		// Fill mods map
-		//noinspection deprecation
 		for (ModContainer modContainer : ModList.get().getSortedMods()) {
 			Mod mod;
 
@@ -145,6 +153,11 @@ public class ModMenu {
 
 	public static void clearModCountCache() {
 		cachedDisplayedModCount = -1;
+	}
+
+	public void onClientSetup(FMLClientSetupEvent event) {
+		ModList.get().getMods().forEach(info -> IConfigScreenFactory.getForMod(info).ifPresent(
+				factory -> configScreenFactories.put(info.getModId(), factory)));
 	}
 
 	public static void checkForUpdates() {
