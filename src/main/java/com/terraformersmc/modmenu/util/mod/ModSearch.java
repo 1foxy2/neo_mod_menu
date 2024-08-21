@@ -46,7 +46,7 @@ public class ModSearch {
 		String hasUpdate = I18n.get("modmenu.searchTerms.hasUpdate");
 
 		// Libraries are currently hidden, ignore them entirely
-		if (mod.isHidden() || !ModMenuConfig.SHOW_LIBRARIES.getValue() && mod.getBadges().contains(Mod.Badge.LIBRARY)) {
+		if (mod.isHidden() || !ModMenuConfig.show_libraries && mod.getBadges().contains(Mod.Badge.LIBRARY)) {
 			return 0;
 		}
 
@@ -70,7 +70,7 @@ public class ModSearch {
 			|| clientside.contains(query) && mod.getBadges().contains(Mod.Badge.CLIENT) // Search for clientside mods
 			|| configurable.contains(query) && screen.getModHasConfigScreen()
 			.get(modId) // Search for mods that can be configured
-			|| hasUpdate.contains(query) && mod.hasUpdate() // Search for mods that have updates
+			// Search for mods that have updates
 		) {
 			return 1;
 		}

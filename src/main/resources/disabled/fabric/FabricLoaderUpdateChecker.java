@@ -1,9 +1,6 @@
 package disabled.fabric;
 
 import com.google.gson.JsonParser;
-import com.terraformersmc.modmenu.api.UpdateChannel;
-import com.terraformersmc.modmenu.api.UpdateChecker;
-import com.terraformersmc.modmenu.api.UpdateInfo;
 import com.terraformersmc.modmenu.util.HttpUtil;
 import com.terraformersmc.modmenu.util.JsonUtil;
 import com.terraformersmc.modmenu.util.OptionalUtil;

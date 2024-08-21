@@ -32,7 +32,7 @@ public class DrawingUtil {
 		int seed = mod.getName().hashCode() + mod.getVersion().hashCode();
 		Random random = new Random(seed);
 		int color = 0xFF000000 | Mth.hsvToRgb(random.nextFloat(1f), random.nextFloat(0.7f, 0.8f), 0.9f);
-		if (!ModMenuConfig.RANDOM_JAVA_COLORS.getValue()) {
+		if (!ModMenuConfig.random_java_colors) {
 			color = 0xFFDD5656;
 		}
 		RenderSystem.setShaderColor(1f, 1f, 1f, 1f);

@@ -1,8 +1,6 @@
 package disabled.fabric;
 
 import com.terraformersmc.modmenu.ModMenu;
-import com.terraformersmc.modmenu.api.UpdateChecker;
-import com.terraformersmc.modmenu.api.UpdateInfo;
 import com.terraformersmc.modmenu.config.ModMenuConfig;
 import com.terraformersmc.modmenu.util.mod.Mod;
 import net.fabricmc.loader.api.FabricLoader;
@@ -199,6 +197,6 @@ public class FabricDummyParentMod implements Mod {
 
 	@Override
 	public boolean isHidden() {
-		return ModMenuConfig.HIDDEN_MODS.getValue().contains(this.getId());
+		return ModMenuConfig.hidden_mods.contains(this.getId());
 	}
 }

@@ -1,4 +1,4 @@
-package com.terraformersmc.modmenu;
+package com.terraformersmc.modmenu.config;
 
 import net.neoforged.neoforge.client.gui.ConfigurationScreen;
 import org.jetbrains.annotations.Nullable;

@@ -54,7 +54,7 @@ public class ParentEntry extends ModListEntry {
 		if (childrenBadgeWidth < childrenWidth + 4) {
 			childrenBadgeWidth = childrenWidth + 4;
 		}
-		int iconSize = ModMenuConfig.COMPACT_LIST.getValue() ? COMPACT_ICON_SIZE : FULL_ICON_SIZE;
+		int iconSize = ModMenuConfig.compact_list ? COMPACT_ICON_SIZE : FULL_ICON_SIZE;
 		int childrenBadgeX = x + iconSize - childrenBadgeWidth;
 		int childrenBadgeY = y + iconSize - childrenBadgeHeight;
 		int childrenOutlineColor = 0xff107454;
@@ -109,10 +109,10 @@ public class ParentEntry extends ModListEntry {
 				yOffset,
 				iconSize + xOffset,
 				iconSize + yOffset,
-				ModMenuConfig.COMPACT_LIST.getValue() ?
+				ModMenuConfig.compact_list ?
 					(int) (256 / (FULL_ICON_SIZE / (double) COMPACT_ICON_SIZE)) :
 					256,
-				ModMenuConfig.COMPACT_LIST.getValue() ?
+				ModMenuConfig.compact_list ?
 					(int) (256 / (FULL_ICON_SIZE / (double) COMPACT_ICON_SIZE)) :
 					256
 			);
@@ -121,8 +121,8 @@ public class ParentEntry extends ModListEntry {
 
 	@Override
 	public boolean mouseClicked(double mouseX, double mouseY, int i) {
-		int iconSize = ModMenuConfig.COMPACT_LIST.getValue() ? COMPACT_ICON_SIZE : FULL_ICON_SIZE;
-		boolean quickConfigure = ModMenuConfig.QUICK_CONFIGURE.getValue();
+		int iconSize = ModMenuConfig.compact_list ? COMPACT_ICON_SIZE : FULL_ICON_SIZE;
+		boolean quickConfigure = ModMenuConfig.quick_configure;
 		if (mouseX - list.getRowLeft() <= iconSize) {
 			this.toggleChildren();
 			return true;

@@ -2,19 +2,16 @@ package com.terraformersmc.modmenu.event;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import com.terraformersmc.modmenu.ModMenu;
-import com.terraformersmc.modmenu.api.ModMenuApi;
 import com.terraformersmc.modmenu.config.ModMenuConfig;
 import com.terraformersmc.modmenu.gui.ModsScreen;
 import com.terraformersmc.modmenu.gui.widget.ModMenuButtonWidget;
 import com.terraformersmc.modmenu.gui.widget.UpdateCheckerTexturedButtonWidget;
-import com.terraformersmc.modmenu.util.UpdateCheckerUtil;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.layouts.LayoutElement;
-import net.minecraft.client.gui.screens.PauseScreen;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.TitleScreen;
 import net.minecraft.network.chat.Component;
@@ -61,14 +58,14 @@ public class ModMenuEventHandler {
 	private static void afterTitleScreenInit(Screen screen) {
 		final List<Renderable> buttons = screen.renderables;
 
-		if (ModMenuConfig.MODIFY_TITLE_SCREEN.getValue()) {
+		if (ModMenuConfig.modify_title_screen) {
 			int modsButtonIndex = -1;
 			final int spacing = 24;
 			int buttonsY = screen.height / 4 + 48;
 			for (int i = 0; i < buttons.size(); i++) {
 				Renderable widget = buttons.get(i);
 				if (widget instanceof Button button) {
-					if (ModMenuConfig.MODS_BUTTON_STYLE.getValue() == ModMenuConfig.TitleMenuButtonStyle.CLASSIC) {
+					if (ModMenuConfig.mods_button_style == ModMenuConfig.TitleMenuButtonStyle.CLASSIC) {
 						if (button.visible) {
 							if (modsButtonIndex == -1) {
 								buttonsY = button.getY();
@@ -76,18 +73,18 @@ public class ModMenuEventHandler {
 						}
 					}
 					if (buttonHasText(button, "menu.online")) {
-						if (ModMenuConfig.MODS_BUTTON_STYLE.getValue() ==
+						if (ModMenuConfig.mods_button_style ==
 							ModMenuConfig.TitleMenuButtonStyle.REPLACE_REALMS) {
 							set(screen, modsButtonIndex, new ModMenuButtonWidget(button.getX(),
 											button.getY() + spacing,
 											button.getWidth(),
 											button.getHeight(),
-											ModMenuApi.createModsButtonText(),
+											ModMenu.createModsButtonText(true),
 											screen));
 							buttons.remove(i);
 							screen.children().remove(buttons.get(i));
 						} else {
-							if (ModMenuConfig.MODS_BUTTON_STYLE.getValue() ==
+							if (ModMenuConfig.mods_button_style ==
 								ModMenuConfig.TitleMenuButtonStyle.SHRINK) {
 								button.setWidth(98);
 							}
@@ -101,25 +98,25 @@ public class ModMenuEventHandler {
 
 			}
 			if (modsButtonIndex != -1) {
-				if (ModMenuConfig.MODS_BUTTON_STYLE.getValue() == ModMenuConfig.TitleMenuButtonStyle.CLASSIC) {
+				if (ModMenuConfig.mods_button_style == ModMenuConfig.TitleMenuButtonStyle.CLASSIC) {
 					add(screen, modsButtonIndex, new ModMenuButtonWidget(screen.width / 2 - 100,
 						buttonsY + spacing,
 						200,
 						20,
-						ModMenuApi.createModsButtonText(),
+							ModMenu.createModsButtonText(true),
 						screen
 					));
-				} else if (ModMenuConfig.MODS_BUTTON_STYLE.getValue() == ModMenuConfig.TitleMenuButtonStyle.SHRINK) {
+				} else if (ModMenuConfig.mods_button_style == ModMenuConfig.TitleMenuButtonStyle.SHRINK) {
 					add(screen, modsButtonIndex,
 							new ModMenuButtonWidget(screen.width / 2 + 2,
 							buttonsY,
 							98,
 							20,
-							ModMenuApi.createModsButtonText(),
+									ModMenu.createModsButtonText(true),
 							screen
 						)
 					);
-				} else if (ModMenuConfig.MODS_BUTTON_STYLE.getValue() == ModMenuConfig.TitleMenuButtonStyle.ICON) {
+				} else if (ModMenuConfig.mods_button_style == ModMenuConfig.TitleMenuButtonStyle.ICON) {
 					add(screen, modsButtonIndex, new UpdateCheckerTexturedButtonWidget(screen.width / 2 + 104,
 						buttonsY,
 						20,
@@ -131,12 +128,11 @@ public class ModMenuEventHandler {
 						32,
 						64,
 						button -> Minecraft.getInstance().setScreen(new ModsScreen(screen)),
-						ModMenuApi.createModsButtonText()
+							ModMenu.createModsButtonText(true)
 					));
 				}
 			}
 		}
-		UpdateCheckerUtil.triggerV2DeprecatedToast();
 	}
 
 	@SubscribeEvent

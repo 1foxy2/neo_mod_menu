@@ -1,6 +1,6 @@
 package com.terraformersmc.modmenu.mixin;
 
-import com.terraformersmc.modmenu.api.ModMenuApi;
+import com.terraformersmc.modmenu.ModMenu;
 import com.terraformersmc.modmenu.config.ModMenuConfig;
 import com.terraformersmc.modmenu.event.ModMenuEventHandler;
 import com.terraformersmc.modmenu.gui.ModsScreen;
@@ -32,11 +32,11 @@ public abstract class MixinGameMenu extends Screen {
 	private void onInitWidgets(CallbackInfo ci, GridLayout gridlayout, GridLayout.RowHelper gridlayout$rowhelper, ServerLinks serverlinks, Component component) {
 		if (gridlayout != null) {
 			final List<LayoutElement> buttons = ((AccessorGridWidget) gridlayout).getChildren();
-			if (ModMenuConfig.MODIFY_GAME_MENU.getValue()) {
+			if (ModMenuConfig.modify_game_menu) {
 				int modsButtonIndex = -1;
 				final int spacing = 24;
 				int buttonsY = this.height / 4 + 8;
-				ModMenuConfig.GameMenuButtonStyle style = ModMenuConfig.GAME_MENU_BUTTON_STYLE.getValue();
+				ModMenuConfig.GameMenuButtonStyle style = ModMenuConfig.game_menu_button_style;
 				int vanillaButtonsY = this.height / 4 + 72 - 16 + 1;
 				final int fullWidthButton = 204;
 
@@ -62,7 +62,7 @@ public abstract class MixinGameMenu extends Screen {
 								widget.getY(),
 								isShortFeedback ? widget.getWidth() : fullWidthButton,
 								widget.getHeight(),
-								ModMenuApi.createModsButtonText(),
+								ModMenu.createModsButtonText(true),
 								this
 							));
 							buttons.stream()
@@ -88,7 +88,7 @@ public abstract class MixinGameMenu extends Screen {
 							buttonsY + spacing,
 							fullWidthButton,
 							20,
-							ModMenuApi.createModsButtonText(),
+							ModMenu.createModsButtonText(true),
 							this
 						));
 					} else if (style == ModMenuConfig.GameMenuButtonStyle.ICON) {
@@ -104,7 +104,7 @@ public abstract class MixinGameMenu extends Screen {
 							32,
 							64,
 							button -> Minecraft.getInstance().setScreen(new ModsScreen(this)),
-							ModMenuApi.createModsButtonText()
+							ModMenu.createModsButtonText(true)
 						));
 					}
 				}

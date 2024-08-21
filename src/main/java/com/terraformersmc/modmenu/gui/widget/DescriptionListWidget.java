@@ -3,7 +3,6 @@ package com.terraformersmc.modmenu.gui.widget;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
-import com.terraformersmc.modmenu.api.UpdateInfo;
 import com.terraformersmc.modmenu.config.ModMenuConfig;
 import com.terraformersmc.modmenu.gui.ModsScreen;
 import com.terraformersmc.modmenu.gui.widget.entries.ModListEntry;
@@ -106,67 +105,9 @@ public class DescriptionListWidget extends AbstractSelectionList<DescriptionList
 					}
 				}
 
-				if (ModMenuConfig.UPDATE_CHECKER.getValue() && !ModMenuConfig.DISABLE_UPDATE_CHECKER.getValue()
-					.contains(mod.getId())) {
-					UpdateInfo updateInfo = mod.getUpdateInfo();
-					if (updateInfo != null && updateInfo.isUpdateAvailable()) {
-						children().add(emptyEntry);
-
-						int index = 0;
-						for (FormattedCharSequence line : textRenderer.split(HAS_UPDATE_TEXT, wrapWidth - 11)) {
-							DescriptionEntry entry = new DescriptionEntry(line);
-							if (index == 0) {
-								entry.setUpdateTextEntry();
-							}
-
-							children().add(entry);
-							index += 1;
-						}
-
-						for (FormattedCharSequence line : textRenderer.split(EXPERIMENTAL_TEXT, wrapWidth - 16)) {
-							children().add(new DescriptionEntry(line, 8));
-						}
-
-
-						Component updateMessage = updateInfo.getUpdateMessage();
-						String downloadLink = updateInfo.getDownloadLink();
-						if (updateMessage == null) {
-							updateMessage = DOWNLOAD_TEXT;
-						} else {
-							if (downloadLink != null) {
-								updateMessage = updateMessage.copy()
-									.withStyle(ChatFormatting.BLUE)
-									.withStyle(ChatFormatting.UNDERLINE);
-							}
-						}
-						for (FormattedCharSequence line : textRenderer.split(updateMessage, wrapWidth - 16)) {
-							if (downloadLink != null) {
-								children().add(new LinkEntry(line, downloadLink, 8));
-							} else {
-								children().add(new DescriptionEntry(line, 8));
-
-							}
-						}
-					}
-					if (mod.getChildHasUpdate()) {
-						children().add(emptyEntry);
-
-						int index = 0;
-						for (FormattedCharSequence line : textRenderer.split(CHILD_HAS_UPDATE_TEXT, wrapWidth - 11)) {
-							DescriptionEntry entry = new DescriptionEntry(line);
-							if (index == 0) {
-								entry.setUpdateTextEntry();
-							}
-
-							children().add(entry);
-							index += 1;
-						}
-					}
-				}
-
 				Map<String, String> links = mod.getLinks();
 				String sourceLink = mod.getSource();
-				if ((!links.isEmpty() || sourceLink != null) && !ModMenuConfig.HIDE_MOD_LINKS.getValue()) {
+				if ((!links.isEmpty() || sourceLink != null) && !ModMenuConfig.hide_mod_links) {
 					children().add(emptyEntry);
 
 					for (FormattedCharSequence line : textRenderer.split(LINKS_TEXT, wrapWidth)) {
@@ -195,7 +136,7 @@ public class DescriptionListWidget extends AbstractSelectionList<DescriptionList
 				}
 
 				Set<String> licenses = mod.getLicense();
-				if (!ModMenuConfig.HIDE_MOD_LICENSE.getValue() && !licenses.isEmpty()) {
+				if (!ModMenuConfig.hide_mod_license && !licenses.isEmpty()) {
 					children().add(emptyEntry);
 
 					for (FormattedCharSequence line : textRenderer.split(LICENSE_TEXT, wrapWidth)) {
@@ -211,7 +152,7 @@ public class DescriptionListWidget extends AbstractSelectionList<DescriptionList
 					}
 				}
 
-				if (!ModMenuConfig.HIDE_MOD_CREDITS.getValue()) {
+				if (!ModMenuConfig.hide_mod_credits) {
 					if ("minecraft".equals(mod.getId())) {
 						children().add(emptyEntry);
 

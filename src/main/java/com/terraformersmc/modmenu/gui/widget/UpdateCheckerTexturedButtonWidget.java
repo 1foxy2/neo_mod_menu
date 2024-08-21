@@ -25,12 +25,4 @@ public class UpdateCheckerTexturedButtonWidget extends LegacyTexturedButtonWidge
 	) {
 		super(x, y, width, height, u, v, hoveredVOffset, texture, textureWidth, textureHeight, pressAction, message);
 	}
-
-	@Override
-	public void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
-		super.renderWidget(guiGraphics, mouseX, mouseY, delta);
-		if (ModMenuConfig.BUTTON_UPDATE_BADGE.getValue() && ModMenu.areModUpdatesAvailable()) {
-			UpdateAvailableBadge.renderBadge(guiGraphics, this.getX() + this.width - 5, this.getY() - 3);
-		}
-	}
 }

@@ -62,7 +62,7 @@ public class ModListEntry extends ObjectSelectionList.Entry<ModListEntry> {
 	) {
 		x += getXOffset();
 		rowWidth -= getXOffset();
-		int iconSize = ModMenuConfig.COMPACT_LIST.getValue() ? COMPACT_ICON_SIZE : FULL_ICON_SIZE;
+		int iconSize = ModMenuConfig.compact_list ? COMPACT_ICON_SIZE : FULL_ICON_SIZE;
 		String modId = mod.getId();
 		if ("java".equals(modId)) {
 			DrawingUtil.drawRandomVersionBackground(mod, guiGraphics, x, y, iconSize, iconSize);
@@ -90,12 +90,7 @@ public class ModListEntry extends ObjectSelectionList.Entry<ModListEntry> {
 			true
 		);
 		var updateBadgeXOffset = 0;
-		if (ModMenuConfig.UPDATE_CHECKER.getValue() && !ModMenuConfig.DISABLE_UPDATE_CHECKER.getValue()
-			.contains(modId) && (mod.hasUpdate() || mod.getChildHasUpdate())) {
-			UpdateAvailableBadge.renderBadge(guiGraphics, x + iconSize + 3 + font.width(name) + 2, y);
-			updateBadgeXOffset = 11;
-		}
-		if (!ModMenuConfig.HIDE_BADGES.getValue()) {
+		if (!ModMenuConfig.hide_badges) {
 			new ModBadgeRenderer(x + iconSize + 3 + font.width(name) + 2 + updateBadgeXOffset,
 				y,
 				x + rowWidth,
@@ -103,7 +98,7 @@ public class ModListEntry extends ObjectSelectionList.Entry<ModListEntry> {
 				list.getParent()
 			).draw(guiGraphics, mouseX, mouseY);
 		}
-		if (!ModMenuConfig.COMPACT_LIST.getValue()) {
+		if (!ModMenuConfig.compact_list) {
 			String summary = mod.getSummary();
 			DrawingUtil.drawWrappedString(guiGraphics,
 				summary,
@@ -124,10 +119,10 @@ public class ModListEntry extends ObjectSelectionList.Entry<ModListEntry> {
 			);
 		}
 
-		if (!(this instanceof ParentEntry) && ModMenuConfig.QUICK_CONFIGURE.getValue() && (this.list.getParent()
+		if (!(this instanceof ParentEntry) && ModMenuConfig.quick_configure && (this.list.getParent()
 			.getModHasConfigScreen()
 			.get(modId) || this.list.getParent().modScreenErrors.containsKey(modId))) {
-			final int textureSize = ModMenuConfig.COMPACT_LIST.getValue() ?
+			final int textureSize = ModMenuConfig.compact_list ?
 				(int) (256 / (FULL_ICON_SIZE / (double) COMPACT_ICON_SIZE)) :
 				256;
 			if (this.client.options.touchscreen().get() || hovered) {
@@ -168,10 +163,10 @@ public class ModListEntry extends ObjectSelectionList.Entry<ModListEntry> {
 	@Override
 	public boolean mouseClicked(double mouseX, double mouseY, int delta) {
 		list.select(this);
-		if (ModMenuConfig.QUICK_CONFIGURE.getValue() && this.list.getParent()
+		if (ModMenuConfig.quick_configure && this.list.getParent()
 			.getModHasConfigScreen()
 			.get(this.mod.getId())) {
-			int iconSize = ModMenuConfig.COMPACT_LIST.getValue() ? COMPACT_ICON_SIZE : FULL_ICON_SIZE;
+			int iconSize = ModMenuConfig.compact_list ? COMPACT_ICON_SIZE : FULL_ICON_SIZE;
 			if (mouseX - list.getRowLeft() <= iconSize) {
 				this.openConfig();
 			} else if (Util.getMillis() - this.sinceLastClick < 250) {

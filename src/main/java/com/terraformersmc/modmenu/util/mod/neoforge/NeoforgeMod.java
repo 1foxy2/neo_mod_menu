@@ -3,14 +3,11 @@ package com.terraformersmc.modmenu.util.mod.neoforge;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.terraformersmc.modmenu.ModMenu;
-import com.terraformersmc.modmenu.api.UpdateChecker;
-import com.terraformersmc.modmenu.api.UpdateInfo;
 import com.terraformersmc.modmenu.config.ModMenuConfig;
 import com.terraformersmc.modmenu.util.VersionUtil;
 import com.terraformersmc.modmenu.util.mod.Mod;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.client.resources.language.I18n;
-import net.minecraft.util.Tuple;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.ModList;
 import net.neoforged.fml.loading.moddiscovery.ModFileInfo;
@@ -20,7 +17,6 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.awt.*;
 import java.io.IOException;
 import java.util.*;
 import java.util.List;
@@ -36,9 +32,6 @@ public class NeoforgeMod implements Mod {
 	protected final Set<Badge> badges;
 
 	protected final Map<String, String> links = new HashMap<>();
-
-	protected @Nullable UpdateChecker updateChecker = null;
-	protected @Nullable UpdateInfo updateInfo = null;
 
 	protected boolean defaultIconWarning = true;
 
@@ -379,39 +372,6 @@ public class NeoforgeMod implements Mod {
 		return true;
 	}
 
-	@Override
-	public boolean allowsUpdateChecks() {
-		if (ModMenuConfig.DISABLE_UPDATE_CHECKER.getValue().contains(this.getId())) {
-			return false;
-		}
-
-		return this.allowsUpdateChecks;
-	}
-
-	@Override
-	public @Nullable UpdateChecker getUpdateChecker() {
-		return updateChecker;
-	}
-
-	@Override
-	public void setUpdateChecker(@Nullable UpdateChecker updateChecker) {
-		this.updateChecker = updateChecker;
-	}
-
-	@Override
-	public @Nullable UpdateInfo getUpdateInfo() {
-		return updateInfo;
-	}
-
-	@Override
-	public void setUpdateInfo(@Nullable UpdateInfo updateInfo) {
-		this.updateInfo = updateInfo;
-		String parent = getParent();
-		if (parent != null && updateInfo != null && updateInfo.isUpdateAvailable()) {
-			ModMenu.MODS.get(parent).setChildHasUpdate();
-		}
-	}
-
 	public ModMenuData getModMenuData() {
 		return modMenuData;
 	}
@@ -444,7 +404,7 @@ public class NeoforgeMod implements Mod {
 
 	@Override
 	public boolean isHidden() {
-		return ModMenuConfig.HIDDEN_MODS.getValue().contains(this.getId());
+		return ModMenuConfig.hidden_mods.contains(this.getId());
 	}
 
 	static class ModMenuData {

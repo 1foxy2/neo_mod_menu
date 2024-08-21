@@ -2,7 +2,6 @@ package disabled.quilt;
 
 import com.google.common.collect.Lists;
 import com.google.common.hash.Hashing;
-import com.terraformersmc.modmenu.util.UpdateCheckerUtil;
 import disabled.fabric.FabricMod;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

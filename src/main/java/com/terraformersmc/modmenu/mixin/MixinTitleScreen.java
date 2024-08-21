@@ -10,9 +10,9 @@ import org.spongepowered.asm.mixin.injection.ModifyArg;
 public class MixinTitleScreen {
 	@ModifyArg(at = @At(value = "INVOKE", target = "Lcom/mojang/realmsclient/gui/screens/RealmsNotificationsScreen;init(Lnet/minecraft/client/Minecraft;II)V"), method = "init", index = 2)
 	private int adjustRealmsHeight(int height) {
-		if (ModMenuConfig.MODIFY_TITLE_SCREEN.getValue() && ModMenuConfig.MODS_BUTTON_STYLE.getValue() == ModMenuConfig.TitleMenuButtonStyle.CLASSIC) {
+		if (ModMenuConfig.modify_title_screen && ModMenuConfig.mods_button_style == ModMenuConfig.TitleMenuButtonStyle.CLASSIC) {
 			return height;
-		} else if (ModMenuConfig.MODS_BUTTON_STYLE.getValue() == ModMenuConfig.TitleMenuButtonStyle.REPLACE_REALMS || ModMenuConfig.MODS_BUTTON_STYLE.getValue() == ModMenuConfig.TitleMenuButtonStyle.SHRINK) {
+		} else if (ModMenuConfig.mods_button_style == ModMenuConfig.TitleMenuButtonStyle.REPLACE_REALMS || ModMenuConfig.mods_button_style == ModMenuConfig.TitleMenuButtonStyle.SHRINK) {
 			return -99999;
 		}
 		return height + 51;
