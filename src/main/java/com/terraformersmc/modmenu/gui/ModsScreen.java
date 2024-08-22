@@ -4,6 +4,7 @@ import com.google.common.base.Joiner;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.terraformersmc.modmenu.ModMenu;
 import com.terraformersmc.modmenu.config.ModMenuConfig;
+import com.terraformersmc.modmenu.event.ModMenuEventHandler;
 import com.terraformersmc.modmenu.gui.widget.DescriptionListWidget;
 import com.terraformersmc.modmenu.gui.widget.LegacyTexturedButtonWidget;
 import com.terraformersmc.modmenu.gui.widget.ModListWidget;
@@ -160,7 +161,7 @@ public class ModsScreen extends Screen {
 		});
 
 		// Filters button
-		Component sortingText = Component.translatable(ModMenu.MOD_ID + ".configuration." + ModMenuConfig.SORTING.getPath().getFirst()) ;
+		Component sortingText = ModMenu.getSortingComponent();
 		Component librariesText = ModMenu.getLibrariesComponent();
 
 		int sortingWidth = font.width(sortingText) + 20;
@@ -190,14 +191,14 @@ public class ModsScreen extends Screen {
 		this.sortingButton = Button.builder(sortingText, button -> {
 			ModMenuConfig.sorting.cycleValue();
 			modList.reloadFilters();
-			button.setMessage(Component.translatable(ModMenu.MOD_ID + ".configuration." + ModMenuConfig.SORTING.getPath().getFirst()));
+			ModMenuConfig.SPEC.save();
+			button.setMessage(ModMenu.getSortingComponent());
 		}).pos(this.filtersX, 45).size(sortingWidth, 20).build();
 
 		// Show libraries button
 		this.librariesButton = Button.builder(librariesText, button -> {
-			ModMenuConfig.show_libraries = !ModMenuConfig.show_libraries;
+			ModMenuConfig.SHOW_LIBRARIES.set(!ModMenuConfig.SHOW_LIBRARIES.get());
 			modList.reloadFilters();
-
 			button.setMessage(ModMenu.getLibrariesComponent());
 		}).pos(this.filtersX + sortingWidth + 2, 45).size(librariesWidth, 20).build();
 

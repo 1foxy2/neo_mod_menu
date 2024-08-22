@@ -9,6 +9,7 @@ import com.terraformersmc.modmenu.util.EnumToLowerCaseJsonConverter;
 import com.terraformersmc.modmenu.util.ModMenuScreenTexts;
 import com.terraformersmc.modmenu.util.mod.Mod;
 import com.terraformersmc.modmenu.util.mod.fabric.FabricMod;
+import com.terraformersmc.modmenu.util.mod.java.JavaDummyMod;
 import com.terraformersmc.modmenu.util.mod.neoforge.NeoforgeDummyParentMod;
 import com.terraformersmc.modmenu.util.mod.neoforge.NeoforgeMod;
 import net.minecraft.client.Minecraft;
@@ -24,6 +25,9 @@ import net.neoforged.fml.ModList;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.fml.loading.FMLEnvironment;
+import net.neoforged.fml.loading.moddiscovery.ModFileInfo;
+import net.neoforged.fml.loading.moddiscovery.ModInfo;
+import net.neoforged.fml.mclanguageprovider.MinecraftModContainer;
 import net.neoforged.neoforge.client.gui.ConfigurationScreen;
 import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 import org.slf4j.Logger;
@@ -46,6 +50,9 @@ public class ModMenu {
 	public static final Component LIBRARIES = Component.translatable(MOD_ID + ".configuration.show_libraries");
 	public static final Component SHOWN_LIBRARIES = Component.translatable( MOD_ID + ".configuration.show_libraries.true");
 	public static final Component HIDDEN_LIBRARIES = Component.translatable(MOD_ID + ".configuration.show_libraries.false");
+	public static final Component SORTING = Component.translatable(MOD_ID + ".configuration.sorting");
+	public static final Component ASCENDING = Component.translatable(MOD_ID + ".configuration.sorting.ascending");
+	public static final Component DESCENDING = Component.translatable(MOD_ID + ".configuration.sorting.descending");
 
 	static {
 		GsonBuilder builder = new GsonBuilder().registerTypeHierarchyAdapter(Enum.class,
@@ -91,34 +98,14 @@ public class ModMenu {
 		container.registerConfig(ModConfig.Type.CLIENT, ModMenuConfig.SPEC);
 		container.registerExtensionPoint(IConfigScreenFactory.class, ConfigurationScreen::new);
 
-		// Ignore deprecations, they're from Quilt Loader being in the dev env
-		/*FabricLoader.getInstance().getEntrypointContainers("modmenu", ModMenuApi.class).forEach(entrypoint -> {
-			//noinspection deprecation
-			ModMetadata metadata = entrypoint.getProvider().getMetadata();
-			String modId = metadata.getId();
-			try {
-				ModMenuApi api = entrypoint.getEntrypoint();
-				configScreenFactories.put(modId, api.getModConfigScreenFactory());
-				apiImplementations.add(api);
-				updateCheckers.put(modId, api.getUpdateChecker());
-				providedUpdateCheckers.putAll(api.getProvidedUpdateCheckers());
-				api.attachModpackBadges(modpackMods::add);
-			} catch (Throwable e) {
-				LOGGER.error("Mod {} provides a broken implementation of ModMenuApi", modId, e);
-			}
-		});*/
-
 		// Fill mods map
 		for (ModContainer modContainer : ModList.get().getSortedMods()) {
 			Mod mod;
 
-			LOGGER.info("has connector: " + HAS_SINYTRA);
 			if (HAS_SINYTRA && FabricMod.isFabricMod(modContainer.getModId())) {
-				mod = new FabricMod(modContainer.getModId(), modpackMods);
-				LOGGER.info("fabric mod: " + mod.getId());
+				mod = new FabricMod(modContainer.getModId());
 			} else {
-				mod = new NeoforgeMod(modContainer, modpackMods);
-				LOGGER.info("neoforge mod: " + mod.getId());
+				mod = new NeoforgeMod(modContainer);
 			}
 
 			/*var updateChecker = updateCheckers.get(mod.getId());
@@ -152,6 +139,7 @@ public class ModMenu {
 				ROOT_MODS.put(mod.getId(), mod);
 			}
 		}
+		MODS.put("java", new JavaDummyMod());
 		MODS.putAll(dummyParents);
 	}
 
@@ -160,34 +148,16 @@ public class ModMenu {
 	}
 
 	public static Component getLibrariesComponent() {
-		return CommonComponents.optionNameValue(LIBRARIES, ModMenuConfig.show_libraries ? SHOWN_LIBRARIES : HIDDEN_LIBRARIES);
+		return CommonComponents.optionNameValue(LIBRARIES, ModMenuConfig.SHOW_LIBRARIES.get() ? SHOWN_LIBRARIES : HIDDEN_LIBRARIES);
+	}
+
+	public static Component getSortingComponent() {
+		return CommonComponents.optionNameValue(SORTING, ModMenuConfig.sorting == ModMenuConfig.Sorting.ASCENDING ? ASCENDING : DESCENDING);
 	}
 
 	public void onClientSetup(FMLClientSetupEvent event) {
 		ModList.get().getMods().forEach(info -> IConfigScreenFactory.getForMod(info).ifPresent(
 				factory -> configScreenFactories.put(info.getModId(), factory)));
-	}
-
-	public static boolean areModUpdatesAvailable() {
-		/*if (!ModMenuConfig.UPDATE_CHECKER.getValue()) {
-			return false;
-		}
-
-		for (Mod mod : MODS.values()) {
-			if (mod.isHidden()) {
-				continue;
-			}
-
-			if (!ModMenuConfig.show_libraries && mod.getBadges().contains(Mod.Badge.LIBRARY)) {
-				continue;
-			}
-
-			if (mod.hasUpdate() || mod.getChildHasUpdate()) {
-				return true; // At least one currently visible mod has an update
-			}
-		}*/
-
-		return false;
 	}
 
 	public static String getDisplayedModCount() {

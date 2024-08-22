@@ -104,10 +104,6 @@ public interface Mod {
 
 	boolean isReal();
 
-	default @Nullable String getSha512Hash() throws IOException {
-		return null;
-	}
-
 	void setChildHasUpdate();
 
 	boolean getChildHasUpdate();

@@ -21,7 +21,7 @@ import java.io.IOException;
 import java.util.*;
 
 public class NeoforgeMod implements Mod {
-	private static final Logger LOGGER = LoggerFactory.getLogger("Mod Menu | FabricMod");
+	private static final Logger LOGGER = LoggerFactory.getLogger("Mod Menu | NeoforgeMod");
 
 	protected final ModContainer container;
 	protected final IModInfo modInfo;
@@ -38,7 +38,7 @@ public class NeoforgeMod implements Mod {
 
 	protected boolean childHasUpdate = false;
 
-	public NeoforgeMod(ModContainer modContainer, Set<String> modpackMods) {
+	public NeoforgeMod(ModContainer modContainer) {
 		this.container = modContainer;
 		this.modInfo = modContainer.getModInfo();
 
@@ -101,12 +101,6 @@ public class NeoforgeMod implements Mod {
 			}
 			modMenuData.getBadges().add(Badge.LIBRARY);
 		}
-		/*if (id.startsWith("fabric") && (id.equals("fabricloader") || modInfo.getProvides()
-				.contains("fabricloader") || id.equals("fabric") || id.equals("fabric-api") || modInfo.getProvides()
-				.contains("fabric") || modInfo.getProvides()
-				.contains("fabric-api") || id.equals("fabric-language-kotlin"))) {
-			modMenuData.badges.add(Badge.LIBRARY);
-		}*/
 
 		/* Add additional badges */
 		this.badges = modMenuData.getBadges();
@@ -115,12 +109,6 @@ public class NeoforgeMod implements Mod {
 		}*/
 		if ("java".equals(id)) {
 			badges.add(Badge.LIBRARY);
-		}
-		/*if ("deprecated".equals(CustomValueUtil.getString("fabric-api:module-lifecycle", modInfo).orElse(null))) {
-			badges.add(Badge.DEPRECATED);
-		}*/
-		if (modpackMods.contains(getId())) {
-			badges.add(Badge.MODPACK);
 		}
 		if ("minecraft".equals(getId())) {
 			badges.add(Badge.MINECRAFT);
@@ -301,22 +289,6 @@ public class NeoforgeMod implements Mod {
 
 	public ModMenuData getModMenuData() {
 		return modMenuData;
-	}
-
-	public @Nullable String getSha512Hash() throws IOException {
-		/*if (container.getContainingMod().isEmpty() && container.getOrigin().getKind() == ModOrigin.Kind.PATH) {
-			List<Path> paths = container.getOrigin().getPaths();
-			var fileOptional = paths.stream()
-				.filter(path -> path.toString().toLowerCase(Locale.ROOT).endsWith(".jar"))
-				.findFirst();
-			if (fileOptional.isPresent()) {
-				var file = fileOptional.get().toFile();
-				if (file.isFile()) {
-					return Files.asByteSource(file).hash(Hashing.sha512()).toString();
-				}
-			} not sure what it does
-		}*/
-		return null;
 	}
 
 	@Override

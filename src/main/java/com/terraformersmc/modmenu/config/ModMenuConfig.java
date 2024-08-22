@@ -182,8 +182,8 @@ public class ModMenuConfig {
             return comparator;
         }
 
-        public Sorting cycleValue() {
-            return values()[ordinal() + 1 == values().length ? 0 : ordinal() + 1];
+        public void cycleValue() {
+            ModMenuConfig.sorting = values()[ordinal() + 1 == values().length ? 0 : ordinal() + 1];
         }
     }
 

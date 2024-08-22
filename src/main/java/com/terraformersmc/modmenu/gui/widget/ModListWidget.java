@@ -127,7 +127,7 @@ public class ModListWidget extends ObjectSelectionList<ModListEntry> implements 
 
 	private boolean hasVisibleChildMods(Mod parent) {
 		List<Mod> children = ModMenu.PARENT_MAP.get(parent);
-		boolean hideLibraries = !ModMenuConfig.show_libraries;
+		boolean hideLibraries = !ModMenuConfig.SHOW_LIBRARIES.get();
 
 		return !children.stream()
 			.allMatch(child -> child.isHidden() || hideLibraries && child.getBadges().contains(Mod.Badge.LIBRARY));
@@ -165,7 +165,7 @@ public class ModListWidget extends ObjectSelectionList<ModListEntry> implements 
 			String modId = mod.getId();
 
 			//Hide parent lib mods when the config is set to hide
-			if (mod.getBadges().contains(Mod.Badge.LIBRARY) && !ModMenuConfig.show_libraries) {
+			if (mod.getBadges().contains(Mod.Badge.LIBRARY) && !ModMenuConfig.SHOW_LIBRARIES.get()) {
 				continue;
 			}
 

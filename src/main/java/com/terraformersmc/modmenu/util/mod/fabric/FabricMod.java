@@ -1,23 +1,18 @@
 package com.terraformersmc.modmenu.util.mod.fabric;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.common.hash.Hashing;
 import com.google.common.io.Files;
 import com.terraformersmc.modmenu.ModMenu;
 import com.terraformersmc.modmenu.config.ModMenuConfig;
-import com.terraformersmc.modmenu.util.OptionalUtil;
 import com.terraformersmc.modmenu.util.VersionUtil;
 import com.terraformersmc.modmenu.util.mod.Mod;
 import com.terraformersmc.modmenu.util.mod.neoforge.NeoforgeIconHandler;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
 import net.fabricmc.loader.api.metadata.*;
-import net.fabricmc.loader.impl.FMLModMetadata;
 import net.minecraft.client.renderer.texture.DynamicTexture;
-import net.minecraft.client.resources.language.I18n;
 import net.neoforged.fml.ModList;
-import net.neoforged.fml.loading.FMLPaths;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -46,15 +41,11 @@ public class FabricMod implements Mod {
 
 	protected boolean childHasUpdate = false;
 
-	public FabricMod(String modId, Set<String> modpackMods) {
+	public FabricMod(String modId) {
 		this.container = FabricLoader.getInstance().getModContainer(modId).get();
 		this.metadata = container.getMetadata();
 
 		String id = metadata.getId();
-
-		if ("minecraft".equals(id) || "java".equals(id)) {
-			allowsUpdateChecks = false;
-		}
 
 		/* Load modern mod menu custom value data */
 		Optional<String> parentId = Optional.empty();
@@ -95,15 +86,6 @@ public class FabricMod implements Mod {
 		this.modMenuData = new ModMenuData(badgeNames, parentId, parentData, id);
 
 		/* Hardcode parents and badges for Fabric API & Fabric Loader */
-		if (id.startsWith("fabric") && metadata.containsCustomValue("fabric-api:module-lifecycle")) {
-			if (FabricLoader.getInstance().isModLoaded("fabric-api") || !FabricLoader.getInstance()
-				.isModLoaded("fabric")) {
-				modMenuData.fillParentIfEmpty("fabric-api");
-			} else {
-				modMenuData.fillParentIfEmpty("fabric");
-			}
-			modMenuData.getBadges().add(Badge.LIBRARY);
-		}
 		if (id.startsWith("fabric") && (id.equals("fabricloader") || metadata.getProvides()
 			.contains("fabricloader") || id.equals("fabric") || id.equals("fabric-api") || metadata.getProvides()
 			.contains("fabric") || metadata.getProvides()
@@ -116,23 +98,8 @@ public class FabricMod implements Mod {
 		if (this.metadata.getEnvironment() == ModEnvironment.CLIENT) {
 			badges.add(Badge.CLIENT);
 		}
-		if (OptionalUtil.isPresentAndTrue(CustomValueUtil.getBoolean(
-			"fabric-loom:generated",
-			metadata
-		)) || "java".equals(id)) {
-			badges.add(Badge.LIBRARY);
-		}
-		if ("deprecated".equals(CustomValueUtil.getString("fabric-api:module-lifecycle", metadata).orElse(null))) {
-			badges.add(Badge.DEPRECATED);
-		}
 		if (metadata.containsCustomValue("patchwork:patcherMeta")) {
 			badges.add(Badge.PATCHWORK_FORGE);
-		}
-		if (modpackMods.contains(getId()) && !"builtin".equals(this.metadata.getType())) {
-			badges.add(Badge.MODPACK);
-		}
-		if ("minecraft".equals(getId())) {
-			badges.add(Badge.MINECRAFT);
 		}
 	}
 
@@ -154,13 +121,7 @@ public class FabricMod implements Mod {
 	public @NotNull DynamicTexture getIcon(NeoforgeIconHandler iconHandler, int i) {
 		String iconSourceId = getId();
 		String iconPath = metadata.getIconPath(i).orElse("assets/" + getId() + "/icon.png");
-		if ("minecraft".equals(getId())) {
-			iconSourceId = ModMenu.MOD_ID;
-			iconPath = "assets/" + ModMenu.MOD_ID + "/minecraft_icon.png";
-		} else if ("java".equals(getId())) {
-			iconSourceId = ModMenu.MOD_ID;
-			iconPath = "assets/" + ModMenu.MOD_ID + "/java_icon.png";
-		}
+
 		final String finalIconSourceId = iconSourceId;
 		net.neoforged.fml.ModContainer iconSource = ModList.get()
 				.getModContainerById(iconSourceId)
@@ -189,17 +150,12 @@ public class FabricMod implements Mod {
 	@Override
 	public @NotNull String getTranslatedDescription() {
 		var description = Mod.super.getTranslatedDescription();
-		if (getId().equals("java")) {
-			description = description + "\n" + I18n.get("modmenu.javaDistributionName", getName());
-		}
+
 		return description;
 	}
 
 	@Override
 	public @NotNull String getVersion() {
-		if ("java".equals(getId())) {
-			return System.getProperty("java.version");
-		}
 		return metadata.getVersion().getFriendlyString();
 	}
 
@@ -210,13 +166,7 @@ public class FabricMod implements Mod {
 	@Override
 	public @NotNull List<String> getAuthors() {
 		List<String> authors = metadata.getAuthors().stream().map(Person::getName).collect(Collectors.toList());
-		if (authors.isEmpty()) {
-			if ("minecraft".equals(getId())) {
-				return Lists.newArrayList("Mojang Studios");
-			} else if ("java".equals(getId())) {
-				return Lists.newArrayList(System.getProperty("java.vendor"));
-			}
-		}
+
 		return authors;
 	}
 
@@ -259,19 +209,11 @@ public class FabricMod implements Mod {
 
 	@Override
 	public @Nullable String getWebsite() {
-		if ("minecraft".equals(getId())) {
-			return "https://www.minecraft.net/";
-		} else if ("java".equals(getId())) {
-			return System.getProperty("java.vendor.url");
-		}
 		return metadata.getContact().get("homepage").orElse(null);
 	}
 
 	@Override
 	public @Nullable String getIssueTracker() {
-		if ("minecraft".equals(getId())) {
-			return "https://aka.ms/snapshotbugs?ref=game";
-		}
 		return metadata.getContact().get("issues").orElse(null);
 	}
 
@@ -287,9 +229,6 @@ public class FabricMod implements Mod {
 
 	@Override
 	public @NotNull Set<String> getLicense() {
-		if ("minecraft".equals(getId())) {
-			return Sets.newHashSet("Minecraft EULA");
-		}
 		return Sets.newHashSet(metadata.getLicense());
 	}
 
@@ -306,22 +245,6 @@ public class FabricMod implements Mod {
 
 	public ModMenuData getModMenuData() {
 		return modMenuData;
-	}
-
-	public @Nullable String getSha512Hash() throws IOException {
-		if (container.getContainingMod().isEmpty() && container.getOrigin().getKind() == ModOrigin.Kind.PATH) {
-			List<Path> paths = container.getOrigin().getPaths();
-			var fileOptional = paths.stream()
-				.filter(path -> path.toString().toLowerCase(Locale.ROOT).endsWith(".jar"))
-				.findFirst();
-			if (fileOptional.isPresent()) {
-				var file = fileOptional.get().toFile();
-				if (file.isFile()) {
-					return Files.asByteSource(file).hash(Hashing.sha512()).toString();
-				}
-			}
-		}
-		return null;
 	}
 
 	@Override
