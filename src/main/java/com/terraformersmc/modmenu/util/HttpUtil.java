@@ -26,7 +26,7 @@ public class HttpUtil {
 
 	private static String buildUserAgent() {
 		String env = ModMenu.DEV_ENVIRONMENT ? "/development" : "";
-		String loader = ModMenu.RUNNING_QUILT ? "quilt" : "fabric";
+		String loader = ModMenu.HAS_SINYTRA ? "quilt" : "fabric";
 
 		var modMenuVersion = getModMenuVersion();
 		var minecraftVersion = SharedConstants.getCurrentVersion().getName();

@@ -19,7 +19,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.*;
-import java.util.List;
 
 public class NeoforgeMod implements Mod {
 	private static final Logger LOGGER = LoggerFactory.getLogger("Mod Menu | FabricMod");
@@ -81,12 +80,15 @@ public class NeoforgeMod implements Mod {
 					LOGGER.error("Error loading parent data from mod: " + id, t);
 				}
 			}
-			List<String> badges = Optional.of((ArrayList<String>) modMenuMap.get("badges")).orElse(new ArrayList<>());
 
-			badgeNames.addAll(badges);
-			if (modMenuMap.get("links") instanceof HashMap<?,?> map) links.putAll((Map<String, String>) map);
+			if (modMenuMap.get("badges") instanceof ArrayList<?> list) badgeNames.addAll((List<String>) list);
 
-			if (modMenuMap.get("update_checker") instanceof Boolean bool) allowsUpdateChecks = bool;
+			if (modMenuMap.get("links") instanceof ArrayList<?> list) list.forEach(string -> {
+				 String[] strings =	string.toString().split(":");
+				 links.put(strings[0], strings[1]);
+			});
+
+			//if (modMenuMap.get("update_checker") instanceof Boolean bool) allowsUpdateChecks = bool;
 		}
 		this.modMenuData = new ModMenuData(badgeNames, parentId, parentData, id);
 
@@ -97,7 +99,7 @@ public class NeoforgeMod implements Mod {
 			} else {
 				modMenuData.fillParentIfEmpty("fabric");
 			}
-			modMenuData.badges.add(Badge.LIBRARY);
+			modMenuData.getBadges().add(Badge.LIBRARY);
 		}
 		/*if (id.startsWith("fabric") && (id.equals("fabricloader") || modInfo.getProvides()
 				.contains("fabricloader") || id.equals("fabric") || id.equals("fabric-api") || modInfo.getProvides()
@@ -107,7 +109,7 @@ public class NeoforgeMod implements Mod {
 		}*/
 
 		/* Add additional badges */
-		this.badges = modMenuData.badges;
+		this.badges = modMenuData.getBadges();
 	/*	if (this.modInfo.getEnvironment() == ModEnvironment.CLIENT) { not sure how to check that
 			badges.add(Badge.CLIENT);
 		}*/
@@ -123,82 +125,6 @@ public class NeoforgeMod implements Mod {
 		if ("minecraft".equals(getId())) {
 			badges.add(Badge.MINECRAFT);
 		}
-
-
-/* 		CustomValue modMenuValue = modInfo.getCustomValue("modmenu");
-		if (modMenuValue != null && modMenuValue.getType() == CustomValue.CvType.OBJECT) {
-			CustomValue.CvObject modMenuObject = modMenuValue.getAsObject();
-			CustomValue parentCv = modMenuObject.get("parent");
-			if (parentCv != null) {
-				if (parentCv.getType() == CustomValue.CvType.STRING) {
-					parentId = Optional.of(parentCv.getAsString());
-				} else if (parentCv.getType() == CustomValue.CvType.OBJECT) {
-					try {
-						CustomValue.CvObject parentObj = parentCv.getAsObject();
-						parentId = CustomValueUtil.getString("id", parentObj);
-						parentData = new ModMenuData.DummyParentData(
-							parentId.orElseThrow(() -> new RuntimeException("Parent object lacks an id")),
-							CustomValueUtil.getString("name", parentObj),
-							CustomValueUtil.getString("description", parentObj),
-							CustomValueUtil.getString("icon", parentObj),
-							CustomValueUtil.getStringSet("badges", parentObj).orElse(new HashSet<>())
-						);
-						if (parentId.orElse("").equals(id)) {
-							parentId = Optional.empty();
-							parentData = null;
-							throw new RuntimeException("Mod declared itself as its own parent");
-						}
-					} catch (Throwable t) {
-						LOGGER.error("Error loading parent data from mod: " + id, t);
-					}
-				}
-			}
-			badgeNames.addAll(CustomValueUtil.getStringSet("badges", modMenuObject).orElse(new HashSet<>()));
-			links.putAll(CustomValueUtil.getStringMap("links", modMenuObject).orElse(new HashMap<>()));
-			allowsUpdateChecks = CustomValueUtil.getBoolean("update_checker", modMenuObject).orElse(true);
-		//}
-		//this.modMenuData = new ModMenuData(badgeNames, parentId, parentData, id);
-
-	    //Hardcode parents and badges for Fabric API & Fabric Loader
-		if (id.startsWith("fabric") && modInfo.containsCustomValue("fabric-api:module-lifecycle")) {
-			if (FabricLoader.getInstance().isModLoaded("fabric-api") || !FabricLoader.getInstance()
-				.isModLoaded("fabric")) {
-				modMenuData.fillParentIfEmpty("fabric-api");
-			} else {
-				modMenuData.fillParentIfEmpty("fabric");
-			}
-			modMenuData.badges.add(Badge.LIBRARY);
-		}
-		if (id.startsWith("fabric") && (id.equals("fabricloader") || modInfo.getProvides()
-			.contains("fabricloader") || id.equals("fabric") || id.equals("fabric-api") || modInfo.getProvides()
-			.contains("fabric") || modInfo.getProvides()
-			.contains("fabric-api") || id.equals("fabric-language-kotlin"))) {
-			modMenuData.badges.add(Badge.LIBRARY);
-		}*/
-
-		/* Add additional badges */
-	/*	this.badges = modMenuData.badges;
-		if (this.modInfo.getEnvironment() == ModEnvironment.CLIENT) {
-			badges.add(Badge.CLIENT);
-		}
-		if (OptionalUtil.isPresentAndTrue(CustomValueUtil.getBoolean(
-			"fabric-loom:generated",
-				modInfo
-		)) || "java".equals(id)) {
-			badges.add(Badge.LIBRARY);
-		}
-		if ("deprecated".equals(CustomValueUtil.getString("fabric-api:module-lifecycle", modInfo).orElse(null))) {
-			badges.add(Badge.DEPRECATED);
-		}
-		if (modInfo.containsCustomValue("patchwork:patcherMeta")) {
-			badges.add(Badge.PATCHWORK_FORGE);
-		}
-		if (modpackMods.contains(getId()) && !"builtin".equals(this.modInfo.getType())) {
-			badges.add(Badge.MODPACK);
-		}
-		if ("minecraft".equals(getId())) {
-			badges.add(Badge.MINECRAFT);
-		}*/
 	}
 
 	public @NotNull ModContainer getContainer() {
@@ -268,7 +194,8 @@ public class NeoforgeMod implements Mod {
 		if ("java".equals(getId())) {
 			return System.getProperty("java.version");
 		}
-		return "sd";//modInfo.getVersion().getQualifier();
+
+		return modInfo.getVersion().toString();
 	}
 
 	public @NotNull String getPrefixedVersion() {
@@ -351,7 +278,7 @@ public class NeoforgeMod implements Mod {
 
 	@Override
 	public @Nullable String getParent() {
-		return modMenuData.parent.orElse(null);
+		return modMenuData.getParent().orElse(null);
 	}
 
 	@Override
@@ -405,90 +332,5 @@ public class NeoforgeMod implements Mod {
 	@Override
 	public boolean isHidden() {
 		return ModMenuConfig.hidden_mods.contains(this.getId());
-	}
-
-	static class ModMenuData {
-		private final Set<Badge> badges;
-		private Optional<String> parent;
-		private @Nullable
-		final DummyParentData dummyParentData;
-
-		public ModMenuData(Set<String> badges, Optional<String> parent, DummyParentData dummyParentData, String id) {
-			this.badges = Badge.convert(badges, id);
-			this.parent = parent;
-			this.dummyParentData = dummyParentData;
-		}
-
-		public Set<Badge> getBadges() {
-			return badges;
-		}
-
-		public Optional<String> getParent() {
-			return parent;
-		}
-
-		public @Nullable DummyParentData getDummyParentData() {
-			return dummyParentData;
-		}
-
-		public void addClientBadge(boolean add) {
-			if (add) {
-				badges.add(Badge.CLIENT);
-			}
-		}
-
-		public void addLibraryBadge(boolean add) {
-			if (add) {
-				badges.add(Badge.LIBRARY);
-			}
-		}
-
-		public void fillParentIfEmpty(String parent) {
-			if (!this.parent.isPresent()) {
-				this.parent = Optional.of(parent);
-			}
-		}
-
-		public static class DummyParentData {
-			private final String id;
-			private final Optional<String> name;
-			private final Optional<String> description;
-			private final Optional<String> icon;
-			private final Set<Badge> badges;
-
-			public DummyParentData(
-				String id,
-				Optional<String> name,
-				Optional<String> description,
-				Optional<String> icon,
-				Set<String> badges
-			) {
-				this.id = id;
-				this.name = name;
-				this.description = description;
-				this.icon = icon;
-				this.badges = Badge.convert(badges, id);
-			}
-
-			public String getId() {
-				return id;
-			}
-
-			public Optional<String> getName() {
-				return name;
-			}
-
-			public Optional<String> getDescription() {
-				return description;
-			}
-
-			public Optional<String> getIcon() {
-				return icon;
-			}
-
-			public Set<Badge> getBadges() {
-				return badges;
-			}
-		}
 	}
 }

@@ -4,6 +4,7 @@ import com.terraformersmc.modmenu.ModMenu;
 import com.terraformersmc.modmenu.TextPlaceholderApiCompat;
 import com.terraformersmc.modmenu.config.ModMenuConfig;
 import com.terraformersmc.modmenu.util.mod.neoforge.NeoforgeIconHandler;
+import com.terraformersmc.modmenu.util.mod.neoforge.NeoforgeMod;
 import eu.pb4.placeholders.api.ParserContext;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.client.resources.language.I18n;
@@ -113,6 +114,8 @@ public interface Mod {
 
 	boolean isHidden();
 
+	public ModMenuData getModMenuData();
+
 	enum Badge {
 		LIBRARY("modmenu.badge.library", 0xff107454, 0xff093929, "library"), CLIENT("modmenu.badge.clientsideOnly",
 			0xff2b4b7c,
@@ -165,6 +168,91 @@ public interface Mod {
 
 		static {
 			Arrays.stream(values()).forEach(badge -> KEY_MAP.put(badge.key, badge));
+		}
+	}
+
+	static class ModMenuData {
+		private final Set<Badge> badges;
+		private Optional<String> parent;
+		private @Nullable
+		final DummyParentData dummyParentData;
+
+		public ModMenuData(Set<String> badges, Optional<String> parent, DummyParentData dummyParentData, String id) {
+			this.badges = Badge.convert(badges, id);
+			this.parent = parent;
+			this.dummyParentData = dummyParentData;
+		}
+
+		public Set<Badge> getBadges() {
+			return badges;
+		}
+
+		public Optional<String> getParent() {
+			return parent;
+		}
+
+		public @Nullable DummyParentData getDummyParentData() {
+			return dummyParentData;
+		}
+
+		public void addClientBadge(boolean add) {
+			if (add) {
+				badges.add(Badge.CLIENT);
+			}
+		}
+
+		public void addLibraryBadge(boolean add) {
+			if (add) {
+				badges.add(Badge.LIBRARY);
+			}
+		}
+
+		public void fillParentIfEmpty(String parent) {
+			if (!this.parent.isPresent()) {
+				this.parent = Optional.of(parent);
+			}
+		}
+
+		public static class DummyParentData {
+			private final String id;
+			private final Optional<String> name;
+			private final Optional<String> description;
+			private final Optional<String> icon;
+			private final Set<Badge> badges;
+
+			public DummyParentData(
+					String id,
+					Optional<String> name,
+					Optional<String> description,
+					Optional<String> icon,
+					Set<String> badges
+			) {
+				this.id = id;
+				this.name = name;
+				this.description = description;
+				this.icon = icon;
+				this.badges = Badge.convert(badges, id);
+			}
+
+			public String getId() {
+				return id;
+			}
+
+			public Optional<String> getName() {
+				return name;
+			}
+
+			public Optional<String> getDescription() {
+				return description;
+			}
+
+			public Optional<String> getIcon() {
+				return icon;
+			}
+
+			public Set<Badge> getBadges() {
+				return badges;
+			}
 		}
 	}
 }

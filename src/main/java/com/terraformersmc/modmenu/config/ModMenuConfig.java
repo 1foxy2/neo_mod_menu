@@ -84,9 +84,9 @@ public class ModMenuConfig {
         COUNT_LIBRARIES = BUILDER
                 .define("count_libraries", true);
         COMPACT_LIST = BUILDER
-                .define("count_libraries", false);
+                .define("compact_list", false);
         COUNT_CHILDREN = BUILDER
-                .define("count_libraries", true);
+                .define("count_children", true);
         MODS_BUTTON_STYLE = BUILDER
                 .defineEnum("mods_button_style", TitleMenuButtonStyle.CLASSIC);
         GAME_MENU_BUTTON_STYLE = BUILDER
@@ -125,7 +125,7 @@ public class ModMenuConfig {
         MODIFY_GAME_MENU = BUILDER
                 .define("modify_game_menu", true);
         HIDE_CONFIG_BUTTONS = BUILDER
-                .define("modify_game_menu", false);
+                .define("hide_config_buttons", false);
         CONFIG_MODE = BUILDER
                 .define("config_mode", false);
         DISABLE_DRAG_AND_DROP = BUILDER

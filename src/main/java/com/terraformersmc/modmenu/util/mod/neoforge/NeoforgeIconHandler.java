@@ -73,10 +73,4 @@ public class NeoforgeIconHandler implements Closeable {
 	void cacheModIcon(Path path, DynamicTexture tex) {
 		modIconCache.put(path, tex);
 	}
-
-	private Dimension calculateImageUv(int width, int height) {
-		if (width == height) return new Dimension();
-		if (width < height) return new Dimension(0, height / 2 - width / 2);
-		else return new Dimension(width / 2 - height / 2, 0);
-	}
 }

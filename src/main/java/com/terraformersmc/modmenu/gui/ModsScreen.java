@@ -160,8 +160,8 @@ public class ModsScreen extends Screen {
 		});
 
 		// Filters button
-		Component sortingText = Component.translatable(ModMenu.MOD_ID + "configuration" + ModMenuConfig.SORTING.getPath().getFirst()) ;
-		Component librariesText = Component.translatable(ModMenu.MOD_ID + "configuration" + ModMenuConfig.SHOW_LIBRARIES.getPath().getFirst());
+		Component sortingText = Component.translatable(ModMenu.MOD_ID + ".configuration." + ModMenuConfig.SORTING.getPath().getFirst()) ;
+		Component librariesText = ModMenu.getLibrariesComponent();
 
 		int sortingWidth = font.width(sortingText) + 20;
 		int librariesWidth = font.width(librariesText) + 20;
@@ -190,14 +190,15 @@ public class ModsScreen extends Screen {
 		this.sortingButton = Button.builder(sortingText, button -> {
 			ModMenuConfig.sorting.cycleValue();
 			modList.reloadFilters();
-			button.setMessage(Component.translatable(ModMenu.MOD_ID + "configuration" + ModMenuConfig.SORTING.getPath().getFirst()));
+			button.setMessage(Component.translatable(ModMenu.MOD_ID + ".configuration." + ModMenuConfig.SORTING.getPath().getFirst()));
 		}).pos(this.filtersX, 45).size(sortingWidth, 20).build();
 
 		// Show libraries button
 		this.librariesButton = Button.builder(librariesText, button -> {
 			ModMenuConfig.show_libraries = !ModMenuConfig.show_libraries;
 			modList.reloadFilters();
-			button.setMessage(Component.translatable(ModMenu.MOD_ID + "configuration" + ModMenuConfig.SHOW_LIBRARIES.getPath().getFirst()));
+
+			button.setMessage(ModMenu.getLibrariesComponent());
 		}).pos(this.filtersX + sortingWidth + 2, 45).size(librariesWidth, 20).build();
 
 		// Configure button

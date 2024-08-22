@@ -18,6 +18,11 @@ description='''${mod_description}'''
 [[mixins]]
 config="${mod_id}.mixins.json"
 
+[modproperties.modmenu]
+links=[
+    "modmenu.discord=https://discord.gg/jEGF5fb"
+]
+
 [[dependencies.${mod_id}]] #optional
     modId="neoforge" #mandatory
     type="required" #mandatory
@@ -30,6 +35,13 @@ config="${mod_id}.mixins.json"
     type="required"
     versionRange="${minecraft_version_range}"
     ordering="NONE"
+    side="BOTH"
+
+[[dependencies.${mod_id}]]
+    modId="connector"
+    type="optional"
+    versionRange="[1,)"
+    ordering="AFTER"
     side="BOTH"
 
 # Features are specific properties of the game environment, that you may want to declare you require. This example declares

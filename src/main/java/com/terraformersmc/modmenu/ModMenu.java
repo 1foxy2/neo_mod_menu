@@ -8,12 +8,14 @@ import com.terraformersmc.modmenu.config.ModMenuConfig;
 import com.terraformersmc.modmenu.util.EnumToLowerCaseJsonConverter;
 import com.terraformersmc.modmenu.util.ModMenuScreenTexts;
 import com.terraformersmc.modmenu.util.mod.Mod;
+import com.terraformersmc.modmenu.util.mod.fabric.FabricMod;
 import com.terraformersmc.modmenu.util.mod.neoforge.NeoforgeDummyParentMod;
 import com.terraformersmc.modmenu.util.mod.neoforge.NeoforgeMod;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.options.OptionsScreen;
 import net.minecraft.client.resources.language.I18n;
+import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.neoforged.bus.api.IEventBus;
@@ -41,6 +43,10 @@ public class ModMenu {
 	public static final Gson GSON;
 	public static final Gson GSON_MINIFIED;
 
+	public static final Component LIBRARIES = Component.translatable(MOD_ID + ".configuration.show_libraries");
+	public static final Component SHOWN_LIBRARIES = Component.translatable( MOD_ID + ".configuration.show_libraries.true");
+	public static final Component HIDDEN_LIBRARIES = Component.translatable(MOD_ID + ".configuration.show_libraries.false");
+
 	static {
 		GsonBuilder builder = new GsonBuilder().registerTypeHierarchyAdapter(Enum.class,
 				new EnumToLowerCaseJsonConverter()
@@ -57,7 +63,7 @@ public class ModMenu {
 	private static final Map<String, IConfigScreenFactory> configScreenFactories = new HashMap<>();
 
 	private static int cachedDisplayedModCount = -1;
-	public static final boolean RUNNING_QUILT = false;
+	public static final boolean HAS_SINYTRA = ModList.get().isLoaded("connector");
 	public static final boolean DEV_ENVIRONMENT = !FMLEnvironment.production;
 	public static final boolean TEXT_PLACEHOLDER_COMPAT = ModList.get().isLoaded("placeholder_api");
 
@@ -84,6 +90,7 @@ public class ModMenu {
 
 		container.registerConfig(ModConfig.Type.CLIENT, ModMenuConfig.SPEC);
 		container.registerExtensionPoint(IConfigScreenFactory.class, ConfigurationScreen::new);
+
 		// Ignore deprecations, they're from Quilt Loader being in the dev env
 		/*FabricLoader.getInstance().getEntrypointContainers("modmenu", ModMenuApi.class).forEach(entrypoint -> {
 			//noinspection deprecation
@@ -105,11 +112,13 @@ public class ModMenu {
 		for (ModContainer modContainer : ModList.get().getSortedMods()) {
 			Mod mod;
 
-			if (RUNNING_QUILT) {
-				//mod = new QuiltMod(modContainer, modpackMods);
+			LOGGER.info("has connector: " + HAS_SINYTRA);
+			if (HAS_SINYTRA && FabricMod.isFabricMod(modContainer.getModId())) {
+				mod = new FabricMod(modContainer.getModId(), modpackMods);
+				LOGGER.info("fabric mod: " + mod.getId());
 			} else {
 				mod = new NeoforgeMod(modContainer, modpackMods);
-				//mod = new FabricMod(modContainer, modpackMods);
+				LOGGER.info("neoforge mod: " + mod.getId());
 			}
 
 			/*var updateChecker = updateCheckers.get(mod.getId());
@@ -131,9 +140,12 @@ public class ModMenu {
 				Mod parent = MODS.getOrDefault(parentId, dummyParents.get(parentId));
 				if (parent == null) {
 					if (mod instanceof NeoforgeMod) {
-						parent = new NeoforgeDummyParentMod((NeoforgeMod) mod, parentId);
-						dummyParents.put(parentId, parent);
+						parent = new NeoforgeDummyParentMod(mod, parentId);
 					}
+					if (mod instanceof FabricMod) {
+						parent = new NeoforgeDummyParentMod(mod, parentId);
+					}
+					dummyParents.put(parentId, parent);
 				}
 				PARENT_MAP.put(parent, mod);
 			} else {
@@ -145,6 +157,10 @@ public class ModMenu {
 
 	public static void clearModCountCache() {
 		cachedDisplayedModCount = -1;
+	}
+
+	public static Component getLibrariesComponent() {
+		return CommonComponents.optionNameValue(LIBRARIES, ModMenuConfig.show_libraries ? SHOWN_LIBRARIES : HIDDEN_LIBRARIES);
 	}
 
 	public void onClientSetup(FMLClientSetupEvent event) {

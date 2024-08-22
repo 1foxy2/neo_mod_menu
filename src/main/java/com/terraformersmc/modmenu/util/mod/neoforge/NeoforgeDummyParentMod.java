@@ -10,14 +10,13 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
-import java.util.List;
 
 public class NeoforgeDummyParentMod implements Mod {
 	private final String id;
-	private final NeoforgeMod host;
+	private final Mod host;
 	private boolean childHasUpdate;
 
-	public NeoforgeDummyParentMod(NeoforgeMod host, String id) {
+	public NeoforgeDummyParentMod(Mod host, String id) {
 		this.host = host;
 		this.id = id;
 	}
@@ -174,5 +173,10 @@ public class NeoforgeDummyParentMod implements Mod {
 	@Override
 	public boolean isHidden() {
 		return ModMenuConfig.hidden_mods.contains(this.getId());
+	}
+
+	@Override
+	public ModMenuData getModMenuData() {
+		return host.getModMenuData();
 	}
 }
