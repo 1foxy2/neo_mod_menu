@@ -104,7 +104,7 @@
   "modmenu.descriptionTranslation.java": "Java үтәү мохите.",
   "modmenu.javaDistributionName": "Кабызылган: %s",
   
-  "modmenu.options": "Мод исемлегенең көйләүләре",
+  "modmenu.configuration.title": "Мод исемлегенең көйләүләре",
   "modmenu.configuration.sorting": "Тәртипләү",
   "modmenu.configuration.sorting.ascending": "A-Z",
   "modmenu.configuration.sorting.descending": "Z-A",

@@ -127,7 +127,7 @@ public class ModListWidget extends ObjectSelectionList<ModListEntry> implements 
 
 	private boolean hasVisibleChildMods(Mod parent) {
 		List<Mod> children = ModMenu.PARENT_MAP.get(parent);
-		boolean hideLibraries = !ModMenuConfig.SHOW_LIBRARIES.get();
+		boolean hideLibraries = !ModMenu.getConfig().SHOW_LIBRARIES.get();
 
 		return !children.stream()
 			.allMatch(child -> child.isHidden() || hideLibraries && child.getBadges().contains(Mod.Badge.LIBRARY));
@@ -137,7 +137,7 @@ public class ModListWidget extends ObjectSelectionList<ModListEntry> implements 
 		this.clearEntries();
 		addedMods.clear();
 		Collection<Mod> mods = ModMenu.MODS.values().stream().filter(mod -> {
-			if (ModMenuConfig.config_mode) {
+			if (ModMenu.getConfig().CONFIG_MODE.get()) {
 				Map<String, Boolean> modHasConfigScreen = parent.getModHasConfigScreen();
 				var hasConfig = modHasConfigScreen.get(mod.getId());
 				if (!hasConfig) {
@@ -156,7 +156,7 @@ public class ModListWidget extends ObjectSelectionList<ModListEntry> implements 
 		if (this.mods == null || refresh) {
 			this.mods = new ArrayList<>();
 			this.mods.addAll(mods);
-			this.mods.sort(ModMenuConfig.sorting.getComparator());
+			this.mods.sort(ModMenu.getConfig().SORTING.get().getComparator());
 		}
 
 		List<Mod> matched = ModSearch.search(parent, searchTerm, this.mods);
@@ -165,7 +165,7 @@ public class ModListWidget extends ObjectSelectionList<ModListEntry> implements 
 			String modId = mod.getId();
 
 			//Hide parent lib mods when the config is set to hide
-			if (mod.getBadges().contains(Mod.Badge.LIBRARY) && !ModMenuConfig.SHOW_LIBRARIES.get()) {
+			if (mod.getBadges().contains(Mod.Badge.LIBRARY) && !ModMenu.getConfig().SHOW_LIBRARIES.get()) {
 				continue;
 			}
 
@@ -173,7 +173,7 @@ public class ModListWidget extends ObjectSelectionList<ModListEntry> implements 
 				if (ModMenu.PARENT_MAP.keySet().contains(mod) && hasVisibleChildMods(mod)) {
 					//Add parent mods when not searching
 					List<Mod> children = ModMenu.PARENT_MAP.get(mod);
-					children.sort(ModMenuConfig.sorting.getComparator());
+					children.sort(ModMenu.getConfig().SORTING.get().getComparator());
 					ParentEntry parent = new ParentEntry(mod, children, this);
 					this.addEntry(parent);
 					//Add children if they are meant to be shown

@@ -2,9 +2,7 @@ package com.terraformersmc.modmenu.util.mod;
 
 import com.terraformersmc.modmenu.ModMenu;
 import com.terraformersmc.modmenu.TextPlaceholderApiCompat;
-import com.terraformersmc.modmenu.config.ModMenuConfig;
 import com.terraformersmc.modmenu.util.mod.neoforge.NeoforgeIconHandler;
-import com.terraformersmc.modmenu.util.mod.neoforge.NeoforgeMod;
 import eu.pb4.placeholders.api.ParserContext;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.client.resources.language.I18n;
@@ -12,9 +10,7 @@ import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.IOException;
 import java.util.*;
-import java.util.List;
 import java.util.stream.Collectors;
 
 public interface Mod {
@@ -25,7 +21,7 @@ public interface Mod {
 	@NotNull
 	default String getTranslatedName() {
 		String translationKey = "modmenu.nameTranslation." + getId();
-		if ((getId().equals("minecraft") || getId().equals("java") || ModMenuConfig.translate_names) && I18n.exists(
+		if ((getId().equals("minecraft") || getId().equals("java") || ModMenu.getConfig().TRANSLATE_NAMES.get()) && I18n.exists(
 			translationKey)) {
 			return I18n.get(translationKey);
 		}
@@ -46,7 +42,7 @@ public interface Mod {
 	@NotNull
 	default String getTranslatedSummary() {
 		String translationKey = "modmenu.summaryTranslation." + getId();
-		if ((getId().equals("minecraft") || getId().equals("java") || ModMenuConfig.translate_descriptions) && I18n.exists(
+		if ((getId().equals("minecraft") || getId().equals("java") || ModMenu.getConfig().TRANSLATE_DESCRIPTIONS.get()) && I18n.exists(
 			translationKey)) {
 			return I18n.get(translationKey);
 		}
@@ -58,7 +54,7 @@ public interface Mod {
 	@NotNull
 	default String getTranslatedDescription() {
 		String translatableDescriptionKey = "modmenu.descriptionTranslation." + getId();
-		if ((getId().equals("minecraft") || getId().equals("java") || ModMenuConfig.translate_descriptions) && I18n.exists(
+		if ((getId().equals("minecraft") || getId().equals("java") || ModMenu.getConfig().TRANSLATE_DESCRIPTIONS.get()) && I18n.exists(
 			translatableDescriptionKey)) {
 			return I18n.get(translatableDescriptionKey);
 		}

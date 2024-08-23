@@ -105,7 +105,7 @@
   "modmenu.descriptionTranslation.java": "The Java runtime environment.",
   "modmenu.javaDistributionName": "Running: %s",
   
-  "modmenu.options": "Mod Menu Options",
+  "modmenu.configuration.title": "Mod Menu Options",
   "modmenu.configuration.sorting": "Sort",
   "modmenu.configuration.sorting.ascending": "A-Z",
   "modmenu.configuration.sorting.descending": "Z-A",
@@ -177,4 +177,16 @@
   "modmenu.configuration.update_channel": "Update Channel",
   "modmenu.configuration.update_channel.alpha": "All",
   "modmenu.configuration.update_channel.beta": "Release & Beta",
-  "modmenu.configuration.update_channel.release": "Release"}
+  "modmenu.configuration.update_channel.release": "Release",
+
+  "modmenu.configuration.count": "Count",
+  "modmenu.configuration.main": "Main",
+  "modmenu.configuration.hide": "Hide",
+
+  "modmenu.configuration.hidden_mods": "Hidden mods",
+  "modmenu.configuration.hidden_configs": "Hidden configs",
+  "modmenu.configuration.config_mode": "config mode",
+  "modmenu.configuration.disable_drag_and_drop": "Disable Drag And Drop",
+  "modmenu.configuration.modify_game_menu": "Modify Game Menu",
+  "modmenu.configuration.modify_title_screen": "Modify Title Screen"
+}

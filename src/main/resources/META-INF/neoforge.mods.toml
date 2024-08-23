@@ -19,9 +19,75 @@ description='''${mod_description}'''
 config="${mod_id}.mixins.json"
 
 [modproperties.modmenu]
-links=[
-    "modmenu.discord=https://discord.gg/jEGF5fb"
+badges=["Client"]
+links=["modmenu.discord=https://discord.gg/jEGF5fb"]
+contributors=[
+    "shedaniel",
+    "Draylar",
+    "Mordna",
+    "Madis0",
+    "Yanis48",
+    "LemmaEOF",
+    "fewizz",
+    "XuyuEre",
+    "geniiii",
+    "thiagokenis",
+    "Juuxel",
+    "Chloe Dawn",
+    "modmuss50",
+    "Patbox",
+    "Lykrast",
+    "Pyrofab",
+    "UpcraftLP",
+    "swordglowsblue",
+    "hinataaki",
+    "LeonXu98",
+    "magneticflux",
+    "vanja-san",
+    "AlexIIL",
+    "masoncook16",
+    "el97",
+    "Hephaestus-Dev",
+    "zabi94",
+    "dexman545",
+    "dhouck",
+    "Hambaka",
+    "po-stulate",
+    "FlashyReese",
+    "egeesin",
+    "TheGlitch76",
+    "ludg1e",
+    "williambl",
+    "PepperCode1",
+    "ThatTrollzer",
+    "ToffeeMax",
+    "kalucky0",
+    "Maaster",
+    "MartrixX",
+    "NotSteven",
+    "Dolphin 2.1",
+    "ENDERZOMBI102",
+    "anatom3000",
+    "OroArmor",
+    "jackassmc",
+    "Vaerian",
+    "RDKRACZ",
+    "Hulenkius",
+    "XfedeX",
+    "spnda",
+    "Jab125",
+    "SolidBlock",
+    "Tkain",
+    "nfitzen",
+    "DenaryDev",
+    "legenden",
+    "NaiNonTH",
+    "MagnusHJensen",
+    "Benjamin-Norton",
+    "triphora",
+    "Pyrrha"
 ]
+sources="sd"
 
 [[dependencies.${mod_id}]] #optional
     modId="neoforge" #mandatory

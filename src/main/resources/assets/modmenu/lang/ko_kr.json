@@ -82,7 +82,7 @@
   "modmenu.nameTranslation.java": "자바",
   "modmenu.descriptionTranslation.java": "자바 런타임 환경",
   "modmenu.javaDistributionName": "실행: %s",
-  "modmenu.options": "모드 메뉴 옵션",
+  "modmenu.configuration.title": "모드 메뉴 옵션",
   "modmenu.configuration.sorting": "정렬: %s",
   "modmenu.configuration.sorting.ascending": "A-Z",
   "modmenu.configuration.sorting.descending": "Z-A",

@@ -2,9 +2,7 @@ package com.terraformersmc.modmenu.gui.widget.entries;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.terraformersmc.modmenu.ModMenu;
-import com.terraformersmc.modmenu.config.ModMenuConfig;
 import com.terraformersmc.modmenu.gui.widget.ModListWidget;
-import com.terraformersmc.modmenu.gui.widget.UpdateAvailableBadge;
 import com.terraformersmc.modmenu.util.DrawingUtil;
 import com.terraformersmc.modmenu.util.ModMenuScreenTexts;
 import com.terraformersmc.modmenu.util.mod.Mod;
@@ -62,7 +60,7 @@ public class ModListEntry extends ObjectSelectionList.Entry<ModListEntry> {
 	) {
 		x += getXOffset();
 		rowWidth -= getXOffset();
-		int iconSize = ModMenuConfig.compact_list ? COMPACT_ICON_SIZE : FULL_ICON_SIZE;
+		int iconSize = ModMenu.getConfig().COMPACT_LIST.get() ? COMPACT_ICON_SIZE : FULL_ICON_SIZE;
 		String modId = mod.getId();
 		if ("java".equals(modId)) {
 			DrawingUtil.drawRandomVersionBackground(mod, guiGraphics, x, y, iconSize, iconSize);
@@ -90,7 +88,7 @@ public class ModListEntry extends ObjectSelectionList.Entry<ModListEntry> {
 			true
 		);
 		var updateBadgeXOffset = 0;
-		if (!ModMenuConfig.hide_badges) {
+		if (!ModMenu.getConfig().HIDE_BADGES.get()) {
 			new ModBadgeRenderer(x + iconSize + 3 + font.width(name) + 2 + updateBadgeXOffset,
 				y,
 				x + rowWidth,
@@ -98,7 +96,7 @@ public class ModListEntry extends ObjectSelectionList.Entry<ModListEntry> {
 				list.getParent()
 			).draw(guiGraphics, mouseX, mouseY);
 		}
-		if (!ModMenuConfig.compact_list) {
+		if (!ModMenu.getConfig().COMPACT_LIST.get()) {
 			String summary = mod.getSummary();
 			DrawingUtil.drawWrappedString(guiGraphics,
 				summary,
@@ -119,10 +117,10 @@ public class ModListEntry extends ObjectSelectionList.Entry<ModListEntry> {
 			);
 		}
 
-		if (!(this instanceof ParentEntry) && ModMenuConfig.quick_configure && (this.list.getParent()
+		if (!(this instanceof ParentEntry) && ModMenu.getConfig().QUICK_CONFIGURE.get() && (this.list.getParent()
 			.getModHasConfigScreen()
 			.get(modId) || this.list.getParent().modScreenErrors.containsKey(modId))) {
-			final int textureSize = ModMenuConfig.compact_list ?
+			final int textureSize = ModMenu.getConfig().COMPACT_LIST.get() ?
 				(int) (256 / (FULL_ICON_SIZE / (double) COMPACT_ICON_SIZE)) :
 				256;
 			if (this.client.options.touchscreen().get() || hovered) {
@@ -163,10 +161,10 @@ public class ModListEntry extends ObjectSelectionList.Entry<ModListEntry> {
 	@Override
 	public boolean mouseClicked(double mouseX, double mouseY, int delta) {
 		list.select(this);
-		if (ModMenuConfig.quick_configure && this.list.getParent()
+		if (ModMenu.getConfig().QUICK_CONFIGURE.get() && this.list.getParent()
 			.getModHasConfigScreen()
 			.get(this.mod.getId())) {
-			int iconSize = ModMenuConfig.compact_list ? COMPACT_ICON_SIZE : FULL_ICON_SIZE;
+			int iconSize = ModMenu.getConfig().COMPACT_LIST.get() ? COMPACT_ICON_SIZE : FULL_ICON_SIZE;
 			if (mouseX - list.getRowLeft() <= iconSize) {
 				this.openConfig();
 			} else if (Util.getMillis() - this.sinceLastClick < 250) {

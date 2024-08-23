@@ -5,6 +5,7 @@ import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.terraformersmc.modmenu.config.ModMenuConfig;
+import com.terraformersmc.modmenu.config.ModMenuConfigScreen;
 import com.terraformersmc.modmenu.util.EnumToLowerCaseJsonConverter;
 import com.terraformersmc.modmenu.util.ModMenuScreenTexts;
 import com.terraformersmc.modmenu.util.mod.Mod;
@@ -24,28 +25,23 @@ import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.ModList;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
-import net.neoforged.fml.loading.FMLEnvironment;
-import net.neoforged.fml.loading.moddiscovery.ModFileInfo;
-import net.neoforged.fml.loading.moddiscovery.ModInfo;
-import net.neoforged.fml.mclanguageprovider.MinecraftModContainer;
 import net.neoforged.neoforge.client.gui.ConfigurationScreen;
 import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
+import net.neoforged.neoforge.common.ModConfigSpec;
+import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.text.NumberFormat;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @net.neoforged.fml.common.Mod(ModMenu.MOD_ID)
 public class ModMenu {
 	public static final String MOD_ID = "modmenu";
-	public static final String GITHUB_REF = "TerraformersMC/ModMenu";
 	public static final Logger LOGGER = LoggerFactory.getLogger("Mod Menu");
 	public static final Gson GSON;
 	public static final Gson GSON_MINIFIED;
+	public static final Pair<ModMenuConfig, ModConfigSpec> CONFIG;
 
 	public static final Component LIBRARIES = Component.translatable(MOD_ID + ".configuration.show_libraries");
 	public static final Component SHOWN_LIBRARIES = Component.translatable( MOD_ID + ".configuration.show_libraries.true");
@@ -61,6 +57,10 @@ public class ModMenu {
 			.setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES);
 		GSON = builder.setPrettyPrinting().create();
 		GSON_MINIFIED = builder.create();
+
+		CONFIG = new ModConfigSpec.Builder()
+				.configure(ModMenuConfig::new);
+		// Store pair values in some constant field
 	}
 
 	public static final Map<String, Mod> MODS = new HashMap<>();
@@ -71,13 +71,12 @@ public class ModMenu {
 
 	private static int cachedDisplayedModCount = -1;
 	public static final boolean HAS_SINYTRA = ModList.get().isLoaded("connector");
-	public static final boolean DEV_ENVIRONMENT = !FMLEnvironment.production;
 	public static final boolean TEXT_PLACEHOLDER_COMPAT = ModList.get().isLoaded("placeholder_api");
 
 	public static Screen getConfigScreen(String modid, Screen menuScreen) {
 		configScreenFactories.putIfAbsent("minecraft", (modContainer, screen) -> new OptionsScreen(screen, Minecraft.getInstance().options));
 
-		if (ModMenuConfig.hidden_configs.contains(modid)) {
+		if (ModMenu.getConfig().HIDDEN_CONFIGS.get().contains(modid)) {
 			return null;
 		}
 		IConfigScreenFactory factory = configScreenFactories.get(modid);
@@ -88,15 +87,10 @@ public class ModMenu {
 	}
 
 	public ModMenu(IEventBus event, ModContainer container) {
-		//ModMenuConfigManager.initializeConfig();
-		Set<String> modpackMods = new HashSet<>();
-		//Map<String, UpdateChecker> updateCheckers = new HashMap<>();
-		//Map<String, UpdateChecker> providedUpdateCheckers = new HashMap<>();
-
 		event.addListener(this::onClientSetup);
-
-		container.registerConfig(ModConfig.Type.CLIENT, ModMenuConfig.SPEC);
-		container.registerExtensionPoint(IConfigScreenFactory.class, ConfigurationScreen::new);
+		container.registerConfig(ModConfig.Type.CLIENT, CONFIG.getValue());
+		container.registerExtensionPoint(IConfigScreenFactory.class, (modContainer, screen) ->
+				new ConfigurationScreen(container, screen, ModMenuConfigScreen::new));
 
 		// Fill mods map
 		for (ModContainer modContainer : ModList.get().getSortedMods()) {
@@ -108,14 +102,7 @@ public class ModMenu {
 				mod = new NeoforgeMod(modContainer);
 			}
 
-			/*var updateChecker = updateCheckers.get(mod.getId());
-
-			if (updateChecker == null) {
-				updateChecker = providedUpdateCheckers.get(mod.getId());
-			}*/
-
 			MODS.put(mod.getId(), mod);
-			//mod.setUpdateChecker(updateChecker);
 		}
 
 		Map<String, Mod> dummyParents = new HashMap<>();
@@ -139,8 +126,12 @@ public class ModMenu {
 				ROOT_MODS.put(mod.getId(), mod);
 			}
 		}
-		MODS.put("java", new JavaDummyMod());
+
+		Mod java = new JavaDummyMod();
+		MODS.put("java", java);
+		ROOT_MODS.put("java", java);
 		MODS.putAll(dummyParents);
+		ROOT_MODS.putAll(dummyParents);
 	}
 
 	public static void clearModCountCache() {
@@ -148,11 +139,11 @@ public class ModMenu {
 	}
 
 	public static Component getLibrariesComponent() {
-		return CommonComponents.optionNameValue(LIBRARIES, ModMenuConfig.SHOW_LIBRARIES.get() ? SHOWN_LIBRARIES : HIDDEN_LIBRARIES);
+		return CommonComponents.optionNameValue(LIBRARIES, ModMenu.getConfig().SHOW_LIBRARIES.get() ? SHOWN_LIBRARIES : HIDDEN_LIBRARIES);
 	}
 
 	public static Component getSortingComponent() {
-		return CommonComponents.optionNameValue(SORTING, ModMenuConfig.sorting == ModMenuConfig.Sorting.ASCENDING ? ASCENDING : DESCENDING);
+		return CommonComponents.optionNameValue(SORTING, ModMenu.getConfig().SORTING.get() == ModMenuConfig.Sorting.ASCENDING ? ASCENDING : DESCENDING);
 	}
 
 	public void onClientSetup(FMLClientSetupEvent event) {
@@ -162,9 +153,9 @@ public class ModMenu {
 
 	public static String getDisplayedModCount() {
 		if (cachedDisplayedModCount == -1) {
-			boolean includeChildren = ModMenuConfig.count_children;
-			boolean includeLibraries = ModMenuConfig.count_libraries;
-			boolean includeHidden = ModMenuConfig.count_hidden_mods;
+			boolean includeChildren = ModMenu.getConfig().COUNT_CHILDREN.get();
+			boolean includeLibraries = ModMenu.getConfig().COUNT_LIBRARIES.get();
+			boolean includeHidden = ModMenu.getConfig().COUNT_HIDDEN_MODS.get();
 
 			// listen, if you have >= 2^32 mods then that's on you
 			cachedDisplayedModCount = Math.toIntExact(MODS.values().stream().filter(mod -> {
@@ -183,8 +174,8 @@ public class ModMenu {
 	}
 
 	public static Component createModsButtonText(boolean title) {
-		var titleStyle = ModMenuConfig.mods_button_style;
-		var gameMenuStyle = ModMenuConfig.game_menu_button_style;
+		var titleStyle = ModMenu.getConfig().MODS_BUTTON_STYLE.get();
+		var gameMenuStyle = ModMenu.getConfig().GAME_MENU_BUTTON_STYLE.get();
 		var isIcon = title ?
 			titleStyle == ModMenuConfig.TitleMenuButtonStyle.ICON :
 			gameMenuStyle == ModMenuConfig.GameMenuButtonStyle.ICON;
@@ -192,19 +183,23 @@ public class ModMenu {
 			titleStyle == ModMenuConfig.TitleMenuButtonStyle.SHRINK :
 			gameMenuStyle == ModMenuConfig.GameMenuButtonStyle.REPLACE;
 		MutableComponent modsText = ModMenuScreenTexts.TITLE.copy();
-		if (ModMenuConfig.mod_count_location.isOnModsButton() && !isIcon) {
+		if (ModMenu.getConfig().MOD_COUNT_LOCATION.get().isOnModsButton() && !isIcon) {
 			String count = ModMenu.getDisplayedModCount();
 			if (isShort) {
 				modsText.append(Component.literal(" ")).append(Component.translatable("modmenu.loaded.short", count));
 			} else {
 				String specificKey = "modmenu.loaded." + count;
 				String key = I18n.exists(specificKey) ? specificKey : "modmenu.loaded";
-				if (ModMenuConfig.easter_eggs && I18n.exists(specificKey + ".secret")) {
+				if (ModMenu.getConfig().EASTER_EGGS.get() && I18n.exists(specificKey + ".secret")) {
 					key = specificKey + ".secret";
 				}
 				modsText.append(Component.literal(" ")).append(Component.translatable(key, count));
 			}
 		}
 		return modsText;
+	}
+
+	public static ModMenuConfig getConfig() {
+		return CONFIG.getLeft();
 	}
 }

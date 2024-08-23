@@ -82,7 +82,7 @@
   "modmenu.nameTranslation.java": "Java",
   "modmenu.descriptionTranslation.java": "Середовище виконання для Java.",
   "modmenu.javaDistributionName": "Запуск: %s",
-  "modmenu.options": "Налаштування Mod Menu",
+  "modmenu.configuration.title": "Налаштування Mod Menu",
   "modmenu.configuration.sorting": "Сортування",
   "modmenu.configuration.sorting.ascending": "А-Я",
   "modmenu.configuration.sorting.descending": "Я-А",

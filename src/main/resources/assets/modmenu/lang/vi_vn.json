@@ -82,7 +82,7 @@
   "modmenu.nameTranslation.java": "Java",
   "modmenu.descriptionTranslation.java": "Java runtime environment.",
   "modmenu.javaDistributionName": "Đang chạy: %s",
-  "modmenu.options": "Tuỳ chọn Mod Menu",
+  "modmenu.configuration.title": "Tuỳ chọn Mod Menu",
   "modmenu.configuration.sorting": "Sắp xếp",
   "modmenu.configuration.sorting.ascending": "A-Z",
   "modmenu.configuration.sorting.descending": "Z-A",

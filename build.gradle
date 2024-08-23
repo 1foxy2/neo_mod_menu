@@ -36,7 +36,7 @@ runs {
 
     server {
         systemProperty 'forge.enabledGameTestNamespaces', project.mod_id
-        programArgument '--nogui'
+        argument '--nogui'
     }
 
     gameTestServer {
@@ -44,7 +44,7 @@ runs {
     }
 
     data {
-        programArguments.addAll '--mod', project.mod_id, '--all', '--output', file('src/generated/resources/').getAbsolutePath(), '--existing', file('src/main/resources/').getAbsolutePath()
+        arguments.addAll '--mod', project.mod_id, '--all', '--output', file('src/generated/resources/').getAbsolutePath(), '--existing', file('src/main/resources/').getAbsolutePath()
     }
 }
 
@@ -64,10 +64,10 @@ repositories {
 dependencies {
     implementation "net.neoforged:neoforge:${neo_version}"
 
-    // Add Connector to the launch classpath
     // Add FFAPI dependency
     implementation "org.sinytra.forgified-fabric-api:forgified-fabric-api:0.102.0+2.0.12+1.21.1"
-    // Install desired Fabric mods. Make sure they remain unmapped at runtime
+ //   compileOnly "org.sinytra.forgified-fabric-api:forgified-fabric-api:0.102.0+2.0.12+1.21.1"
+ //   runtimeOnly "org.sinytra.forgified-fabric-api:forgified-fabric-api:0.102.0+2.0.12+1.21.1"
 }
 
 tasks.withType(ProcessResources).configureEach {

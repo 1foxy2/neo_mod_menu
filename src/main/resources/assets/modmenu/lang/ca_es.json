@@ -82,7 +82,7 @@
   "modmenu.nameTranslation.java": "Java",
   "modmenu.descriptionTranslation.java": "The Java runtime environment.",
   "modmenu.javaDistributionName": "Running: %s",
-  "modmenu.options": "Opcions de Mod Menu",
+  "modmenu.configuration.title": "Opcions de Mod Menu",
   "modmenu.configuration.sorting": "Ordenar",
   "modmenu.configuration.sorting.ascending": "A-Z",
   "modmenu.configuration.sorting.descending": "Z-A",

@@ -21,7 +21,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.fml.event.config.ModConfigEvent;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
 import net.neoforged.neoforge.client.event.ScreenEvent;
@@ -35,13 +34,13 @@ import java.util.List;
 @EventBusSubscriber(modid = ModMenu.MOD_ID, value = Dist.CLIENT)
 public class ModMenuEventHandler {
 	public static final ResourceLocation MODS_BUTTON_TEXTURE = ResourceLocation.fromNamespaceAndPath(ModMenu.MOD_ID, "textures/gui/mods_button.png");
-	private static Lazy<KeyMapping> MENU_KEY_BIND = Lazy.of(() -> new KeyMapping("key.modmenu.open_menu",
-			KeyConflictContext.IN_GAME, InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_X, "key.categories.misc"));;
+	private static final Lazy<KeyMapping> MENU_KEY_BIND = Lazy.of(() -> new KeyMapping("key.modmenu.open_menu",
+			KeyConflictContext.IN_GAME, InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_UNKNOWN, "key.categories.misc"));;
 
 	@SubscribeEvent
 	public static void onScreenInit(ScreenEvent.Init.Post event) {
 		Screen screen = event.getScreen();
-		if (screen instanceof TitleScreen) {
+		if (ModMenu.getConfig().MODIFY_TITLE_SCREEN.get() && screen instanceof TitleScreen) {
 			removeModsButton(screen);
 			afterTitleScreenInit(screen);
 		}
@@ -56,66 +55,76 @@ public class ModMenuEventHandler {
 	private static void afterTitleScreenInit(Screen screen) {
 		final List<Renderable> buttons = screen.renderables;
 
-		if (ModMenuConfig.modify_title_screen) {
-			int modsButtonIndex = -1;
-			final int spacing = 24;
-			int buttonsY = screen.height / 4 + 48;
-			for (int i = 0; i < buttons.size(); i++) {
-				Renderable widget = buttons.get(i);
-				if (widget instanceof Button button) {
-					if (ModMenuConfig.mods_button_style == ModMenuConfig.TitleMenuButtonStyle.CLASSIC) {
-						if (button.visible) {
-							if (modsButtonIndex == -1) {
-								buttonsY = button.getY();
-							}
-						}
-					}
-					if (buttonHasText(button, "menu.online")) {
-						if (ModMenuConfig.mods_button_style ==
-							ModMenuConfig.TitleMenuButtonStyle.REPLACE_REALMS) {
-							set(screen, modsButtonIndex, new ModMenuButtonWidget(button.getX(),
-											button.getY() + spacing,
-											button.getWidth(),
-											button.getHeight(),
-											ModMenu.createModsButtonText(true),
-											screen));
-							buttons.remove(i);
-							screen.children().remove(buttons.get(i));
-						} else {
-							if (ModMenuConfig.mods_button_style ==
-								ModMenuConfig.TitleMenuButtonStyle.SHRINK) {
-								button.setWidth(98);
-							}
-							modsButtonIndex = i + 1;
-							if (button.visible) {
-								buttonsY = button.getY();
-							}
+		int modsButtonIndex = -1;
+		final int spacing = 24;
+		int buttonsY = screen.height / 4 + 48;
+		boolean replacedRealmButton = false;
+		boolean isRealmsButton;
+		for (int i = 0; i < buttons.size(); i++) {
+			Renderable widget = buttons.get(i);
+			if (widget instanceof Button button) {
+				if (i != buttons.size() - 1) {
+					shiftButtons(button, replacedRealmButton, spacing + (replacedRealmButton ? -12 : 8));
+				}
+
+				isRealmsButton = buttonHasText(button, "menu.online");
+				if (isRealmsButton)
+					replacedRealmButton = true;
+
+
+				if (ModMenu.getConfig().MODS_BUTTON_STYLE.get() == ModMenuConfig.TitleMenuButtonStyle.CLASSIC) {
+					if (button.visible) {
+						shiftButtons(button, modsButtonIndex == -1, spacing);
+						if (modsButtonIndex == -1) {
+							buttonsY = button.getY();
 						}
 					}
 				}
-
+				if (isRealmsButton) {
+					if (ModMenu.getConfig().MODS_BUTTON_STYLE.get() ==
+							ModMenuConfig.TitleMenuButtonStyle.REPLACE_REALMS) {
+						buttons.set(i, new ModMenuButtonWidget(button.getX(),
+								button.getY(),
+								button.getWidth(),
+								button.getHeight(),
+								ModMenu.createModsButtonText(true),
+								screen
+						));
+					} else {
+						if (ModMenu.getConfig().MODS_BUTTON_STYLE.get() ==
+								ModMenuConfig.TitleMenuButtonStyle.SHRINK) {
+							button.setWidth(98);
+						}
+						modsButtonIndex = i + 1;
+						if (button.visible) {
+							buttonsY = button.getY();
+						}
+					}
+				}
 			}
-			if (modsButtonIndex != -1) {
-				if (ModMenuConfig.mods_button_style == ModMenuConfig.TitleMenuButtonStyle.CLASSIC) {
-					add(screen, modsButtonIndex, new ModMenuButtonWidget(screen.width / 2 - 100,
+
+		}
+		if (modsButtonIndex != -1) {
+			if (ModMenu.getConfig().MODS_BUTTON_STYLE.get() == ModMenuConfig.TitleMenuButtonStyle.CLASSIC) {
+				add(screen, modsButtonIndex, new ModMenuButtonWidget(screen.width / 2 - 100,
 						buttonsY + spacing,
 						200,
 						20,
-							ModMenu.createModsButtonText(true),
+						ModMenu.createModsButtonText(true),
 						screen
-					));
-				} else if (ModMenuConfig.mods_button_style == ModMenuConfig.TitleMenuButtonStyle.SHRINK) {
-					add(screen, modsButtonIndex,
-							new ModMenuButtonWidget(screen.width / 2 + 2,
-							buttonsY,
-							98,
-							20,
-									ModMenu.createModsButtonText(true),
-							screen
+				));
+			} else if (ModMenu.getConfig().MODS_BUTTON_STYLE.get() == ModMenuConfig.TitleMenuButtonStyle.SHRINK) {
+				add(screen, modsButtonIndex,
+						new ModMenuButtonWidget(screen.width / 2 + 2,
+								buttonsY,
+								98,
+								20,
+								ModMenu.createModsButtonText(true),
+								screen
 						)
-					);
-				} else if (ModMenuConfig.mods_button_style == ModMenuConfig.TitleMenuButtonStyle.ICON) {
-					add(screen, modsButtonIndex, new UpdateCheckerTexturedButtonWidget(screen.width / 2 + 104,
+				);
+			} else if (ModMenu.getConfig().MODS_BUTTON_STYLE.get() == ModMenuConfig.TitleMenuButtonStyle.ICON) {
+				add(screen, modsButtonIndex, new UpdateCheckerTexturedButtonWidget(screen.width / 2 + 104,
 						buttonsY,
 						20,
 						20,
@@ -126,9 +135,8 @@ public class ModMenuEventHandler {
 						32,
 						64,
 						button -> Minecraft.getInstance().setScreen(new ModsScreen(screen)),
-							ModMenu.createModsButtonText(true)
-					));
-				}
+						ModMenu.createModsButtonText(true)
+				));
 			}
 		}
 	}
@@ -173,7 +181,6 @@ public class ModMenuEventHandler {
 	}
 
 	public static void add(Screen screen, int index, AbstractWidget element) {
-		// ensure no duplicates
 		final int duplicateIndex = screen.renderables.indexOf(element);
 
 		if (duplicateIndex >= 0) {

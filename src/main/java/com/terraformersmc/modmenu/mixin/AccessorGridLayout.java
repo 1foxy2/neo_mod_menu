@@ -8,7 +8,7 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 import java.util.List;
 
 @Mixin(GridLayout.class)
-public interface AccessorGridWidget {
+public interface AccessorGridLayout {
 	@Accessor
 	List<LayoutElement> getChildren();
 }

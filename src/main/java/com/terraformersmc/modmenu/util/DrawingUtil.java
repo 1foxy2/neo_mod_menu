@@ -1,6 +1,7 @@
 package com.terraformersmc.modmenu.util;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.terraformersmc.modmenu.ModMenu;
 import com.terraformersmc.modmenu.config.ModMenuConfig;
 import com.terraformersmc.modmenu.util.mod.Mod;
 import net.minecraft.client.Minecraft;
@@ -32,7 +33,7 @@ public class DrawingUtil {
 		int seed = mod.getName().hashCode() + mod.getVersion().hashCode();
 		Random random = new Random(seed);
 		int color = 0xFF000000 | Mth.hsvToRgb(random.nextFloat(1f), random.nextFloat(0.7f, 0.8f), 0.9f);
-		if (!ModMenuConfig.random_java_colors) {
+		if (!ModMenu.getConfig().RANDOM_JAVA_COLORS.get()) {
 			color = 0xFFDD5656;
 		}
 		RenderSystem.setShaderColor(1f, 1f, 1f, 1f);

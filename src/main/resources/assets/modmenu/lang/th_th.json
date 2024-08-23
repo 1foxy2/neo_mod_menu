@@ -82,7 +82,7 @@
   "modmenu.nameTranslation.java": "Java",
   "modmenu.descriptionTranslation.java": "The Java runtime environment.",
   "modmenu.javaDistributionName": "Running: %s",
-  "modmenu.options": "ตั้งค่า Mod Menu",
+  "modmenu.configuration.title": "ตั้งค่า Mod Menu",
   "modmenu.configuration.sorting": "จัดเรียง",
   "modmenu.configuration.sorting.ascending": "A-Z",
   "modmenu.configuration.sorting.descending": "Z-A",

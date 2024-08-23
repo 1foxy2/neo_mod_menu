@@ -3,8 +3,6 @@ package com.terraformersmc.modmenu.gui;
 import com.google.common.base.Joiner;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.terraformersmc.modmenu.ModMenu;
-import com.terraformersmc.modmenu.config.ModMenuConfig;
-import com.terraformersmc.modmenu.event.ModMenuEventHandler;
 import com.terraformersmc.modmenu.gui.widget.DescriptionListWidget;
 import com.terraformersmc.modmenu.gui.widget.LegacyTexturedButtonWidget;
 import com.terraformersmc.modmenu.gui.widget.ModListWidget;
@@ -126,7 +124,7 @@ public class ModsScreen extends Screen {
 			}
 		}
 
-		int paneY = ModMenuConfig.config_mode ? 48 : 48 + 19;
+		int paneY = ModMenu.getConfig().CONFIG_MODE.get() ? 48 : 48 + 19;
 		this.paneWidth = this.width / 2 - 8;
 		this.rightPaneX = this.width - this.paneWidth;
 
@@ -135,16 +133,16 @@ public class ModsScreen extends Screen {
 			this.paneWidth,
 			this.height - paneY - 36,
 			paneY,
-			ModMenuConfig.compact_list ? 23 : 36,
+				ModMenu.getConfig().COMPACT_LIST.get() ? 23 : 36,
 			this.modList,
 			this
 		);
 		this.modList.setX(0);
 
 		// Search box
-		int filtersButtonSize = (ModMenuConfig.config_mode ? 0 : 22);
+		int filtersButtonSize = (ModMenu.getConfig().CONFIG_MODE.get() ? 0 : 22);
 		int searchWidthMax = this.paneWidth - 32 - filtersButtonSize;
-		int searchBoxWidth = ModMenuConfig.config_mode ? Math.min(200, searchWidthMax) : searchWidthMax;
+		int searchBoxWidth = ModMenu.getConfig().CONFIG_MODE.get() ? Math.min(200, searchWidthMax) : searchWidthMax;
 
 		this.searchBoxX = this.paneWidth / 2 - searchBoxWidth / 2 - filtersButtonSize / 2;
 
@@ -172,7 +170,7 @@ public class ModsScreen extends Screen {
 
 		this.updateFiltersX();
 
-		if (!ModMenuConfig.config_mode) {
+		if (!ModMenu.getConfig().CONFIG_MODE.get()) {
 			this.filtersButton = LegacyTexturedButtonWidget.legacyTexturedBuilder(ModMenuScreenTexts.TOGGLE_FILTER_OPTIONS,
 					button -> {
 						this.setFilterOptionsShown(!this.filterOptionsShown);
@@ -189,21 +187,22 @@ public class ModsScreen extends Screen {
 
 		// Sorting button
 		this.sortingButton = Button.builder(sortingText, button -> {
-			ModMenuConfig.sorting.cycleValue();
+			ModMenu.getConfig().SORTING.get().cycleValue();
+			ModMenu.CONFIG.getRight().save();
 			modList.reloadFilters();
-			ModMenuConfig.SPEC.save();
 			button.setMessage(ModMenu.getSortingComponent());
 		}).pos(this.filtersX, 45).size(sortingWidth, 20).build();
 
 		// Show libraries button
 		this.librariesButton = Button.builder(librariesText, button -> {
-			ModMenuConfig.SHOW_LIBRARIES.set(!ModMenuConfig.SHOW_LIBRARIES.get());
+			ModMenu.getConfig().SHOW_LIBRARIES.set(!ModMenu.getConfig().SHOW_LIBRARIES.get());
+			ModMenu.CONFIG.getRight().save();
 			modList.reloadFilters();
 			button.setMessage(ModMenu.getLibrariesComponent());
 		}).pos(this.filtersX + sortingWidth + 2, 45).size(librariesWidth, 20).build();
 
 		// Configure button
-		if (!ModMenuConfig.hide_config_buttons) {
+		if (!ModMenu.getConfig().HIDE_CONFIG_BUTTONS.get()) {
 			this.configureButton = LegacyTexturedButtonWidget.legacyTexturedBuilder(CommonComponents.EMPTY, button -> {
 					final String id = Objects.requireNonNull(selected).getMod().getId();
 					if (modHasConfigScreen.get(id)) {
@@ -330,7 +329,7 @@ public class ModsScreen extends Screen {
 		this.searchBox.render(guiGraphics, mouseX, mouseY, delta);
 		RenderSystem.disableBlend();
 		guiGraphics.drawCenteredString(this.font, this.title, this.modList.getWidth() / 2, 8, 16777215);
-		if (!ModMenuConfig.disable_drag_and_drop) {
+		if (!ModMenu.getConfig().DISABLE_DRAG_AND_DROP.get()) {
 			guiGraphics.drawCenteredString(this.font,
 				ModMenuScreenTexts.DROP_INFO_LINE_1,
 				this.width - this.modList.getWidth() / 2,
@@ -344,11 +343,11 @@ public class ModsScreen extends Screen {
 				ChatFormatting.GRAY.getColor()
 			);
 		}
-		if (!ModMenuConfig.config_mode) {
+		if (!ModMenu.getConfig().CONFIG_MODE.get()) {
 			Component fullModCount = this.computeModCountText(true);
-			if (!ModMenuConfig.config_mode && this.updateFiltersX()) {
+			if (!ModMenu.getConfig().CONFIG_MODE.get() && this.updateFiltersX()) {
 				if (this.filterOptionsShown) {
-					if (!ModMenuConfig.show_libraries ||
+					if (!ModMenu.getConfig().SHOW_LIBRARIES.get() ||
 						font.width(fullModCount) <= this.filtersX - 5) {
 						guiGraphics.drawString(font,
 							fullModCount.getVisualOrderText(),
@@ -374,7 +373,7 @@ public class ModsScreen extends Screen {
 						);
 					}
 				} else {
-					if (!ModMenuConfig.show_libraries ||
+					if (!ModMenu.getConfig().SHOW_LIBRARIES.get() ||
 						font.width(fullModCount) <= modList.getWidth() - 5) {
 						guiGraphics.drawString(font,
 							fullModCount.getVisualOrderText(),
@@ -445,7 +444,7 @@ public class ModsScreen extends Screen {
 				);
 				this.init = false;
 			}
-			if (!ModMenuConfig.hide_badges) {
+			if (!ModMenu.getConfig().HIDE_BADGES.get()) {
 				modBadgeRenderer.draw(guiGraphics, mouseX, mouseY);
 			}
 			if (mod.isReal()) {
@@ -485,7 +484,7 @@ public class ModsScreen extends Screen {
 			.map(Mod::getId)
 			.collect(Collectors.toSet()));
 
-		if (includeLibs && ModMenuConfig.show_libraries) {
+		if (includeLibs && ModMenu.getConfig().SHOW_LIBRARIES.get()) {
 			int[] rootLibs = formatModCount(ModMenu.ROOT_MODS.values()
 				.stream()
 				.filter(mod -> !mod.isHidden() && mod.getBadges().contains(Mod.Badge.LIBRARY))
@@ -498,7 +497,7 @@ public class ModsScreen extends Screen {
 	}
 
 	private Component computeLibraryCountText() {
-		if (ModMenuConfig.show_libraries) {
+		if (ModMenu.getConfig().SHOW_LIBRARIES.get()) {
 			int[] rootLibs = formatModCount(ModMenu.ROOT_MODS.values()
 				.stream()
 				.filter(mod -> !mod.isHidden() && mod.getBadges().contains(Mod.Badge.LIBRARY))

@@ -104,7 +104,7 @@
   "modmenu.descriptionTranslation.java": "Бягучае асяроддзе Java.",
   "modmenu.javaDistributionName": "Бягучая: %s",
   
-  "modmenu.options": "Налады Mod Menu",
+  "modmenu.configuration.title": "Налады Mod Menu",
   "modmenu.configuration.sorting": "Сартыроўка",
   "modmenu.configuration.sorting.ascending": "A-Z",
   "modmenu.configuration.sorting.descending": "Z-A",

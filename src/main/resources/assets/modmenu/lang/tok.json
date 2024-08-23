@@ -82,7 +82,7 @@
   "modmenu.nameTranslation.java": "ilo Sawa",
   "modmenu.descriptionTranslation.java": "nasin kepeken pi ilo Sawa.",
   "modmenu.javaDistributionName": "kepeken: %s",
-  "modmenu.options": "ante pi lipu lawa namako",
+  "modmenu.configuration.title": "ante pi lipu lawa namako",
   "modmenu.configuration.sorting": "nasin nanpa",
   "modmenu.configuration.sorting.ascending": "A-Z",
   "modmenu.configuration.sorting.descending": "Z-A",

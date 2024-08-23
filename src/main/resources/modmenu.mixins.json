@@ -4,11 +4,14 @@
   "package": "com.terraformersmc.modmenu.mixin",
   "compatibilityLevel": "JAVA_21",
   "client": [
-    "AccessorGridWidget",
-    "MixinGameMenu",
+    "AccessorGridLayout",
+    "MixinPauseScreen",
     "MixinTitleScreen"
   ],
   "injectors": {
     "defaultRequire": 1
-  }
+  },
+  "mixins": [
+    "MixinBrandingControl"
+  ]
 }

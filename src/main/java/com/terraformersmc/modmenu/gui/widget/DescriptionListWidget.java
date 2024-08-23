@@ -3,7 +3,7 @@ package com.terraformersmc.modmenu.gui.widget;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
-import com.terraformersmc.modmenu.config.ModMenuConfig;
+import com.terraformersmc.modmenu.ModMenu;
 import com.terraformersmc.modmenu.gui.ModsScreen;
 import com.terraformersmc.modmenu.gui.widget.entries.ModListEntry;
 import com.terraformersmc.modmenu.util.mod.Mod;
@@ -107,7 +107,7 @@ public class DescriptionListWidget extends AbstractSelectionList<DescriptionList
 
 				Map<String, String> links = mod.getLinks();
 				String sourceLink = mod.getSource();
-				if ((!links.isEmpty() || sourceLink != null) && !ModMenuConfig.hide_mod_links) {
+				if ((!links.isEmpty() || sourceLink != null) && !ModMenu.getConfig().HIDE_MOD_LINKS.get()) {
 					children().add(emptyEntry);
 
 					for (FormattedCharSequence line : textRenderer.split(LINKS_TEXT, wrapWidth)) {
@@ -136,7 +136,7 @@ public class DescriptionListWidget extends AbstractSelectionList<DescriptionList
 				}
 
 				Set<String> licenses = mod.getLicense();
-				if (!ModMenuConfig.hide_mod_license && !licenses.isEmpty()) {
+				if (!ModMenu.getConfig().HIDE_MOD_LICENSE.get() && !licenses.isEmpty()) {
 					children().add(emptyEntry);
 
 					for (FormattedCharSequence line : textRenderer.split(LICENSE_TEXT, wrapWidth)) {
@@ -152,7 +152,7 @@ public class DescriptionListWidget extends AbstractSelectionList<DescriptionList
 					}
 				}
 
-				if (!ModMenuConfig.hide_mod_credits) {
+				if (!ModMenu.getConfig().HIDE_MOD_CREDITS.get()) {
 					if ("minecraft".equals(mod.getId())) {
 						children().add(emptyEntry);
 

@@ -104,7 +104,7 @@
   "modmenu.descriptionTranslation.java": "Środowisko wykonawcze Java.",
   "modmenu.javaDistributionName": "Uruchomione: %s",
   
-  "modmenu.options": "Opcje Mod Menu",
+  "modmenu.configuration.title": "Opcje Mod Menu",
   "modmenu.configuration.sorting": "Sortuj",
   "modmenu.configuration.sorting.ascending": "A-Z",
   "modmenu.configuration.sorting.descending": "Z-A",

@@ -82,7 +82,7 @@
   "modmenu.nameTranslation.java": "Java",
   "modmenu.descriptionTranslation.java": "Το περιβάλλον Java runtime.",
   "modmenu.javaDistributionName": "Χρησιμοποιείται: %s",
-  "modmenu.options": "Επιλογές Mod Menu",
+  "modmenu.configuration.title": "Επιλογές Mod Menu",
   "modmenu.configuration.sorting": "Ταξινόμηση",
   "modmenu.configuration.sorting.ascending": "A-Z",
   "modmenu.configuration.sorting.descending": "Z-A",

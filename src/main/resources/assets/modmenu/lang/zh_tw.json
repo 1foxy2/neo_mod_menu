@@ -82,7 +82,7 @@
   "modmenu.nameTranslation.java": "Java",
   "modmenu.descriptionTranslation.java": "Java運行環境。",
   "modmenu.javaDistributionName": "正在運行：%s",
-  "modmenu.options": "模組選單選項",
+  "modmenu.configuration.title": "模組選單選項",
   "modmenu.configuration.sorting": "排序",
   "modmenu.configuration.sorting.ascending": "A 至 Z",
   "modmenu.configuration.sorting.descending": "Z 至 A",

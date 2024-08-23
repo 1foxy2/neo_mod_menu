@@ -95,7 +95,7 @@
   "modmenu.descriptionTranslation.java": "Java runtime miljøet.",
   "modmenu.javaDistributionName": "Kjører: %s",
   
-  "modmenu.options": "Instillinger for modmeny",
+  "modmenu.configuration.title": "Instillinger for modmeny",
   "modmenu.configuration.sorting": "Sorter",
   "modmenu.configuration.sorting.ascending": "A-Z",
   "modmenu.configuration.sorting.descending": "Z-A",

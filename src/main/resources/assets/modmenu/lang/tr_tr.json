@@ -82,7 +82,7 @@
   "modmenu.nameTranslation.java": "Java",
   "modmenu.descriptionTranslation.java": "Java çalıştırma ortamı.",
   "modmenu.javaDistributionName": "Çalışıyor: %s",
-  "modmenu.options": "Mod Menü Ayarları",
+  "modmenu.configuration.title": "Mod Menü Ayarları",
   "modmenu.configuration.sorting": "Sırala",
   "modmenu.configuration.sorting.ascending": "A-Z",
   "modmenu.configuration.sorting.descending": "Z-A",

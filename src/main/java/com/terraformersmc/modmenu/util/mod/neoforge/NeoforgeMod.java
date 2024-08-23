@@ -3,11 +3,9 @@ package com.terraformersmc.modmenu.util.mod.neoforge;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.terraformersmc.modmenu.ModMenu;
-import com.terraformersmc.modmenu.config.ModMenuConfig;
 import com.terraformersmc.modmenu.util.VersionUtil;
 import com.terraformersmc.modmenu.util.mod.Mod;
 import net.minecraft.client.renderer.texture.DynamicTexture;
-import net.minecraft.client.resources.language.I18n;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.ModList;
 import net.neoforged.fml.loading.moddiscovery.ModFileInfo;
@@ -17,7 +15,6 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.util.*;
 
 public class NeoforgeMod implements Mod {
@@ -32,11 +29,16 @@ public class NeoforgeMod implements Mod {
 
 	protected final Map<String, String> links = new HashMap<>();
 
+	protected final List<String> contributors = new ArrayList<>();
+	protected final List<String> authors = new ArrayList<>();
+
 	protected boolean defaultIconWarning = true;
 
 	protected boolean allowsUpdateChecks = true;
 
 	protected boolean childHasUpdate = false;
+
+	protected String sources;
 
 	public NeoforgeMod(ModContainer modContainer) {
 		this.container = modContainer;
@@ -67,7 +69,7 @@ public class NeoforgeMod implements Mod {
 					parentData = new ModMenuData.DummyParentData(
 							parentId.orElseThrow(() -> new RuntimeException("Parent object lacks an id")),
 							Optional.of((String) parentValues.get("name")),
-							Optional.of((String) parentValues.get("description")),
+							Optional.of(parentValues.get("description") + "\n" + modInfo.getConfig().getConfigElement("credits").orElse("")),
 							Optional.of((String) parentValues.get("icon")),
 							badges
 					);
@@ -80,16 +82,25 @@ public class NeoforgeMod implements Mod {
 					LOGGER.error("Error loading parent data from mod: " + id, t);
 				}
 			}
-
+			
 			if (modMenuMap.get("badges") instanceof ArrayList<?> list) badgeNames.addAll((List<String>) list);
 
 			if (modMenuMap.get("links") instanceof ArrayList<?> list) list.forEach(string -> {
-				 String[] strings =	string.toString().split(":");
+				 String[] strings =	string.toString().split("=");
 				 links.put(strings[0], strings[1]);
 			});
 
-			//if (modMenuMap.get("update_checker") instanceof Boolean bool) allowsUpdateChecks = bool;
+			if (modMenuMap.get("contributors") instanceof ArrayList<?> list) contributors.addAll((List<String>) list);
+
+			this.sources = (String) modMenuMap.getOrDefault("sources", "");
+        }
+
+		for (String string : modInfo.getConfig().getConfigElement("authors").orElse("").toString().split(", ")) {
+			if (string.contains(",")) authors.addAll(Arrays.stream(string.split(",")).toList());
+
+			authors.add(string);
 		}
+
 		this.modMenuData = new ModMenuData(badgeNames, parentId, parentData, id);
 
 		/* Hardcode parents and badges for Fabric API & Fabric Loader */
@@ -136,9 +147,6 @@ public class NeoforgeMod implements Mod {
 		if ("minecraft".equals(getId())) {
 			iconSourceId = ModMenu.MOD_ID;
 			iconPath = "assets/" + ModMenu.MOD_ID + "/minecraft_icon.png";
-		} else if ("java".equals(getId())) {
-			iconSourceId = ModMenu.MOD_ID;
-			iconPath = "assets/" + ModMenu.MOD_ID + "/java_icon.png";
 		} else if ("neoforge".equals(getId())) {
 			iconSourceId = ModMenu.MOD_ID;
 			iconPath = "assets/" + ModMenu.MOD_ID + "/neoforge.png";
@@ -171,18 +179,12 @@ public class NeoforgeMod implements Mod {
 	@Override
 	public @NotNull String getTranslatedDescription() {
 		var description = Mod.super.getTranslatedDescription();
-		if (getId().equals("java")) {
-			description = description + "\n" + I18n.get("modmenu.javaDistributionName", getName());
-		}
+
 		return description;
 	}
 
 	@Override
 	public @NotNull String getVersion() {
-		if ("java".equals(getId())) {
-			return System.getProperty("java.version");
-		}
-
 		return modInfo.getVersion().toString();
 	}
 
@@ -192,12 +194,9 @@ public class NeoforgeMod implements Mod {
 
 	@Override
 	public @NotNull List<String> getAuthors() {
-		List<String> authors = Arrays.stream(modInfo.getConfig().getConfigElement("authors").orElse("").toString().split(",")).toList();
 		if (authors.isEmpty()) {
 			if ("minecraft".equals(getId())) {
 				return Lists.newArrayList("Mojang Studios");
-			} else if ("java".equals(getId())) {
-				return Lists.newArrayList(System.getProperty("java.vendor"));
 			}
 		}
 		return authors;
@@ -205,19 +204,18 @@ public class NeoforgeMod implements Mod {
 
 	@Override
 	public @NotNull Map<String, Collection<String>> getContributors() {
-		/*Map<String, Collection<String>> contributors = new LinkedHashMap<>();
+		Map<String, Collection<String>> contributors = new LinkedHashMap<>();
 
-		for (var contributor : this.modInfo.getContributors()) {
-			contributors.put(contributor.getName(), List.of("Contributor"));
+		for (String contributor : this.contributors) {
+			contributors.put(contributor, List.of("Contributor"));
 		}
 
-		return contributors;*/
-		return Map.of();
+		return contributors;
 	}
 
 	@Override
 	public @NotNull SortedMap<String, Set<String>> getCredits() {
-		/*SortedMap<String, Set<String>> credits = new TreeMap<>();
+		SortedMap<String, Set<String>> credits = new TreeMap<>();
 
 		var authors = this.getAuthors();
 		var contributors = this.getContributors();
@@ -231,9 +229,9 @@ public class NeoforgeMod implements Mod {
 				credits.computeIfAbsent(role, key -> new LinkedHashSet<>());
 				credits.get(role).add(contributor.getKey());
 			}
-		}*/
+		}
 
-		return new TreeMap<>();//credits;
+		return credits;
 	}
 
 	@Override
@@ -245,10 +243,12 @@ public class NeoforgeMod implements Mod {
 	public @Nullable String getWebsite() {
 		if ("minecraft".equals(getId())) {
 			return "https://www.minecraft.net/";
-		} else if ("java".equals(getId())) {
-			return System.getProperty("java.vendor.url");
 		}
-		return String.valueOf(modInfo.getModURL().orElse(null));
+
+		if (modInfo.getModURL().isPresent())
+			return modInfo.getModURL().get().toString();
+
+		return null;
 	}
 
 	@Override
@@ -256,12 +256,12 @@ public class NeoforgeMod implements Mod {
 		if ("minecraft".equals(getId())) {
 			return "https://aka.ms/snapshotbugs?ref=game";
 		}
-		return null;//modInfo.getContact().get("issues").orElse(null);
+		return (String) modInfo.getConfig().getConfigElement("issueTrackerURL").orElse(null);
 	}
 
 	@Override
 	public @Nullable String getSource() {
-		return null;//modInfo.getContact().get("sources").orElse(null);
+		return this.sources;
 	}
 
 	@Override
@@ -303,6 +303,6 @@ public class NeoforgeMod implements Mod {
 
 	@Override
 	public boolean isHidden() {
-		return ModMenuConfig.hidden_mods.contains(this.getId());
+		return ModMenu.getConfig().HIDDEN_MODS.get().contains(this.getId());
 	}
 }

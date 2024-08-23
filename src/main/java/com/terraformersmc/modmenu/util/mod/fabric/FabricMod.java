@@ -259,7 +259,7 @@ public class FabricMod implements Mod {
 
 	@Override
 	public boolean isHidden() {
-		return ModMenuConfig.hidden_mods.contains(this.getId());
+		return ModMenu.getConfig().HIDDEN_MODS.get().contains(this.getId());
 	}
 
 	public static boolean isFabricMod(String modid) {

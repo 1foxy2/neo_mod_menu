@@ -82,7 +82,7 @@
   "modmenu.nameTranslation.java": "Java",
   "modmenu.descriptionTranslation.java": "Běhové prostředí jazyka Java.",
   "modmenu.javaDistributionName": "Běží: %s",
-  "modmenu.options": "Možnosti nabídky modů",
+  "modmenu.configuration.title": "Možnosti nabídky modů",
   "modmenu.configuration.sorting": "Řazení",
   "modmenu.configuration.sorting.ascending": "A-Z",
   "modmenu.configuration.sorting.descending": "Z-A",

@@ -82,7 +82,7 @@
   "modmenu.nameTranslation.java": "Java",
   "modmenu.descriptionTranslation.java": "Исполняющая система Java.",
   "modmenu.javaDistributionName": "Запущено: %s",
-  "modmenu.options": "Настройки списка модов",
+  "modmenu.configuration.title": "Настройки списка модов",
   "modmenu.configuration.sorting": "Сортировка",
   "modmenu.configuration.sorting.ascending": "A-Z",
   "modmenu.configuration.sorting.descending": "Z-A",

@@ -82,7 +82,7 @@
   "modmenu.nameTranslation.java": "Java",
   "modmenu.descriptionTranslation.java": "Java käituskeskkond.",
   "modmenu.javaDistributionName": "Käitatud: %s",
-  "modmenu.options": "Mod Menu valikud",
+  "modmenu.configuration.title": "Mod Menu valikud",
   "modmenu.configuration.sorting": "Jrk",
   "modmenu.configuration.sorting.ascending": "A-Z",
   "modmenu.configuration.sorting.descending": "Z-A",

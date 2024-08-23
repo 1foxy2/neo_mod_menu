@@ -1,5 +1,6 @@
 package com.terraformersmc.modmenu.mixin;
 
+import com.terraformersmc.modmenu.ModMenu;
 import com.terraformersmc.modmenu.config.ModMenuConfig;
 import net.minecraft.client.gui.screens.TitleScreen;
 import org.spongepowered.asm.mixin.Mixin;
@@ -10,9 +11,9 @@ import org.spongepowered.asm.mixin.injection.ModifyArg;
 public class MixinTitleScreen {
 	@ModifyArg(at = @At(value = "INVOKE", target = "Lcom/mojang/realmsclient/gui/screens/RealmsNotificationsScreen;init(Lnet/minecraft/client/Minecraft;II)V"), method = "init", index = 2)
 	private int adjustRealmsHeight(int height) {
-		if (ModMenuConfig.modify_title_screen && ModMenuConfig.mods_button_style == ModMenuConfig.TitleMenuButtonStyle.CLASSIC) {
+		if (ModMenu.getConfig().MODIFY_TITLE_SCREEN.get() && ModMenu.getConfig().MODS_BUTTON_STYLE.get() == ModMenuConfig.TitleMenuButtonStyle.CLASSIC) {
 			return height;
-		} else if (ModMenuConfig.mods_button_style == ModMenuConfig.TitleMenuButtonStyle.REPLACE_REALMS || ModMenuConfig.mods_button_style == ModMenuConfig.TitleMenuButtonStyle.SHRINK) {
+		} else if (ModMenu.getConfig().MODS_BUTTON_STYLE.get() == ModMenuConfig.TitleMenuButtonStyle.REPLACE_REALMS || ModMenu.getConfig().MODS_BUTTON_STYLE.get() == ModMenuConfig.TitleMenuButtonStyle.SHRINK) {
 			return -99999;
 		}
 		return height + 51;
