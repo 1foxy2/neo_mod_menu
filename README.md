@@ -1,27 +1,21 @@
+fork of Mod menu https://modrinth.com/mod/modmenu for neoforge. compatible with connector and connector extras. 
 
-Installation information
-=======
+do add more details about your mod just put those lines into neoforge.mods.toml
 
-This template repository can be directly cloned to get you started with a new
-mod. Simply create a new repository cloned from this one, by following the
-instructions at [github](https://docs.github.com/en/repositories/creating-and-managing-repositories/creating-a-repository-from-a-template).
+```
+[modproperties.modmenu] 
+badges=["client", "library"] # badges, available: client, library, deprecated
+links=["translation.key.example=https://something.com"] # a link, before = is the translation key and after is the url
+contributors=[ # list of contributors
+"contributor1",
+"contributor2"
+]
+sources="https://url to sources.sources" # a link to sources of the mod
 
-Once you have your clone, simply open the repository in the IDE of your choice. The usual recommendation for an IDE is either IntelliJ IDEA or Eclipse.
-
-> **Note**: For Eclipse, use tasks in `Launch Group` instead of ones founds in `Java Application`. A preparation task must run before launching the game. NeoGradle uses launch groups to do these subsequently.
-
-If at any point you are missing libraries in your IDE, or you've run into problems you can
-run `gradlew --refresh-dependencies` to refresh the local cache. `gradlew clean` to reset everything 
-{this does not affect your code} and then start the process again.
-
-Mapping Names:
-============
-By default, the MDK is configured to use the official mapping names from Mojang for methods and fields 
-in the Minecraft codebase. These names are covered by a specific license. All modders should be aware of this
-license. For the latest license text, refer to the mapping file itself, or the reference copy here:
-https://github.com/NeoForged/NeoForm/blob/main/Mojang.md
-
-Additional Resources: 
-==========
-Community Documentation: https://docs.neoforged.net/  
-NeoForged Discord: https://discord.neoforged.net/
+[modproperties.modmenu_parent] # other than id is only needed if parent isnt a real mod
+id="example-api" #id of a parrent mod
+name= "Example API" #name of a parrent mod
+description= "Modular example library"
+icon= "assets/example-api-module-v1/parent_icon.png"
+badges= ["library"]
+```

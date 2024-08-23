@@ -112,16 +112,41 @@ public interface Mod {
 	Optional<ModContainer> getContainer();
 
 	enum Badge {
-		LIBRARY("mod_menu.badge.library", 0xff107454, 0xff093929, "library"), CLIENT("mod_menu.badge.clientsideOnly",
+		LIBRARY(
+				"mod_menu.badge.library",
+				0xff107454,
+				0xff093929,
+				"library"),
+		CLIENT(
+				"mod_menu.badge.clientsideOnly",
 			0xff2b4b7c,
 			0xff0e2a55,
 			"client"
-		), DEPRECATED("mod_menu.badge.deprecated", 0xff841426, 0xff530C17, "deprecated"), PATCHWORK_FORGE(
+		),
+
+		DEPRECATED(
+				"mod_menu.badge.deprecated",
+				0xff841426,
+				0xff530C17,
+				"deprecated"
+		),
+
+		PATCHWORK_FORGE(
 			"mod_menu.badge.forge",
 			0xff1f2d42,
 			0xff101721,
 			null
-		), MODPACK("mod_menu.badge.modpack", 0xff7a2b7c, 0xff510d54, null), MINECRAFT("mod_menu.badge.minecraft",
+		),
+
+		MODPACK(
+				"mod_menu.badge.modpack",
+				0xff7a2b7c,
+				0xff510d54,
+				null
+		),
+
+
+		MINECRAFT("mod_menu.badge.minecraft",
 			0xff6f6c6a,
 			0xff31302f,
 			null

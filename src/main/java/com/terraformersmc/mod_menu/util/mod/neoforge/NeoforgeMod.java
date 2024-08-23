@@ -58,17 +58,21 @@ public class NeoforgeMod implements Mod {
 
 		if (modMenuValue.isPresent()) {
 			Map<String, Object> modMenuMap = modMenuValue.get();
-			if (modMenuMap.get("parent") instanceof HashMap<?,?> parentValues) {
-				try {
-					HashSet<String> badges = new HashSet<>();
-					if (parentValues.get("badges") instanceof ArrayList<?> list && !list.isEmpty()) badges.addAll((ArrayList<String>) list);
 
-					parentId = Optional.of((String) parentValues.get("id"));
+			Optional<Map<String, Object>> parentValues = ownFile.flatMap(mfi -> mfi.getConfigElement("modproperties", "modmenu_parent"));
+			if (parentValues.isPresent() && !parentValues.get().isEmpty()) {
+				try {
+
+					HashSet<String> badges = new HashSet<>();
+					if (parentValues.get().get("badges") instanceof ArrayList<?> list && !list.isEmpty())
+						badges.addAll((ArrayList<String>) list);
+
+					parentId = Optional.of((String) parentValues.get().get("id"));
 					parentData = new ModMenuData.DummyParentData(
 							parentId.orElseThrow(() -> new RuntimeException("Parent object lacks an id")),
-							Optional.of((String) parentValues.get("name")),
-							Optional.of(parentValues.get("description") + "\n" + modInfo.getConfig().getConfigElement("credits").orElse("")),
-							Optional.of((String) parentValues.get("icon")),
+							Optional.of((String) parentValues.get().get("name")),
+							Optional.of(parentValues.get().get("description") + "\n" + modInfo.getConfig().getConfigElement("credits").orElse("")),
+							Optional.of((String) parentValues.get().get("icon")),
 							badges
 					);
 					if (parentId.orElse("").equals(id)) {
@@ -80,18 +84,18 @@ public class NeoforgeMod implements Mod {
 					LOGGER.error("Error loading parent data from mod: " + id, t);
 				}
 			}
-			
+
 			if (modMenuMap.get("badges") instanceof ArrayList<?> list) badgeNames.addAll((List<String>) list);
 
 			if (modMenuMap.get("links") instanceof ArrayList<?> list) list.forEach(string -> {
-				 String[] strings =	string.toString().split("=");
-				 links.put(strings[0], strings[1]);
+				String[] strings = string.toString().split("=");
+				links.put(strings[0], strings[1]);
 			});
 
 			if (modMenuMap.get("contributors") instanceof ArrayList<?> list) contributors.addAll((List<String>) list);
 
 			this.sources = (String) modMenuMap.getOrDefault("sources", "");
-        }
+		}
 
 		for (String string : modInfo.getConfig().getConfigElement("authors").orElse("").toString().split(", ")) {
 			if (string.contains(",")) authors.addAll(Arrays.stream(string.split(",")).toList());
