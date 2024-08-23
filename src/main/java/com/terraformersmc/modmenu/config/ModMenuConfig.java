@@ -3,7 +3,6 @@ package com.terraformersmc.modmenu.config;
 import com.google.gson.annotations.SerializedName;
 import com.terraformersmc.modmenu.ModMenu;
 import com.terraformersmc.modmenu.util.mod.Mod;
-import net.minecraft.network.chat.Component;
 import net.neoforged.neoforge.common.ModConfigSpec;
 import net.neoforged.neoforge.common.TranslatableEnum;
 

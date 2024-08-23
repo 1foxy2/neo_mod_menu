@@ -11,7 +11,6 @@ import net.minecraft.network.chat.contents.TranslatableContents;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.neoforge.client.gui.ConfigurationScreen;
 import net.neoforged.neoforge.common.ModConfigSpec;
-import net.neoforged.neoforge.common.TranslatableEnum;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;

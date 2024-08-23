@@ -13,7 +13,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.List;
 import java.util.function.BiConsumer;
-import java.util.stream.IntStream;
 
 @Mixin(BrandingControl.class)
 public abstract class MixinBrandingControl {

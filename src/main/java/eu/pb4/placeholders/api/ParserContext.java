@@ -40,7 +40,6 @@ public final class ParserContext {
 
 
         public static <T> Key<T> of(String key) {
-            //noinspection unchecked
             return new Key<T>(key, null);
         }
     };

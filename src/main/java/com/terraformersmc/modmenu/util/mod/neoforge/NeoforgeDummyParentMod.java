@@ -1,7 +1,6 @@
 package com.terraformersmc.modmenu.util.mod.neoforge;
 
 import com.terraformersmc.modmenu.ModMenu;
-import com.terraformersmc.modmenu.config.ModMenuConfig;
 import com.terraformersmc.modmenu.util.mod.Mod;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.neoforged.fml.ModContainer;

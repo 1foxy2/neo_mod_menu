@@ -178,9 +178,8 @@ public class NeoforgeMod implements Mod {
 
 	@Override
 	public @NotNull String getTranslatedDescription() {
-		var description = Mod.super.getTranslatedDescription();
 
-		return description;
+        return Mod.super.getTranslatedDescription();
 	}
 
 	@Override

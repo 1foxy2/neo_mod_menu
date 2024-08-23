@@ -1,16 +1,16 @@
 package com.terraformersmc.modmenu.util.mod.fabric;
 
 import com.google.common.collect.Sets;
-import com.google.common.hash.Hashing;
-import com.google.common.io.Files;
 import com.terraformersmc.modmenu.ModMenu;
-import com.terraformersmc.modmenu.config.ModMenuConfig;
 import com.terraformersmc.modmenu.util.VersionUtil;
 import com.terraformersmc.modmenu.util.mod.Mod;
 import com.terraformersmc.modmenu.util.mod.neoforge.NeoforgeIconHandler;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
-import net.fabricmc.loader.api.metadata.*;
+import net.fabricmc.loader.api.metadata.CustomValue;
+import net.fabricmc.loader.api.metadata.ModEnvironment;
+import net.fabricmc.loader.api.metadata.ModMetadata;
+import net.fabricmc.loader.api.metadata.Person;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.neoforged.fml.ModList;
 import org.jetbrains.annotations.NotNull;
@@ -18,8 +18,6 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -149,9 +147,7 @@ public class FabricMod implements Mod {
 
 	@Override
 	public @NotNull String getTranslatedDescription() {
-		var description = Mod.super.getTranslatedDescription();
-
-		return description;
+        return Mod.super.getTranslatedDescription();
 	}
 
 	@Override
@@ -165,9 +161,8 @@ public class FabricMod implements Mod {
 
 	@Override
 	public @NotNull List<String> getAuthors() {
-		List<String> authors = metadata.getAuthors().stream().map(Person::getName).collect(Collectors.toList());
 
-		return authors;
+        return metadata.getAuthors().stream().map(Person::getName).collect(Collectors.toList());
 	}
 
 	@Override

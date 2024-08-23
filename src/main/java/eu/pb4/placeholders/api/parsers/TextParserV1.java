@@ -123,8 +123,7 @@ public class TextParserV1 implements NodeParser {
     }
 
     public @Nullable TextTag getTag(String name) {
-        var o = this.byNameAlias.get(name);
-        return o;
+        return this.byNameAlias.get(name);
     }
 
     public record TextTag(String name, String[] aliases, String type, boolean userSafe, TagNodeBuilder parser) {

@@ -1,14 +1,12 @@
 package com.terraformersmc.modmenu.util.mod.neoforge;
 
 import com.mojang.blaze3d.platform.NativeImage;
-import com.terraformersmc.modmenu.ModMenu;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.neoforged.fml.ModContainer;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.awt.*;
 import java.io.Closeable;
 import java.io.InputStream;
 import java.nio.file.Files;

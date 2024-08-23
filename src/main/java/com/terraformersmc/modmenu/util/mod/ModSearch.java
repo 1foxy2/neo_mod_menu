@@ -1,7 +1,6 @@
 package com.terraformersmc.modmenu.util.mod;
 
 import com.terraformersmc.modmenu.ModMenu;
-import com.terraformersmc.modmenu.config.ModMenuConfig;
 import com.terraformersmc.modmenu.gui.ModsScreen;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.util.Tuple;
