@@ -8,7 +8,7 @@ modId="${mod_id}" #mandatory
 version="${mod_version}" #mandatory
 displayName="${mod_name}" #mandatory
 #updateJSONURL="https://change.me.example.invalid/updates.json" #optional
-displayURL="https://modrinth.com/mod/modmenu" #optional
+displayURL="https://modrinth.com/mod/better-modlist" #optional
 #logoFile="examplemod.png" #optional
 #credits="" #optional
 issueTrackerURL="https://github.com/1foxy2/neo_mod_menu/issues" #optional
@@ -87,7 +87,7 @@ contributors=[
     "triphora",
     "Pyrrha"
 ]
-sources="sd"
+sources="https://github.com/1foxy2/neo_mod_menu"
 
 [[dependencies.${mod_id}]] #optional
     modId="neoforge" #mandatory
