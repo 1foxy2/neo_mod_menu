@@ -188,5 +188,6 @@
   "mod_menu.configuration.config_mode": "config mode",
   "mod_menu.configuration.disable_drag_and_drop": "Disable Drag And Drop",
   "mod_menu.configuration.modify_game_menu": "Modify Game Menu",
-  "mod_menu.configuration.modify_title_screen": "Modify Title Screen"
+  "mod_menu.configuration.modify_title_screen": "Modify Title Screen",
+  "mod_menu.configuration.library_list": "List of libraries"
 }

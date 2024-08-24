@@ -34,6 +34,7 @@ public class NeoforgeMod implements Mod {
 
 	protected boolean defaultIconWarning = true;
 	protected boolean childHasUpdate = false;
+	protected boolean wasInLibraries = false;
 
 	protected String sources;
 	protected String issueTrackerUrl;
@@ -312,5 +313,17 @@ public class NeoforgeMod implements Mod {
 	@Override
 	public boolean isHidden() {
 		return ModMenu.getConfig().HIDDEN_MODS.get().contains(this.getId());
+	}
+
+	@Override
+	public void reCalculateLibraries() {
+		boolean isInLibraries = ModMenu.getConfig().LIBRARY_LIST.get().contains(getId());
+		if (isInLibraries && !wasInLibraries) {
+			this.modMenuData.addLibraryBadge(true);
+			wasInLibraries = true;
+		} else if (!isInLibraries && wasInLibraries) {
+			this.modMenuData.getBadges().remove(Badge.LIBRARY);
+			wasInLibraries = false;
+		}
 	}
 }

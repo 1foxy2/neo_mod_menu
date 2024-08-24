@@ -14,6 +14,7 @@ public class NeoforgeDummyParentMod implements Mod {
 	private final String id;
 	private final Mod host;
 	private boolean childHasUpdate;
+	protected boolean wasInLibraries = false;
 
 	public NeoforgeDummyParentMod(Mod host, String id) {
 		this.host = host;
@@ -182,5 +183,17 @@ public class NeoforgeDummyParentMod implements Mod {
 	@Override
 	public Optional<ModContainer> getContainer() {
 		return Optional.empty();
+	}
+
+	@Override
+	public void reCalculateLibraries() {
+		boolean isInLibraries = ModMenu.getConfig().LIBRARY_LIST.get().contains(getId());
+		if (isInLibraries && !wasInLibraries) {
+			this.getModMenuData().addLibraryBadge(true);
+			wasInLibraries = true;
+		} else if (!isInLibraries && wasInLibraries) {
+			this.getModMenuData().getBadges().remove(Badge.LIBRARY);
+			wasInLibraries = false;
+		}
 	}
 }

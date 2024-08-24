@@ -41,6 +41,7 @@ public class ModMenuConfig {
     public final ModConfigSpec.BooleanValue DISABLE_DRAG_AND_DROP;
     public final ModConfigSpec.ConfigValue<List<? extends String>> HIDDEN_MODS;
     public final ModConfigSpec.ConfigValue<List<? extends String>> HIDDEN_CONFIGS;
+    public final ModConfigSpec.ConfigValue<List<? extends String>> LIBRARY_LIST;
   //  public static final ModConfigSpec.BooleanValue DISABLE_UPDATE_CHECKER;
 
     public ModMenuConfig(ModConfigSpec.Builder builder) {
@@ -92,6 +93,8 @@ public class ModMenuConfig {
                 .defineList("hidden_mods", ArrayList::new, String::new, object -> object instanceof String);
         HIDDEN_CONFIGS = builder
                 .defineList("hidden_configs", ArrayList::new, String::new, object -> object instanceof String);
+        LIBRARY_LIST = builder
+                .defineList("library_list", ArrayList::new, String::new, object -> object instanceof String);
         builder.pop();
 
         builder.push("count");

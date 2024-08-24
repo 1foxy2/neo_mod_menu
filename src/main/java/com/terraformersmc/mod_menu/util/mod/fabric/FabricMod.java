@@ -13,7 +13,6 @@ import net.fabricmc.loader.api.metadata.ModMetadata;
 import net.fabricmc.loader.api.metadata.Person;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.neoforged.fml.ModList;
-import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -40,6 +39,8 @@ public class FabricMod implements Mod {
 	protected boolean allowsUpdateChecks = true;
 
 	protected boolean childHasUpdate = false;
+
+	protected boolean wasInLibraries = false;
 
 	public FabricMod(String modId) {
 		this.container = FabricLoader.getInstance().getModContainer(modId).get();
@@ -258,5 +259,17 @@ public class FabricMod implements Mod {
 	@Override
 	public boolean isHidden() {
 		return ModMenu.getConfig().HIDDEN_MODS.get().contains(this.getId());
+	}
+
+	@Override
+	public void reCalculateLibraries() {
+		boolean isInLibraries = ModMenu.getConfig().LIBRARY_LIST.get().contains(getId());
+		if (isInLibraries && !wasInLibraries) {
+			this.modMenuData.addLibraryBadge(true);
+			wasInLibraries = true;
+		} else if (!isInLibraries && wasInLibraries) {
+			this.modMenuData.getBadges().remove(Badge.LIBRARY);
+			wasInLibraries = false;
+		}
 	}
 }

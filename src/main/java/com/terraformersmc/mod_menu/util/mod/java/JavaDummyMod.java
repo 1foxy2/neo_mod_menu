@@ -22,7 +22,7 @@ public class JavaDummyMod implements Mod {
 
 	protected final ModMenuData modMenuData;
 
-	private static String modid = "java";
+	private static final String modid = "java";
 
 	protected final Map<String, String> links = new HashMap<>();
 
@@ -41,7 +41,6 @@ public class JavaDummyMod implements Mod {
 		this.modMenuData = new ModMenuData(badgeNames, parentId, null, modid);
 
 		modMenuData.getBadges().add(Badge.LIBRARY);
-
 	}
 
 
@@ -182,4 +181,7 @@ public class JavaDummyMod implements Mod {
 	public Optional<ModContainer> getContainer() {
 		return Optional.empty();
 	}
+
+	@Override
+	public void reCalculateLibraries() {}
 }

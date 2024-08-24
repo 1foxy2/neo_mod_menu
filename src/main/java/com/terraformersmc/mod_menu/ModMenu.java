@@ -34,9 +34,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.text.NumberFormat;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @net.neoforged.fml.common.Mod(ModMenu.MOD_ID)
 public class ModMenu {
@@ -146,6 +144,7 @@ public class ModMenu {
 	public void onClientSetup(FMLClientSetupEvent event) {
 		ModList.get().getMods().forEach(info -> IConfigScreenFactory.getForMod(info).ifPresent(
 				factory -> configScreenFactories.put(info.getModId(), factory)));
+		addLibraryBadge();
 	}
 
 	public static void clearModCountCache() {
@@ -210,5 +209,12 @@ public class ModMenu {
 
 	public static ModMenuConfig getConfig() {
 		return CONFIG.getLeft();
+	}
+
+	public static void addLibraryBadge() {
+		Set<Mod> allMods = new HashSet<>();
+		allMods.addAll(ROOT_MODS.values());
+		allMods.addAll(MODS.values());
+		allMods.forEach(Mod::reCalculateLibraries);
 	}
 }

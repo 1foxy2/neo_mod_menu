@@ -29,6 +29,7 @@ public class ModMenuConfigScreen extends ConfigurationScreen.ConfigurationSectio
     private static final String LANG_PREFIX = "neoforge.configuration.uitext.";
     private static final String SECTION = LANG_PREFIX + "section";
     private static final String SECTION_TEXT = LANG_PREFIX + "sectiontext";
+    private static final String CRUMB = LANG_PREFIX + "breadcrumb";
     protected static final ConfigurationScreen.TranslationChecker translationChecker = new ConfigurationScreen.TranslationChecker();
 
     public ModMenuConfigScreen(Screen parent, ModConfig.Type type, ModConfig modConfig, Component title) {
@@ -38,7 +39,6 @@ public class ModMenuConfigScreen extends ConfigurationScreen.ConfigurationSectio
     public ModMenuConfigScreen(Context parentContext, Screen parent, Map<String, Object> valueSpecs, String key, Set<? extends UnmodifiableConfig.Entry> entrySet, Component title) {
         super(parentContext, parent, valueSpecs, key, entrySet, title);
     }
-
 
     @Nullable
     @Override
@@ -106,5 +106,21 @@ public class ModMenuConfigScreen extends ConfigurationScreen.ConfigurationSectio
                         onChanged(key);
                     }, source.get());
                 }));
+    }
+
+    @Nullable
+    @Override
+    protected <T> Element createList(String key, ModConfigSpec.ListValueSpec spec, ModConfigSpec.ConfigValue<List<T>> list) {
+        if (key.equals("library_list"))
+            return new Element(Component.translatable(SECTION, getTranslationComponent(key)), getTooltipComponent(key, null),
+                Button.builder(Component.translatable(SECTION, Component.translatable(translationChecker.check(getTranslationKey(key) + ".button", SECTION_TEXT))),
+                                button -> {
+                        ModMenu.addLibraryBadge();
+                    minecraft.setScreen(((ModMenuConfigListScreen) sectionCache.computeIfAbsent(key,
+                                            k -> new ModMenuConfigListScreen<>(Context.list(context, this), key, Component.translatable(CRUMB, this.getTitle(), getTranslationComponent(key)), spec, list))).rebuild());
+                                })
+                        .tooltip(Tooltip.create(getTooltipComponent(key, null))).build(),
+                false);
+        return super.createList(key, spec, list);
     }
 }

@@ -15,6 +15,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public interface Mod {
+
 	@NotNull String getId();
 
 	@NotNull String getName();
@@ -110,6 +111,8 @@ public interface Mod {
 	ModMenuData getModMenuData();
 
 	Optional<ModContainer> getContainer();
+
+	void reCalculateLibraries();
 
 	enum Badge {
 		LIBRARY(
