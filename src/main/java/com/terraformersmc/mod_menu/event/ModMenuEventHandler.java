@@ -10,6 +10,7 @@ import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.PlainTextButton;
 import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.layouts.LayoutElement;
 import net.minecraft.client.gui.screens.Screen;
@@ -62,15 +63,12 @@ public class ModMenuEventHandler {
 		boolean isRealmsButton;
 		for (int i = 0; i < buttons.size(); i++) {
 			Renderable widget = buttons.get(i);
-			if (widget instanceof Button button) {
-				if (!buttonHasText(button, "title.credits")) {
-					shiftButtons(button, replacedRealmButton, spacing + (replacedRealmButton ? -12 : 8));
-				}
+			if (widget instanceof Button button && !(button instanceof PlainTextButton)) {
+				shiftButtons(button, replacedRealmButton, spacing + (replacedRealmButton ? -12 : 8));
 
 				isRealmsButton = buttonHasText(button, "menu.online");
 				if (isRealmsButton)
 					replacedRealmButton = true;
-
 
 				if (ModMenu.getConfig().MODS_BUTTON_STYLE.get() == ModMenuConfig.TitleMenuButtonStyle.CLASSIC) {
 					if (button.visible) {
