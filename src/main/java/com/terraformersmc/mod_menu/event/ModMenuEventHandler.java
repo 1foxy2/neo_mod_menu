@@ -63,7 +63,7 @@ public class ModMenuEventHandler {
 		for (int i = 0; i < buttons.size(); i++) {
 			Renderable widget = buttons.get(i);
 			if (widget instanceof Button button) {
-				if (i != buttons.size() - 1) {
+				if (!buttonHasText(button, "title.credits")) {
 					shiftButtons(button, replacedRealmButton, spacing + (replacedRealmButton ? -12 : 8));
 				}
 
