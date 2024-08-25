@@ -2,16 +2,14 @@
   "required": true,
   "minVersion": "0.8",
   "package": "com.terraformersmc.mod_menu.mixin",
-  "compatibilityLevel": "JAVA_21",
+  "compatibilityLevel": "JAVA_17",
   "client": [
     "AccessorGridLayout",
     "MixinPauseScreen",
-    "MixinTitleScreen"
+    "MixinTitleScreen",
+    "MixinBrandingControl"
   ],
   "injectors": {
     "defaultRequire": 1
-  },
-  "mixins": [
-    "MixinBrandingControl"
-  ]
+  }
 }

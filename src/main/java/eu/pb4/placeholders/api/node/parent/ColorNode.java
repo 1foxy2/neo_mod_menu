@@ -2,12 +2,13 @@ package eu.pb4.placeholders.api.node.parent;
 
 import eu.pb4.placeholders.api.ParserContext;
 import eu.pb4.placeholders.api.node.TextNode;
-import net.minecraft.network.chat.Style;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.TextColor;
 
 import java.util.Arrays;
 
-public final class ColorNode extends SimpleStylingNode {
+public final class ColorNode extends ParentNode {
     private final TextColor color;
 
     public ColorNode(TextNode[] children, TextColor color) {
@@ -16,8 +17,8 @@ public final class ColorNode extends SimpleStylingNode {
     }
 
     @Override
-    protected Style style(ParserContext context) {
-        return Style.EMPTY.withColor(this.color);
+    protected Component applyFormatting(MutableComponent out, ParserContext context) {
+        return out.setStyle(out.getStyle().withColor(this.color));
     }
 
     @Override

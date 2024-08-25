@@ -21,7 +21,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 /**
- * Basic markdown parser supporting only single-line vanilla component compatible formatting.
+ * Basic markdown parser supporting only single-line vanilla text compatible formatting.
  */
 public final class MarkdownLiteParserV1 implements NodeParser {
     public static NodeParser ALL = new MarkdownLiteParserV1(MarkdownFormat.values());
@@ -80,7 +80,15 @@ public final class MarkdownLiteParserV1 implements NodeParser {
             parseLiteral(literalNode, list::add);
             return parseSubNodes(list.listIterator(), null, -1, false);
         } else if (input instanceof TranslatedNode translatedNode) {
-            return new TextNode[]{ translatedNode.transform(this) };
+            var list = new ArrayList<>();
+            for (var arg : translatedNode.args()) {
+                if (arg instanceof TextNode textNode) {
+                    list.add(TextNode.asSingle(this.parseNodes(textNode)));
+                } else {
+                    list.add(arg);
+                }
+            }
+            return new TextNode[]{TranslatedNode.ofFallback(translatedNode.key(), translatedNode.fallback(), list.toArray())};
         } else if (input instanceof ParentTextNode parentTextNode) {
             var list = new ArrayList<SubNode<?>>();
             for (var children : parentTextNode.getChildren()) {

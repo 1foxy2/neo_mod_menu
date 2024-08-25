@@ -1,15 +1,13 @@
 package eu.pb4.placeholders.api.parsers;
 
 import com.google.common.collect.ImmutableList;
-import eu.pb4.placeholders.api.arguments.StringArgs;
 import eu.pb4.placeholders.api.node.EmptyNode;
 import eu.pb4.placeholders.api.node.LiteralNode;
 import eu.pb4.placeholders.api.node.TextNode;
 import eu.pb4.placeholders.api.node.parent.ParentNode;
 import eu.pb4.placeholders.api.node.parent.ParentTextNode;
-import eu.pb4.placeholders.impl.GeneralUtils;
 import eu.pb4.placeholders.impl.textparser.TextParserImpl;
-import eu.pb4.placeholders.impl.textparser.TextTagsV1;
+import eu.pb4.placeholders.impl.textparser.TextTags;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -19,15 +17,9 @@ import java.util.Map;
 import java.util.function.Function;
 
 /**
- * Original parser implementing Simple Text Format
- * <a href="https://placeholders.pb4.eu/user/text-format/">Format documentation</a>
- * <p>
- * Regex-based component parsing implementation. Should be always used first.
+ * Regex-based text parsing implementation. Should be always used first.
  * Loosely based on MiniMessage, with some degree of compatibility with it.
- *
- * @Deprecated Replaced with {@link TagParser}
  */
-@Deprecated
 public class TextParserV1 implements NodeParser {
 
     public static final TextParserV1 DEFAULT = new TextParserV1();
@@ -122,10 +114,6 @@ public class TextParserV1 implements NodeParser {
         return o != null ? o.parser() : null;
     }
 
-    public @Nullable TextTag getTag(String name) {
-        return this.byNameAlias.get(name);
-    }
-
     public record TextTag(String name, String[] aliases, String type, boolean userSafe, TagNodeBuilder parser) {
         public static TextTag of(String name, String type, TagNodeBuilder parser) {
             return of(name, type, true, parser);
@@ -137,13 +125,6 @@ public class TextParserV1 implements NodeParser {
 
         public static TextTag of(String name, List<String> aliases, String type, boolean userSafe, TagNodeBuilder parser) {
             return new TextTag(name, aliases.toArray(new String[0]), type, userSafe, parser);
-        }
-
-
-        public static TextTag from(eu.pb4.placeholders.api.parsers.tag.TextTag tag) {
-            return new TextTag(tag.name(), tag.aliases(), tag.type(), tag.userSafe(), tag.selfContained()
-                    ? TagNodeBuilder.selfClosing((a, b) -> tag.nodeCreator().createTextNode(GeneralUtils.CASTER, StringArgs.ordered(a, ':'), b))
-                    : TagNodeBuilder.wrapping((a, b, c) -> tag.nodeCreator().createTextNode(a, StringArgs.ordered(b, ':'), c)));
         }
     }
 
@@ -163,29 +144,9 @@ public class TextParserV1 implements NodeParser {
         }
     }
 
-    private record TagParserGetterParser(TagParserGetter getter) implements NodeParser {
-        @Override
-        public TextNode[] parseNodes(TextNode input) {
-            return parseNodesWith(input, getter);
-        }
-    }
-
     @FunctionalInterface
     public interface TagNodeBuilder {
         TagNodeValue parseString(String tag, String data, String input, TagParserGetter tags, String endAt);
-
-        static TagNodeBuilder selfClosing(SelfTagParsedCreator selfTagCreator) {
-            return (tag, data, input, handlers, endAt) -> {
-                return new TagNodeValue(selfTagCreator.createTextNode(data, new TagParserGetterParser(handlers)), 0);
-            };
-        }
-
-        static TagNodeBuilder wrapping(FormattingTagParsedCreator formattingTagCreator) {
-            return (tag, data, input, handlers, endAt) -> {
-                var out = parseNodesWith(input, handlers, endAt);
-                return new TagNodeValue(formattingTagCreator.createTextNode(out.nodes(), data, new TagParserGetterParser(handlers)), out.length());
-            };
-        }
 
         static TagNodeBuilder selfClosing(SelfTagCreator selfTagCreator) {
             return (tag, data, input, handlers, endAt) -> {
@@ -215,14 +176,6 @@ public class TextParserV1 implements NodeParser {
             TextNode createTextNode(TextNode[] nodes, String arg);
         }
 
-        interface SelfTagParsedCreator {
-            TextNode createTextNode(String arg, NodeParser parser);
-        }
-
-        interface FormattingTagParsedCreator {
-            TextNode createTextNode(TextNode[] nodes, String arg, NodeParser parser);
-        }
-
         interface BooleanFormattingTagCreator {
             TextNode createTextNode(TextNode[] nodes, boolean arg);
         }
@@ -235,6 +188,6 @@ public class TextParserV1 implements NodeParser {
     }
 
     static {
-        TextTagsV1.register();
+        TextTags.register();
     }
 }

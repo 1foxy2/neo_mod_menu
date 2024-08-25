@@ -2,12 +2,13 @@ package eu.pb4.placeholders.impl;
 
 import eu.pb4.placeholders.api.node.*;
 import eu.pb4.placeholders.api.node.parent.*;
+import net.fabricmc.loader.api.FabricLoader;
+import net.fabricmc.loader.api.Version;
+import net.fabricmc.loader.api.VersionParsingException;
 import net.minecraft.ChatFormatting;
-import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.*;
 import net.minecraft.network.chat.contents.*;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.fml.loading.FMLEnvironment;
 import org.jetbrains.annotations.ApiStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,8 +20,21 @@ import java.util.function.Function;
 @ApiStatus.Internal
 public class GeneralUtils {
     public static final Logger LOGGER = LoggerFactory.getLogger("Text Placeholder API");
-    public static final boolean IS_DEV = !FMLEnvironment.production;
+    public static final boolean IS_DEV = FabricLoader.getInstance().isDevelopmentEnvironment();
     public static final TextNode[] CASTER = new TextNode[0];
+
+    public static final boolean IS_LEGACY_TRANSLATION;
+
+    static {
+        boolean IS_LEGACY1;
+        try {
+            IS_LEGACY1 = FabricLoader.getInstance().getModContainer("minecraft").get().getMetadata().getVersion().compareTo(Version.parse("1.19.4")) < 0;
+        } catch (VersionParsingException e) {
+            IS_LEGACY1 = false;
+            e.printStackTrace();
+        }
+        IS_LEGACY_TRANSLATION = IS_LEGACY1;
+    }
 
     public static String durationToString(long x) {
         long seconds = x % 60;
@@ -41,22 +55,22 @@ public class GeneralUtils {
         }
     }
 
-    public static boolean isEmpty(Component component) {
+    public static boolean isEmpty(Component text) {
         return (
-                component.getContents() == PlainTextContents.EMPTY
-                || (component.getContents() instanceof PlainTextContents.LiteralContents l && l.text().isEmpty())
-               ) && component.getSiblings().isEmpty();
+                text.getContents() == ComponentContents.EMPTY
+                || (text.getContents() instanceof LiteralContents l && l.text().isEmpty())
+               ) && text.getSiblings().isEmpty();
     }
 
     public static MutableComponent toGradient(Component base, GradientNode.GradientProvider posToColor) {
-        return recursiveGradient(base, posToColor, 0, getGradientLength(base)).component();
+        return recursiveGradient(base, posToColor, 0, getGradientLength(base)).text();
     }
 
     private static int getGradientLength(Component base) {
-        int length = base.getContents() instanceof PlainTextContents.LiteralContents l ? l.text().length() : base.getContents() == PlainTextContents.EMPTY ? 0 : 1;
+        int length = base.getContents() instanceof LiteralContents l ? l.text().length() : base.getContents() == ComponentContents.EMPTY ? 0 : 1;
 
-        for (var component : base.getSiblings()) {
-            length += getGradientLength(component);
+        for (var text : base.getSiblings()) {
+            length += getGradientLength(text);
         }
 
         return length;
@@ -65,7 +79,7 @@ public class GeneralUtils {
     private static TextLengthPair recursiveGradient(Component base, GradientNode.GradientProvider posToColor, int pos, int totalLength) {
         if (base.getStyle().getColor() == null) {
             MutableComponent out = Component.empty().setStyle(base.getStyle());
-            if (base.getContents() instanceof PlainTextContents.LiteralContents literalTextContent) {
+            if (base.getContents() instanceof LiteralContents literalTextContent) {
                 var l = literalTextContent.text().length();
                 for (var i = 0; i < l; i++) {
                     var character = literalTextContent.text().charAt(i);
@@ -91,15 +105,63 @@ public class GeneralUtils {
             for (Component sibling : base.getSiblings()) {
                 var pair = recursiveGradient(sibling, posToColor, pos, totalLength);
                 pos = pair.length;
-                out.append(pair.component);
+                out.append(pair.text);
             }
             return new TextLengthPair(out, pos);
         }
         return new TextLengthPair(base.copy(), pos + base.getString().length());
     }
 
+    public static int hvsToRgb(float hue, float saturation, float value) {
+        int h = (int) (hue * 6) % 6;
+        float f = hue * 6 - h;
+        float p = value * (1 - saturation);
+        float q = value * (1 - f * saturation);
+        float t = value * (1 - (1 - f) * saturation);
+
+        return switch (h) {
+            case 0 -> rgbToInt(value, t, p);
+            case 1 -> rgbToInt(q, value, p);
+            case 2 -> rgbToInt(p, value, t);
+            case 3 -> rgbToInt(p, q, value);
+            case 4 -> rgbToInt(t, p, value);
+            case 5 -> rgbToInt(value, p, q);
+            default -> 0;
+        };
+    }
+
     public static int rgbToInt(float r, float g, float b) {
         return (((int) (r * 0xff)) & 0xFF) << 16 | (((int) (g * 0xff)) & 0xFF) << 8 | (((int) (b * 0xff) & 0xFF));
+    }
+
+    public static HSV rgbToHsv(int rgb) {
+        float b = (float) (rgb % 256) / 255;
+        rgb = rgb >> 8;
+        float g = (float) (rgb % 256) / 255;
+        rgb = rgb >> 8;
+        float r = (float) (rgb % 256) / 255;
+
+        float cmax = Math.max(r, Math.max(g, b));
+        float cmin = Math.min(r, Math.min(g, b));
+        float diff = cmax - cmin;
+        float h = -1, s = -1;
+
+        if (cmax == cmin) {
+            h = 0;
+        } else if (cmax == r) {
+            h = (0.1666f * ((g - b) / diff) + 1) % 1;
+        } else if (cmax == g) {
+            h = (0.1666f * ((b - r) / diff) + 0.333f) % 1;
+        } else if (cmax == b) {
+            h = (0.1666f * ((r - g) / diff) + 0.666f) % 1;
+        }
+        if (cmax == 0) {
+            s = 0;
+        } else {
+            s = (diff / cmax);
+        }
+
+        return new HSV(h, s, cmax);
     }
 
     public static Component deepTransform(Component input) {
@@ -149,7 +211,7 @@ public class GeneralUtils {
 
             baseText = Component.translatable(translatable.getKey(), obj.toArray());
         } else {
-            baseText = input.plainCopy();
+            baseText = input.plainCopy() ;
         }
 
         for (var sibling : input.getSiblings()) {
@@ -188,19 +250,19 @@ public class GeneralUtils {
 
     public static Component getItemText(ItemStack stack, boolean rarity) {
         if (!stack.isEmpty()) {
-            MutableComponent mutableComponent = Component.empty().append(stack.getHoverName());
-            if (stack.has(DataComponents.CUSTOM_NAME)) {
-                mutableComponent.withStyle(ChatFormatting.ITALIC);
+            MutableComponent mutableText = Component.empty().append(stack.getHoverName());
+            if (stack.hasCustomHoverName()) {
+                mutableText.withStyle(ChatFormatting.ITALIC);
             }
 
             if (rarity) {
-                mutableComponent.withStyle(stack.getRarity().getStyleModifier());
+                mutableText.withStyle(stack.getRarity().getStyleModifier());
             }
-            mutableComponent.withStyle((style) -> {
+            mutableText.withStyle((style) -> {
                 return style.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_ITEM, new HoverEvent.ItemStackInfo(stack)));
             });
 
-            return mutableComponent;
+            return mutableText;
         }
 
         return Component.empty().append(ItemStack.EMPTY.getHoverName());
@@ -209,13 +271,13 @@ public class GeneralUtils {
     public static ParentNode convertToNodes(Component input) {
         var list = new ArrayList<TextNode>();
 
-        if (input.getContents() instanceof PlainTextContents.LiteralContents content) {
+        if (input.getContents() instanceof LiteralContents content) {
             list.add(new LiteralNode(content.text()));
         } else if (input.getContents() instanceof TranslatableContents content) {
             var args = new ArrayList<>();
             for (var arg : content.getArgs()) {
-                if (arg instanceof Component component) {
-                    args.add(convertToNodes(component));
+                if (arg instanceof Component text) {
+                    args.add(convertToNodes(text));
                 } else if (arg instanceof String s) {
                     args.add(new LiteralNode(s));
                 } else {
@@ -223,8 +285,11 @@ public class GeneralUtils {
                 }
             }
 
-
-            list.add(TranslatedNode.ofFallback(content.getKey(), content.getFallback(), args.toArray()));
+            if (IS_LEGACY_TRANSLATION) {
+                list.add(TranslatedNode.of(content.getKey(), args.toArray()));
+            } else {
+                list.add(TranslatedNode.ofFallback(content.getKey(), content.getFallback(), args.toArray()));
+            }
         } else if (input.getContents() instanceof ScoreContents content) {
             list.add(new ScoreNode(content.getName(), content.getObjective()));
         } else if (input.getContents() instanceof KeybindContents content) {
@@ -274,23 +339,26 @@ public class GeneralUtils {
         }
     }
 
-    public record TextLengthPair(MutableComponent component, int length) {
+    public record HSV(float h, float s, float v) {
+    }
+
+    public record TextLengthPair(MutableComponent text, int length) {
         public static final TextLengthPair EMPTY = new TextLengthPair(null, 0);
     }
 
     public record Pair<L, R>(L left, R right) {
     }
 
-    public record MutableTransformer(Function<Style, Style> textMutableComponentFunction) implements Function<MutableComponent, Component> {
+    public record MutableTransformer(Function<Style, Style> textMutableTextFunction) implements Function<MutableComponent, Component> {
         public static final MutableTransformer CLEAR = new MutableTransformer(x -> Style.EMPTY);
 
         @Override
-        public Component apply(MutableComponent component) {
-            return GeneralUtils.cloneTransformText(component, this::transformStyle);
+        public Component apply(MutableComponent text) {
+            return GeneralUtils.cloneTransformText(text, this::transformStyle);
         }
 
-        private MutableComponent transformStyle(MutableComponent mutableComponent) {
-            return mutableComponent.setStyle(textMutableComponentFunction.apply(mutableComponent.getStyle()));
+        private MutableComponent transformStyle(MutableComponent mutableText) {
+            return mutableText.setStyle(textMutableTextFunction.apply(mutableText.getStyle()));
         }
     }
 }

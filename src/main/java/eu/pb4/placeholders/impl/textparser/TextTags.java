@@ -1,13 +1,10 @@
 package eu.pb4.placeholders.impl.textparser;
 
-import com.google.gson.JsonParser;
-import com.mojang.serialization.JsonOps;
 import eu.pb4.placeholders.api.node.*;
 import eu.pb4.placeholders.api.node.parent.*;
 import eu.pb4.placeholders.api.parsers.TextParserV1;
 import eu.pb4.placeholders.impl.GeneralUtils;
 import net.minecraft.ChatFormatting;
-import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.TagParser;
 import net.minecraft.network.chat.*;
@@ -24,9 +21,8 @@ import java.util.function.Function;
 
 import static eu.pb4.placeholders.impl.textparser.TextParserImpl.*;
 
-@Deprecated
 @ApiStatus.Internal
-public final class TextTagsV1 {
+public final class TextTags {
     public static void register() {
         {
             Map<String, List<String>> aliases = new HashMap<>();
@@ -111,7 +107,7 @@ public final class TextTagsV1 {
                             List.of("colour", "c"),
                             "color",
                             true,
-                            wrap((nodes, data) -> new ColorNode(nodes, TextColor.parseColor(cleanArgument(data)).result().orElse(null)))
+                            wrap((nodes, data) -> new ColorNode(nodes, TextColor.parseColor(cleanArgument(data))))
                     )
             );
         }
@@ -196,10 +192,9 @@ public final class TextTagsV1 {
                 String[] lines = data.split(":", 2);
                 var out = recursiveParsing(input, handlers, endAt);
                 if (lines.length > 1) {
-                    for (ClickEvent.Action action : ClickEvent.Action.values()) {
-                        if (action.getSerializedName().equals(cleanArgument(lines[0]))) {
-                            return out.value(new ClickActionNode(out.nodes(), action, new LiteralNode(restoreOriginalEscaping(cleanArgument(lines[1])))));
-                        }
+                    ClickEvent.Action action = ClickEvent.Action.getByName(cleanArgument(lines[0]));
+                    if (action != null) {
+                        return out.value(new ClickActionNode(out.nodes(), action, new LiteralNode(restoreOriginalEscaping(cleanArgument(lines[1])))));
                     }
                 }
                 return out.value(new ParentNode(out.nodes()));
@@ -304,7 +299,8 @@ public final class TextTagsV1 {
 
                                 try {
                                     if (lines.length > 1) {
-                                        HoverEvent.Action<?> action = HoverEvent.Action.CODEC.parse(JsonOps.INSTANCE, JsonParser.parseString(cleanArgument(lines[0].toLowerCase(Locale.ROOT)))).result().orElse(null);
+                                        HoverEvent.Action<?> action = HoverEvent.Action.getByName(cleanArgument(lines[0].toLowerCase(Locale.ROOT)));
+
                                         if (action == HoverEvent.Action.SHOW_TEXT) {
                                             return out.value(new HoverNode<>(out.nodes(), HoverNode.Action.TEXT, new ParentNode(parse(restoreOriginalEscaping(cleanArgument(lines[1])), handlers))));
                                         } else if (action == HoverEvent.Action.SHOW_ENTITY) {
@@ -322,7 +318,7 @@ public final class TextTagsV1 {
                                             try {
                                                 return out.value(new HoverNode<>(out.nodes(),
                                                         HoverNode.Action.ITEM_STACK,
-                                                        new HoverEvent.ItemStackInfo(ItemStack.parseOptional(RegistryAccess.EMPTY, TagParser.parseTag(restoreOriginalEscaping(cleanArgument(lines[1])))))
+                                                        new HoverEvent.ItemStackInfo(ItemStack.of(TagParser.parseTag(restoreOriginalEscaping(cleanArgument(lines[1])))))
                                                 ));
                                             } catch (Throwable e) {
                                                 lines = lines[1].split(":", 2);
@@ -331,6 +327,10 @@ public final class TextTagsV1 {
 
                                                     if (lines.length > 1) {
                                                         stack.setCount(Integer.parseInt(lines[1]));
+                                                    }
+
+                                                    if (lines.length > 2) {
+                                                        stack.setTag(TagParser.parseTag(restoreOriginalEscaping(cleanArgument(lines[2]))));
                                                     }
 
                                                     return out.value(new HoverNode<>(out.nodes(),
@@ -449,7 +449,10 @@ public final class TextTagsV1 {
                                 var out = recursiveParsing(input, handlers, endAt);
                                 List<TextColor> textColors = new ArrayList<>();
                                 for (String string : val) {
-                                    TextColor.parseColor(string).result().ifPresent(textColors::add);
+                                    TextColor color = TextColor.parseColor(string);
+                                    if (color != null) {
+                                        textColors.add(color);
+                                    }
                                 }
                                 return out.value(GradientNode.colors(textColors, out.nodes()));
                             }
@@ -472,13 +475,11 @@ public final class TextTagsV1 {
                                 var textColors = new ArrayList<TextColor>();
 
                                 for (String string : val) {
-                                    TextColor.parseColor(string).result().ifPresent(textColors::add);
+                                    TextColor color = TextColor.parseColor(string);
+                                    if (color != null) {
+                                        textColors.add(color);
+                                    }
                                 }
-                                // We cannot have an empty list!
-                                if (textColors.isEmpty()) {
-                                    return out.value(new ParentNode(out.nodes()));
-                                }
-
                                 return out.value(GradientNode.colorsHard(textColors, out.nodes()));
 
                             }
@@ -509,7 +510,7 @@ public final class TextTagsV1 {
                             "raw_style",
                             "special",
                             false,
-                            (tag, data, input, handlers, endAt) -> new TextParserV1.TagNodeValue(new DirectTextNode(Component.Serializer.fromJsonLenient(restoreOriginalEscaping(cleanArgument(data)), RegistryAccess.EMPTY)), 0)
+                            (tag, data, input, handlers, endAt) -> new TextParserV1.TagNodeValue(new DirectTextNode(Component.Serializer.fromJsonLenient(restoreOriginalEscaping(cleanArgument(data)))), 0)
                     )
             );
         }

@@ -8,8 +8,8 @@ import net.minecraft.network.chat.Component;
  */
 public record NonTransformableNode(TextNode node) implements TextNode {
     @Override
-    public Component toComponent(ParserContext context, boolean removeBackslashes) {
-        return node.toComponent(context, removeBackslashes);
+    public Component toText(ParserContext context, boolean removeBackslashes) {
+        return node.toText(context, removeBackslashes);
     }
 
     @Override

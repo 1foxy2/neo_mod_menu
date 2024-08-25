@@ -3,8 +3,7 @@ package com.terraformersmc.mod_menu.config;
 import com.google.gson.annotations.SerializedName;
 import com.terraformersmc.mod_menu.ModMenu;
 import com.terraformersmc.mod_menu.util.mod.Mod;
-import net.neoforged.neoforge.common.ModConfigSpec;
-import net.neoforged.neoforge.common.TranslatableEnum;
+import net.minecraftforge.common.ForgeConfigSpec;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -12,39 +11,39 @@ import java.util.List;
 import java.util.Locale;
 
 public class ModMenuConfig {
-    public final ModConfigSpec.EnumValue<Sorting> SORTING;
-    public final ModConfigSpec.BooleanValue COUNT_LIBRARIES;
-    public final ModConfigSpec.BooleanValue COMPACT_LIST;
-    public final ModConfigSpec.BooleanValue COUNT_CHILDREN;
-    public final ModConfigSpec.EnumValue<TitleMenuButtonStyle> MODS_BUTTON_STYLE;
-    public final ModConfigSpec.BooleanValue COUNT_HIDDEN_MODS;
-    public final ModConfigSpec.EnumValue<GameMenuButtonStyle> GAME_MENU_BUTTON_STYLE;
-    public final ModConfigSpec.EnumValue<ModCountLocation> MOD_COUNT_LOCATION;
-    public final ModConfigSpec.BooleanValue HIDE_MOD_LINKS;
-    public final ModConfigSpec.BooleanValue SHOW_LIBRARIES;
-    public final ModConfigSpec.BooleanValue HIDE_MOD_LICENSE;
-    public final ModConfigSpec.BooleanValue HIDE_BADGES;
-    public final ModConfigSpec.BooleanValue HIDE_MOD_CREDITS;
-    public final ModConfigSpec.BooleanValue EASTER_EGGS;
-    public final ModConfigSpec.BooleanValue RANDOM_JAVA_COLORS;
-    public final ModConfigSpec.BooleanValue TRANSLATE_NAMES;
-    public final ModConfigSpec.BooleanValue TRANSLATE_DESCRIPTIONS;
-    //public static final ModConfigSpec.BooleanValue UPDATE_CHECKER;
-  //  public static final ModConfigSpec.BooleanValue BUTTON_UPDATE_BADGE;
-//    public static final ModConfigSpec.BooleanValue UPDATE_CHANNEL;
-    public final ModConfigSpec.BooleanValue QUICK_CONFIGURE;
+    public final ForgeConfigSpec.EnumValue<Sorting> SORTING;
+    public final ForgeConfigSpec.BooleanValue COUNT_LIBRARIES;
+    public final ForgeConfigSpec.BooleanValue COMPACT_LIST;
+    public final ForgeConfigSpec.BooleanValue COUNT_CHILDREN;
+    public final ForgeConfigSpec.EnumValue<TitleMenuButtonStyle> MODS_BUTTON_STYLE;
+    public final ForgeConfigSpec.BooleanValue COUNT_HIDDEN_MODS;
+    public final ForgeConfigSpec.EnumValue<GameMenuButtonStyle> GAME_MENU_BUTTON_STYLE;
+    public final ForgeConfigSpec.EnumValue<ModCountLocation> MOD_COUNT_LOCATION;
+    public final ForgeConfigSpec.BooleanValue HIDE_MOD_LINKS;
+    public final ForgeConfigSpec.BooleanValue SHOW_LIBRARIES;
+    public final ForgeConfigSpec.BooleanValue HIDE_MOD_LICENSE;
+    public final ForgeConfigSpec.BooleanValue HIDE_BADGES;
+    public final ForgeConfigSpec.BooleanValue HIDE_MOD_CREDITS;
+    public final ForgeConfigSpec.BooleanValue EASTER_EGGS;
+    public final ForgeConfigSpec.BooleanValue RANDOM_JAVA_COLORS;
+    public final ForgeConfigSpec.BooleanValue TRANSLATE_NAMES;
+    public final ForgeConfigSpec.BooleanValue TRANSLATE_DESCRIPTIONS;
+    //public static final ForgeConfigSpec.BooleanValue UPDATE_CHECKER;
+  //  public static final ForgeConfigSpec.BooleanValue BUTTON_UPDATE_BADGE;
+//    public static final ForgeConfigSpec.BooleanValue UPDATE_CHANNEL;
+    public final ForgeConfigSpec.BooleanValue QUICK_CONFIGURE;
 
-    public final ModConfigSpec.BooleanValue MODIFY_TITLE_SCREEN;
-    public final ModConfigSpec.BooleanValue MODIFY_GAME_MENU;
-    public final ModConfigSpec.BooleanValue HIDE_CONFIG_BUTTONS;
-    public final ModConfigSpec.BooleanValue CONFIG_MODE;
-    public final ModConfigSpec.BooleanValue DISABLE_DRAG_AND_DROP;
-    public final ModConfigSpec.ConfigValue<List<? extends String>> HIDDEN_MODS;
-    public final ModConfigSpec.ConfigValue<List<? extends String>> HIDDEN_CONFIGS;
-    public final ModConfigSpec.ConfigValue<List<? extends String>> LIBRARY_LIST;
-  //  public static final ModConfigSpec.BooleanValue DISABLE_UPDATE_CHECKER;
+    public final ForgeConfigSpec.BooleanValue MODIFY_TITLE_SCREEN;
+    public final ForgeConfigSpec.BooleanValue MODIFY_GAME_MENU;
+    public final ForgeConfigSpec.BooleanValue HIDE_CONFIG_BUTTONS;
+    public final ForgeConfigSpec.BooleanValue CONFIG_MODE;
+    public final ForgeConfigSpec.BooleanValue DISABLE_DRAG_AND_DROP;
+    public final ForgeConfigSpec.ConfigValue<List<? extends String>> HIDDEN_MODS;
+    public final ForgeConfigSpec.ConfigValue<List<? extends String>> HIDDEN_CONFIGS;
+    public final ForgeConfigSpec.ConfigValue<List<? extends String>> LIBRARY_LIST;
+  //  public static final ForgeConfigSpec.BooleanValue DISABLE_UPDATE_CHECKER;
 
-    public ModMenuConfig(ModConfigSpec.Builder builder) {
+    public ModMenuConfig(ForgeConfigSpec.Builder builder) {
         builder.push("main");
         SORTING = builder
                 .defineEnum("sorting", Sorting.ASCENDING);
@@ -90,11 +89,11 @@ public class ModMenuConfig {
         HIDE_CONFIG_BUTTONS = builder
                 .define("hide_config_buttons", false);
         HIDDEN_MODS = builder
-                .defineList("hidden_mods", ArrayList::new, String::new, object -> object instanceof String);
+                .defineList("hidden_mods", ArrayList::new, object -> object instanceof String);
         HIDDEN_CONFIGS = builder
-                .defineList("hidden_configs", ArrayList::new, String::new, object -> object instanceof String);
+                .defineList("hidden_configs", ArrayList::new, object -> object instanceof String);
         LIBRARY_LIST = builder
-                .defineList("library_list", ArrayList::new, String::new, object -> object instanceof String);
+                .defineList("library_list", ArrayList::new, object -> object instanceof String);
         builder.pop();
 
         builder.push("count");
@@ -113,7 +112,7 @@ public class ModMenuConfig {
         //  UPDATE_CHANNEL
     }
 
-    public enum Sorting implements TranslatableEnum {
+    public enum Sorting {
         ASCENDING(Comparator.comparing(mod -> mod.getTranslatedName()
                 .toLowerCase(Locale.ROOT))), DESCENDING(ASCENDING.getComparator().reversed());
 

@@ -1,6 +1,6 @@
 fork of Mod menu https://modrinth.com/mod/modmenu for neoforge. compatible with connector and connector extras. 
 
-to add more details about your mod just put those lines into neoforge.mods.toml
+to add more details about your mod just put those lines into mods.toml
 
 ```
 [modproperties.modmenu] 

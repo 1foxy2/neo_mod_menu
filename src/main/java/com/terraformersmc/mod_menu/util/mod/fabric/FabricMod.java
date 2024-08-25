@@ -13,7 +13,7 @@ import net.fabricmc.loader.api.metadata.ModMetadata;
 import net.fabricmc.loader.api.metadata.Person;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.util.Tuple;
-import net.neoforged.fml.ModList;
+import net.minecraftforge.fml.ModList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -28,7 +28,7 @@ public class FabricMod implements Mod {
 	private static final Logger LOGGER = LoggerFactory.getLogger("Mod Menu | FabricMod");
 
 	protected final ModContainer container;
-	protected final net.neoforged.fml.ModContainer forgeContainer;
+	protected final net.minecraftforge.fml.ModContainer forgeContainer;
 	protected final ModMetadata metadata;
 
 	protected final ModMenuData modMenuData;
@@ -114,7 +114,7 @@ public class FabricMod implements Mod {
 		}
 	}
 
-	public Optional<net.neoforged.fml.ModContainer> getContainer() {
+	public Optional<net.minecraftforge.fml.ModContainer> getContainer() {
 		return Optional.of(forgeContainer);
 	}
 
@@ -135,7 +135,7 @@ public class FabricMod implements Mod {
 
 		final String finalIconSourceId = iconSourceId;
 		if (isSmall) iconPath = iconPath.replace(".png", "_small.png");
-		net.neoforged.fml.ModContainer iconSource = ModList.get()
+		net.minecraftforge.fml.ModContainer iconSource = ModList.get()
 				.getModContainerById(iconSourceId)
 			.orElseThrow(() -> new RuntimeException("Cannot get ModContainer for Fabric mod with id " + finalIconSourceId));
 		Tuple<DynamicTexture, Dimension> icon = iconHandler.createIcon(iconSource, iconPath);

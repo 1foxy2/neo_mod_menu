@@ -8,7 +8,7 @@ import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Tuple;
-import net.neoforged.fml.ModContainer;
+import net.minecraftforge.fml.ModContainer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

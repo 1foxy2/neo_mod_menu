@@ -60,7 +60,7 @@ public class DescriptionListWidget extends AbstractSelectionList<DescriptionList
 		int itemHeight,
 		ModsScreen parent
 	) {
-		super(client, width, height, y, itemHeight);
+		super(client, width, height, y, y + height, itemHeight);
 		this.parent = parent;
 		this.textRenderer = client.font;
 	}
@@ -77,17 +77,17 @@ public class DescriptionListWidget extends AbstractSelectionList<DescriptionList
 
 	@Override
 	protected int getScrollbarPosition() {
-		return this.width - 6 + this.getX();
+		return this.width - 6 + this.getLeft();
 	}
 
 	@Override
-	public void updateWidgetNarration(NarrationElementOutput builder) {
+	public void updateNarration(NarrationElementOutput builder) {
 		Mod mod = parent.getSelectedEntry().getMod();
 		builder.add(NarratedElementType.TITLE, mod.getTranslatedName() + " " + mod.getPrefixedVersion());
 	}
 
 	@Override
-	public void renderListItems(GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
+	public void renderList(GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
 		ModListEntry selectedEntry = parent.getSelectedEntry();
 		if (selectedEntry != lastSelected) {
 			lastSelected = selectedEntry;
@@ -205,7 +205,7 @@ public class DescriptionListWidget extends AbstractSelectionList<DescriptionList
 
 		Tesselator tessellator = Tesselator.getInstance();
 		BufferBuilder bufferBuilder;
-		MeshData builtBuffer;
+		BufferBuilder.RenderedBuffer builtBuffer;
 
 		//		{
 		//			RenderSystem.setShader(GameRenderer::getPositionTexColorProgram);
@@ -220,7 +220,7 @@ public class DescriptionListWidget extends AbstractSelectionList<DescriptionList
 		//		}
 
 		this.enableScissor(guiGraphics);
-		super.renderListItems(guiGraphics, mouseX, mouseY, delta);
+		super.renderList(guiGraphics, mouseX, mouseY, delta);
 		guiGraphics.disableScissor();
 
 		RenderSystem.depthFunc(515);
@@ -233,43 +233,44 @@ public class DescriptionListWidget extends AbstractSelectionList<DescriptionList
 		);
 		RenderSystem.setShader(GameRenderer::getPositionColorShader);
 
-		bufferBuilder = tessellator.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
-		bufferBuilder.addVertex(this.getX(), (this.getY() + 4), 0.0F).
+		bufferBuilder = tessellator.getBuilder();
+		bufferBuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
+		bufferBuilder.vertex(this.getLeft(), (this.getTop() + 4), 0.0F).
 
-			setColor(0, 0, 0, 0);
+			color(0, 0, 0, 0);
 
-		bufferBuilder.addVertex(this.getRight(), (this.getY() + 4), 0.0F).
+		bufferBuilder.vertex(this.getRight(), (this.getTop() + 4), 0.0F).
 
-			setColor(0, 0, 0, 0);
+			color(0, 0, 0, 0);
 
-		bufferBuilder.addVertex(this.getRight(), this.getY(), 0.0F).
+		bufferBuilder.vertex(this.getRight(), this.getTop(), 0.0F).
 
-			setColor(0, 0, 0, 255);
+			color(0, 0, 0, 255);
 
-		bufferBuilder.addVertex(this.getX(), this.getY(), 0.0F).
+		bufferBuilder.vertex(this.getLeft(), this.getTop(), 0.0F).
 
-			setColor(0, 0, 0, 255);
+			color(0, 0, 0, 255);
 
-		bufferBuilder.addVertex(this.getX(), this.getBottom(), 0.0F).
+		bufferBuilder.vertex(this.getLeft(), this.getBottom(), 0.0F).
 
-			setColor(0, 0, 0, 255);
+			color(0, 0, 0, 255);
 
-		bufferBuilder.addVertex(this.getRight(), this.getBottom(), 0.0F).
+		bufferBuilder.vertex(this.getRight(), this.getBottom(), 0.0F).
 
-			setColor(0, 0, 0, 255);
+			color(0, 0, 0, 255);
 
-		bufferBuilder.addVertex(this.getRight(), (this.getBottom() - 4), 0.0F).
+		bufferBuilder.vertex(this.getRight(), (this.getBottom() - 4), 0.0F).
 
-			setColor(0, 0, 0, 0);
+			color(0, 0, 0, 0);
 
-		bufferBuilder.addVertex(this.getX(), (this.getBottom() - 4), 0.0F).
+		bufferBuilder.vertex(this.getLeft(), (this.getBottom() - 4), 0.0F).
 
-			setColor(0, 0, 0, 0);
+			color(0, 0, 0, 0);
 
 		try {
-			builtBuffer = bufferBuilder.buildOrThrow();
+			builtBuffer = bufferBuilder.end();
 			BufferUploader.drawWithShader(builtBuffer);
-			builtBuffer.close();
+			builtBuffer.release();
 		} catch (Exception e) {
 			// Ignored
 		}
@@ -279,36 +280,37 @@ public class DescriptionListWidget extends AbstractSelectionList<DescriptionList
 	}
 
 	public void renderScrollBar(BufferBuilder bufferBuilder, Tesselator tessellator) {
-		MeshData builtBuffer;
+		BufferBuilder.RenderedBuffer builtBuffer;
 		int scrollbarStartX = this.getScrollbarPosition();
 		int scrollbarEndX = scrollbarStartX + 6;
 		int maxScroll = this.getMaxScroll();
 		if (maxScroll > 0) {
-			int p = (int) ((float) ((this.getBottom() - this.getY()) * (this.getBottom() - this.getY())) / (float) this.getMaxPosition());
-			p = Mth.clamp(p, 32, this.getBottom() - this.getY() - 8);
-			int q = (int) this.getScrollAmount() * (this.getBottom() - this.getY() - p) / maxScroll + this.getY();
-			if (q < this.getY()) {
-				q = this.getY();
+			int p = (int) ((float) ((this.getBottom() - this.getTop()) * (this.getBottom() - this.getTop())) / (float) this.getMaxPosition());
+			p = Mth.clamp(p, 32, this.getBottom() - this.getTop() - 8);
+			int q = (int) this.getScrollAmount() * (this.getBottom() - this.getTop() - p) / maxScroll + this.getTop();
+			if (q < this.getTop()) {
+				q = this.getTop();
 			}
 
 			RenderSystem.setShader(GameRenderer::getPositionColorShader);
-			bufferBuilder = tessellator.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
-			bufferBuilder.addVertex(scrollbarStartX, this.getBottom(), 0.0F).setColor(0, 0, 0, 255);
-			bufferBuilder.addVertex(scrollbarEndX, this.getBottom(), 0.0F).setColor(0, 0, 0, 255);
-			bufferBuilder.addVertex(scrollbarEndX, this.getY(), 0.0F).setColor(0, 0, 0, 255);
-			bufferBuilder.addVertex(scrollbarStartX, this.getY(), 0.0F).setColor(0, 0, 0, 255);
-			bufferBuilder.addVertex(scrollbarStartX, q + p, 0.0F).setColor(128, 128, 128, 255);
-			bufferBuilder.addVertex(scrollbarEndX, q + p, 0.0F).setColor(128, 128, 128, 255);
-			bufferBuilder.addVertex(scrollbarEndX, q, 0.0F).setColor(128, 128, 128, 255);
-			bufferBuilder.addVertex(scrollbarStartX, q, 0.0F).setColor(128, 128, 128, 255);
-			bufferBuilder.addVertex(scrollbarStartX, q + p - 1, 0.0F).setColor(192, 192, 192, 255);
-			bufferBuilder.addVertex(scrollbarEndX - 1, q + p - 1, 0.0F).setColor(192, 192, 192, 255);
-			bufferBuilder.addVertex(scrollbarEndX - 1, q, 0.0F).setColor(192, 192, 192, 255);
-			bufferBuilder.addVertex(scrollbarStartX, q, 0.0F).setColor(192, 192, 192, 255);
+			bufferBuilder = tessellator.getBuilder();
+			bufferBuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
+			bufferBuilder.vertex(scrollbarStartX, this.getBottom(), 0.0F).color(0, 0, 0, 255);
+			bufferBuilder.vertex(scrollbarEndX, this.getBottom(), 0.0F).color(0, 0, 0, 255);
+			bufferBuilder.vertex(scrollbarEndX, this.getTop(), 0.0F).color(0, 0, 0, 255);
+			bufferBuilder.vertex(scrollbarStartX, this.getTop(), 0.0F).color(0, 0, 0, 255);
+			bufferBuilder.vertex(scrollbarStartX, q + p, 0.0F).color(128, 128, 128, 255);
+			bufferBuilder.vertex(scrollbarEndX, q + p, 0.0F).color(128, 128, 128, 255);
+			bufferBuilder.vertex(scrollbarEndX, q, 0.0F).color(128, 128, 128, 255);
+			bufferBuilder.vertex(scrollbarStartX, q, 0.0F).color(128, 128, 128, 255);
+			bufferBuilder.vertex(scrollbarStartX, q + p - 1, 0.0F).color(192, 192, 192, 255);
+			bufferBuilder.vertex(scrollbarEndX - 1, q + p - 1, 0.0F).color(192, 192, 192, 255);
+			bufferBuilder.vertex(scrollbarEndX - 1, q, 0.0F).color(192, 192, 192, 255);
+			bufferBuilder.vertex(scrollbarStartX, q, 0.0F).color(192, 192, 192, 255);
 			try {
-				builtBuffer = bufferBuilder.buildOrThrow();
+				builtBuffer = bufferBuilder.end();
 				BufferUploader.drawWithShader(builtBuffer);
-				builtBuffer.close();
+				builtBuffer.release();
 			} catch (Exception e) {
 				// Ignored
 			}

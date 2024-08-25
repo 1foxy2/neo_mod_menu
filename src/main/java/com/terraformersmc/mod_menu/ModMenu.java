@@ -5,7 +5,6 @@ import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.terraformersmc.mod_menu.config.ModMenuConfig;
-import com.terraformersmc.mod_menu.config.ModMenuConfigScreen;
 import com.terraformersmc.mod_menu.gui.ModsScreen;
 import com.terraformersmc.mod_menu.util.EnumToLowerCaseJsonConverter;
 import com.terraformersmc.mod_menu.util.ModMenuScreenTexts;
@@ -15,34 +14,36 @@ import com.terraformersmc.mod_menu.util.mod.java.JavaDummyMod;
 import com.terraformersmc.mod_menu.util.mod.neoforge.NeoforgeDummyParentMod;
 import com.terraformersmc.mod_menu.util.mod.neoforge.NeoforgeMod;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.OptionsScreen;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.gui.screens.options.OptionsScreen;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.neoforged.bus.api.IEventBus;
-import net.neoforged.fml.ModContainer;
-import net.neoforged.fml.ModList;
-import net.neoforged.fml.config.ModConfig;
-import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
-import net.neoforged.neoforge.client.gui.ConfigurationScreen;
-import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
-import net.neoforged.neoforge.common.ModConfigSpec;
+import net.minecraftforge.client.ConfigScreenHandler;
+import net.minecraftforge.common.ForgeConfigSpec;
+import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.fml.ModContainer;
+import net.minecraftforge.fml.ModList;
+import net.minecraftforge.fml.ModLoadingContext;
+import net.minecraftforge.fml.config.ModConfig;
+import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.text.NumberFormat;
 import java.util.*;
+import java.util.function.BiFunction;
 
-@net.neoforged.fml.common.Mod(ModMenu.MOD_ID)
+@net.minecraftforge.fml.common.Mod(ModMenu.MOD_ID)
 public class ModMenu {
 	public static final String MOD_ID = "mod_menu";
 	public static final Logger LOGGER = LoggerFactory.getLogger("Mod Menu");
 	public static final Gson GSON;
 	public static final Gson GSON_MINIFIED;
-	public static final Pair<ModMenuConfig, ModConfigSpec> CONFIG;
+	public static final Pair<ModMenuConfig, ForgeConfigSpec> CONFIG;
 
 	public static final Component LIBRARIES = Component.translatable(MOD_ID + ".configuration.show_libraries");
 	public static final Component SHOWN_LIBRARIES = Component.translatable( MOD_ID + ".configuration.show_libraries.true");
@@ -59,7 +60,7 @@ public class ModMenu {
 		GSON = builder.setPrettyPrinting().create();
 		GSON_MINIFIED = builder.create();
 
-		CONFIG = new ModConfigSpec.Builder()
+		CONFIG = new ForgeConfigSpec.Builder()
 				.configure(ModMenuConfig::new);
 	}
 
@@ -67,40 +68,41 @@ public class ModMenu {
 	public static final Map<String, Mod> ROOT_MODS = new HashMap<>();
 	public static final LinkedListMultimap<Mod, Mod> PARENT_MAP = LinkedListMultimap.create();
 
-	public static final Map<String, IConfigScreenFactory> configScreenFactories = new HashMap<>();
+	public static final Map<String, BiFunction<Minecraft, Screen, Screen>> configScreenFactories = new HashMap<>();
 
 	private static int cachedDisplayedModCount = -1;
 	public static final boolean HAS_SINYTRA = ModList.get().isLoaded("connector");
 	public static final boolean TEXT_PLACEHOLDER_COMPAT = ModList.get().isLoaded("placeholder_api");
 
 	public static Screen getConfigScreen(ModContainer c, Screen menuScreen) {
-		configScreenFactories.putIfAbsent("minecraft", (modContainer, screen) -> new OptionsScreen(screen, Minecraft.getInstance().options));
+		configScreenFactories.putIfAbsent("minecraft", (minecraft, screen) -> new OptionsScreen(screen, Minecraft.getInstance().options));
 
 		if (ModMenu.getConfig().HIDDEN_CONFIGS.get().contains(c.getModId()) || "java".equals(c.getModId())) {
 			return null;
 		}
 
-		IConfigScreenFactory factory = configScreenFactories.get(c.getModId());
+		BiFunction<Minecraft, Screen, Screen> factory = configScreenFactories.get(c.getModId());
 		if (factory != null) {
-            return factory.createScreen(c, menuScreen);
+            return factory.apply(Minecraft.getInstance(), menuScreen);
         }
 
-		Optional<IConfigScreenFactory> factoryOptional = IConfigScreenFactory.getForMod(c.getModInfo());
+		Optional<BiFunction<Minecraft, Screen, Screen>> factoryOptional = ConfigScreenHandler.getScreenFactoryFor(c.getModInfo());
 
 		factoryOptional.ifPresent(f -> configScreenFactories.put(c.getModId(), f));
 
-        return factoryOptional.map(iConfigScreenFactory -> iConfigScreenFactory.createScreen(c, menuScreen)).orElse(null);
+        return factoryOptional.map(f -> f.apply(Minecraft.getInstance(), menuScreen)).orElse(null);
     }
 
-	public ModMenu(IEventBus bus, ModContainer container) {
+	public ModMenu() {
+		IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
 		bus.addListener(this::onClientSetup);
 
-		container.registerConfig(ModConfig.Type.CLIENT, CONFIG.getValue());
-		container.registerExtensionPoint(IConfigScreenFactory.class, (modContainer, screen) ->
-				new ConfigurationScreen(container, screen, ModMenuConfigScreen::new));
+		ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, CONFIG.getValue());
+		//container.registerExtensionPoint(ConfigScreenHandler.ConfigScreenFactory.class, (modContainer, screen) ->
+		//		new ConfigurationScreen(container, screen, ModMenuConfigScreen::new));
 
 		// Fill mods map
-		for (ModContainer modContainer : ModList.get().getSortedMods()) {
+		ModList.get().forEachModContainer((s, modContainer) -> {
 			Mod mod;
 
 			if (HAS_SINYTRA && ModsScreen.isFabricMod(modContainer.getModInfo().getOwningFile().getFile().getFilePath())) {
@@ -110,7 +112,7 @@ public class ModMenu {
 			}
 
 			MODS.put(mod.getId(), mod);
-		}
+		});
 
 		Map<String, Mod> dummyParents = new HashMap<>();
 
@@ -142,7 +144,7 @@ public class ModMenu {
 	}
 
 	public void onClientSetup(FMLClientSetupEvent event) {
-		ModList.get().getMods().forEach(info -> IConfigScreenFactory.getForMod(info).ifPresent(
+		ModList.get().getMods().forEach(info -> ConfigScreenHandler.getScreenFactoryFor(info).ifPresent(
 				factory -> configScreenFactories.put(info.getModId(), factory)));
 		addLibraryBadge();
 	}

@@ -5,7 +5,7 @@ import net.minecraft.network.chat.Component;
 
 public record ScoreNode(String name, String objective) implements TextNode {
     @Override
-    public Component toComponent(ParserContext context, boolean removeBackslashes) {
+    public Component toText(ParserContext context, boolean removeBackslashes) {
         return Component.score(name, objective);
     }
 }

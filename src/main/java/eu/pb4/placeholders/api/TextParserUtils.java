@@ -6,25 +6,19 @@ import eu.pb4.placeholders.api.node.parent.ParentTextNode;
 import eu.pb4.placeholders.api.parsers.TextParserV1;
 import net.minecraft.network.chat.Component;
 
-
-/**
- * You should use {@link eu.pb4.placeholders.api.parsers.ParserBuilder} for stacked parsing
- * or {@link eu.pb4.placeholders.api.parsers.TagParser} for only tags to component.
- */
-@Deprecated
 public final class TextParserUtils {
     private TextParserUtils() {}
 
     public static Component formatText(String text) {
-        return formatNodes(text).toComponent(null, true);
+        return formatNodes(text).toText(null, true);
     }
 
     public static Component formatTextSafe(String text) {
-        return formatNodesSafe(text).toComponent(null, true);
+        return formatNodesSafe(text).toText(null, true);
     }
 
     public static Component formatText(String text, TextParserV1.TagParserGetter getter) {
-        return formatNodes(text, getter).toComponent(null, true);
+        return formatNodes(text, getter).toText(null, true);
     }
 
     public static ParentTextNode formatNodes(String text) {

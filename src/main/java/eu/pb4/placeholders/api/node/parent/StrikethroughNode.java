@@ -2,13 +2,12 @@ package eu.pb4.placeholders.api.node.parent;
 
 import eu.pb4.placeholders.api.ParserContext;
 import eu.pb4.placeholders.api.node.TextNode;
-import net.minecraft.network.chat.Style;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 
 import java.util.Arrays;
 
-public final class StrikethroughNode extends SimpleStylingNode {
-    private static final Style TRUE = Style.EMPTY.withStrikethrough(true);
-    private static final Style FALSE = Style.EMPTY.withStrikethrough(false);
+public final class StrikethroughNode extends ParentNode {
     private final boolean value;
 
     public StrikethroughNode(TextNode[] nodes, boolean value) {
@@ -17,8 +16,8 @@ public final class StrikethroughNode extends SimpleStylingNode {
     }
 
     @Override
-    protected Style style(ParserContext context) {
-        return this.value ? TRUE : FALSE;
+    protected Component applyFormatting(MutableComponent out, ParserContext context) {
+        return out.setStyle(out.getStyle().withStrikethrough(this.value));
     }
 
     @Override

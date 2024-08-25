@@ -19,11 +19,6 @@ import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-
-/**
- * Replaced with {@link TagLikeParser}
- */
-@Deprecated
 public record PatternPlaceholderParser(Pattern pattern, Function<String, @Nullable TextNode> placeholderProvider) implements NodeParser {
     public static final Pattern PLACEHOLDER_PATTERN = Pattern.compile("(?<!((?<!(\\\\))\\\\))[%](?<id>[^%]+:[^%]+)[%]");
     public static final Pattern ALT_PLACEHOLDER_PATTERN = Pattern.compile("(?<!((?<!(\\\\))\\\\))[{](?<id>[^{}]+:[^{}]+)[}]");
@@ -59,7 +54,18 @@ public record PatternPlaceholderParser(Pattern pattern, Function<String, @Nullab
     @Override
     public TextNode[] parseNodes(TextNode text) {
         if (text instanceof TranslatedNode translatedNode) {
-            return new TextNode[]{ translatedNode.transform(this) };
+            var list = new ArrayList<>();
+
+            for (var arg : translatedNode.args()) {
+                if (arg instanceof TextNode textNode) {
+                    list.add(TextNode.asSingle(this.parseNodes(textNode)));
+                } else {
+                    list.add(arg);
+                }
+            }
+
+            return new TextNode[]{TranslatedNode.ofFallback(translatedNode.key(), translatedNode.fallback(), list.toArray())};
+
         } else if (text instanceof LiteralNode literalNode) {
             var out = new ArrayList<TextNode>();
 

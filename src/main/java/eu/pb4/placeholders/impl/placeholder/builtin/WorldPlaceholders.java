@@ -17,7 +17,7 @@ public class WorldPlaceholders {
     static final int CHUNK_AREA = (int)Math.pow(17.0D, 2.0D);
 
     public static void register() {
-        Placeholders.register(ResourceLocation.fromNamespaceAndPath("world", "time"), (ctx, arg) -> {
+        Placeholders.register(new ResourceLocation("world", "time"), (ctx, arg) -> {
             ServerLevel world;
             if (ctx.player() != null) {
                 world = ctx.player().serverLevel();
@@ -30,7 +30,7 @@ public class WorldPlaceholders {
             return PlaceholderResult.value(String.format("%02d:%02d", (dayTime / 60 + 6) % 24, dayTime % 60));
         });
 
-        Placeholders.register(ResourceLocation.fromNamespaceAndPath("world", "time_alt"), (ctx, arg) -> {
+        Placeholders.register(new ResourceLocation("world", "time_alt"), (ctx, arg) -> {
             ServerLevel world;
             if (ctx.player() != null) {
                 world = ctx.player().serverLevel();
@@ -47,7 +47,7 @@ public class WorldPlaceholders {
             return PlaceholderResult.value(String.format("%02d:%02d %s", y, dayTime % 60, x > 11 ? "PM" : "AM" ));
         });
 
-        Placeholders.register(ResourceLocation.fromNamespaceAndPath("world", "day"), (ctx, arg) -> {
+        Placeholders.register(new ResourceLocation("world", "day"), (ctx, arg) -> {
             ServerLevel world;
             if (ctx.player() != null) {
                 world = ctx.player().serverLevel();
@@ -58,7 +58,7 @@ public class WorldPlaceholders {
             return PlaceholderResult.value("" + world.getDayTime() / 24000);
         });
 
-        Placeholders.register(ResourceLocation.fromNamespaceAndPath("world", "id"), (ctx, arg) -> {
+        Placeholders.register(new ResourceLocation("world", "id"), (ctx, arg) -> {
             ServerLevel world;
             if (ctx.player() != null) {
                 world = ctx.player().serverLevel();
@@ -66,10 +66,10 @@ public class WorldPlaceholders {
                 world = ctx.server().overworld();
             }
 
-            return PlaceholderResult.value(world.dimension().location().toString());
+            return PlaceholderResult.value(world.dimension().registry().toString());
         });
 
-        Placeholders.register(ResourceLocation.fromNamespaceAndPath("world", "name"), (ctx, arg) -> {
+        Placeholders.register(new ResourceLocation("world", "name"), (ctx, arg) -> {
             ServerLevel world;
             if (ctx.player() != null) {
                 world = ctx.player().serverLevel();
@@ -78,7 +78,7 @@ public class WorldPlaceholders {
             }
             List<String> parts = new ArrayList<>();
             {
-                String[] words = world.dimension().location().getPath().split("_");
+                String[] words = world.dimension().registry().getPath().split("_");
                 for (String word : words) {
                     String[] s = word.split("", 2);
                     s[0] = s[0].toUpperCase(Locale.ROOT);
@@ -90,7 +90,7 @@ public class WorldPlaceholders {
 
 
 
-        Placeholders.register(ResourceLocation.fromNamespaceAndPath("world", "player_count"), (ctx, arg) -> {
+        Placeholders.register(new ResourceLocation("world", "player_count"), (ctx, arg) -> {
             ServerLevel world;
             if (ctx.player() != null) {
                 world = ctx.player().serverLevel();
@@ -101,7 +101,7 @@ public class WorldPlaceholders {
             return PlaceholderResult.value("" + world.players().size());
         });
 
-        Placeholders.register(ResourceLocation.fromNamespaceAndPath("world", "mob_count_colored"), (ctx, arg) -> {
+        Placeholders.register(new ResourceLocation("world", "mob_count_colored"), (ctx, arg) -> {
             ServerLevel world;
             if (ctx.player() != null) {
                 world = ctx.player().serverLevel();
@@ -109,16 +109,16 @@ public class WorldPlaceholders {
                 world = ctx.server().overworld();
             }
 
-            NaturalSpawner.SpawnState spawnState = world.getChunkSource().getLastSpawnState();
+            NaturalSpawner.SpawnState info = world.getChunkSource().getLastSpawnState();
 
-            MobCategory mobCategory = null;
+            MobCategory spawnGroup = null;
             if (arg != null) {
-                mobCategory = MobCategory.valueOf(arg.toUpperCase(Locale.ROOT));
+                spawnGroup = MobCategory.valueOf(arg.toUpperCase(Locale.ROOT));
             }
 
-            if (mobCategory != null) {
-                int count = spawnState.getMobCategoryCounts().getInt(mobCategory);
-                int cap = mobCategory.getMaxInstancesPerChunk() * spawnState.getSpawnableChunkCount() / CHUNK_AREA;
+            if (spawnGroup != null) {
+                int count = info.getMobCategoryCounts().getInt(spawnGroup);
+                int cap = spawnGroup.getMaxInstancesPerChunk() * info.getSpawnableChunkCount() / CHUNK_AREA;
 
                 return PlaceholderResult.value(count > 0 ? Component.literal("" + count).withStyle(count > cap ? ChatFormatting.LIGHT_PURPLE : count > 0.8 * cap ? ChatFormatting.RED : count > 0.5 * cap ? ChatFormatting.GOLD : ChatFormatting.GREEN) : Component.literal("-").withStyle(ChatFormatting.GRAY));
             } else {
@@ -127,18 +127,18 @@ public class WorldPlaceholders {
                 for (MobCategory group : MobCategory.values()) {
                     cap += group.getMaxInstancesPerChunk();
                 }
-                cap = cap * spawnState.getSpawnableChunkCount() / CHUNK_AREA;
+                cap = cap * info.getSpawnableChunkCount() / CHUNK_AREA;
 
                 int count = 0;
 
-                for (int value : spawnState.getMobCategoryCounts().values()) {
+                for (int value : info.getMobCategoryCounts().values()) {
                     count += value;
                 }
                 return PlaceholderResult.value(count > 0 ? Component.literal("" + count).withStyle(count > cap ? ChatFormatting.LIGHT_PURPLE : count > 0.8 * cap ? ChatFormatting.RED : count > 0.5 * cap ? ChatFormatting.GOLD : ChatFormatting.GREEN) : Component.literal("-").withStyle(ChatFormatting.GRAY));
             }
         });
 
-        Placeholders.register(ResourceLocation.fromNamespaceAndPath("world", "mob_count"), (ctx, arg) -> {
+        Placeholders.register(new ResourceLocation("world", "mob_count"), (ctx, arg) -> {
             ServerLevel world;
             if (ctx.player() != null) {
                 world = ctx.player().serverLevel();
@@ -146,26 +146,26 @@ public class WorldPlaceholders {
                 world = ctx.server().overworld();
             }
 
-            NaturalSpawner.SpawnState spawnState = world.getChunkSource().getLastSpawnState();
+            NaturalSpawner.SpawnState info = world.getChunkSource().getLastSpawnState();
 
-            MobCategory mobCategory = null;
+            MobCategory spawnGroup = null;
             if (arg != null) {
-                mobCategory = MobCategory.valueOf(arg.toUpperCase(Locale.ROOT));
+                spawnGroup = MobCategory.valueOf(arg.toUpperCase(Locale.ROOT));
             }
 
-            if (mobCategory != null) {
-                return PlaceholderResult.value("" + spawnState.getMobCategoryCounts().getInt(mobCategory));
+            if (spawnGroup != null) {
+                return PlaceholderResult.value("" + info.getMobCategoryCounts().getInt(spawnGroup));
             } else {
                 int x = 0;
 
-                for (int value : spawnState.getMobCategoryCounts().values()) {
+                for (int value : info.getMobCategoryCounts().values()) {
                     x += value;
                 }
                 return PlaceholderResult.value("" + x);
             }
         });
 
-        Placeholders.register(ResourceLocation.fromNamespaceAndPath("world", "mob_cap"), (ctx, arg) -> {
+        Placeholders.register(new ResourceLocation("world", "mob_cap"), (ctx, arg) -> {
             ServerLevel world;
             if (ctx.player() != null) {
                 world = ctx.player().serverLevel();
@@ -173,22 +173,22 @@ public class WorldPlaceholders {
                 world = ctx.server().overworld();
             }
 
-            NaturalSpawner.SpawnState spawnState = world.getChunkSource().getLastSpawnState();
+            NaturalSpawner.SpawnState info = world.getChunkSource().getLastSpawnState();
 
-            MobCategory mobCategory = null;
+            MobCategory spawnGroup = null;
             if (arg != null) {
-                mobCategory = MobCategory.valueOf(arg.toUpperCase(Locale.ROOT));
+                spawnGroup = MobCategory.valueOf(arg.toUpperCase(Locale.ROOT));
             }
 
-            if (mobCategory != null) {
-                return PlaceholderResult.value("" + mobCategory.getMaxInstancesPerChunk() * spawnState.getSpawnableChunkCount() / CHUNK_AREA);
+            if (spawnGroup != null) {
+                return PlaceholderResult.value("" + spawnGroup.getMaxInstancesPerChunk() * info.getSpawnableChunkCount() / CHUNK_AREA);
             } else {
                 int x = 0;
 
                 for (MobCategory group : MobCategory.values()) {
                     x += group.getMaxInstancesPerChunk();
                 }
-                return PlaceholderResult.value("" + x * spawnState.getSpawnableChunkCount() / CHUNK_AREA);
+                return PlaceholderResult.value("" + x * info.getSpawnableChunkCount() / CHUNK_AREA);
             }
         });
     }

@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Objects;
 
 public class ParentEntry extends ModListEntry {
-	private static final ResourceLocation PARENT_MOD_TEXTURE = ResourceLocation.fromNamespaceAndPath(ModMenu.MOD_ID, "textures/gui/parent_mod.png");
+	private static final ResourceLocation PARENT_MOD_TEXTURE = new ResourceLocation(ModMenu.MOD_ID, "textures/gui/parent_mod.png");
 	protected List<Mod> children;
 	protected ModListWidget list;
 	protected boolean hoveringIcon = false;

@@ -1,11 +1,9 @@
 package com.terraformersmc.mod_menu.util.mod.neoforge;
 
 import com.mojang.blaze3d.platform.NativeImage;
-import com.terraformersmc.mod_menu.ModMenu;
-import com.terraformersmc.mod_menu.gui.widget.entries.ModListEntry;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.util.Tuple;
-import net.neoforged.fml.ModContainer;
+import net.minecraftforge.fml.ModContainer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

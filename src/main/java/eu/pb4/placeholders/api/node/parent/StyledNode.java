@@ -3,12 +3,10 @@ package eu.pb4.placeholders.api.node.parent;
 import eu.pb4.placeholders.api.ParserContext;
 import eu.pb4.placeholders.api.node.TextNode;
 import eu.pb4.placeholders.api.parsers.NodeParser;
-import net.minecraft.network.chat.ClickEvent;
-import net.minecraft.network.chat.HoverEvent;
-import net.minecraft.network.chat.Style;
+import net.minecraft.network.chat.*;
 import org.jetbrains.annotations.Nullable;
 
-public final class StyledNode extends SimpleStylingNode {
+public final class StyledNode extends ParentNode {
     private final Style style;
 
     private final ParentNode hoverValue;
@@ -27,15 +25,15 @@ public final class StyledNode extends SimpleStylingNode {
         var style = this.style;
 
         if (hoverValue != null && style.getHoverEvent() != null && style.getHoverEvent().getAction() == HoverEvent.Action.SHOW_TEXT) {
-            style = style.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, this.hoverValue.toComponent(context, true)));
+            style = style.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, this.hoverValue.toText(context, true)));
         }
 
         if (clickValue != null && style.getClickEvent() != null) {
-            style = style.withClickEvent(new ClickEvent(style.getClickEvent().getAction(), this.clickValue.toComponent(context, true).getString()));
+            style = style.withClickEvent(new ClickEvent(style.getClickEvent().getAction(), this.clickValue.toText(context, true).getString()));
         }
 
         if (insertion != null) {
-            style = style.withInsertion(this.insertion.toComponent(context, true).getString());
+            style = style.withInsertion(this.insertion.toText(context, true).getString());
         }
         return style;
     }
@@ -58,6 +56,11 @@ public final class StyledNode extends SimpleStylingNode {
     @Nullable
     public TextNode insertion() {
         return insertion;
+    }
+
+    @Override
+    protected Component applyFormatting(MutableComponent out, ParserContext context) {
+        return (out.getStyle() == Style.EMPTY ? out : Component.empty().append(out)).setStyle(this.style(context));
     }
 
     @Override

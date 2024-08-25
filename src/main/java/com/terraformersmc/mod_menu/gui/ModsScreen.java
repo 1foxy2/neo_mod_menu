@@ -32,7 +32,7 @@ import net.minecraft.network.chat.FormattedText;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.CommonLinks;
 import net.minecraft.util.Tuple;
-import net.neoforged.fml.loading.FMLPaths;
+import net.minecraftforge.fml.loading.FMLPaths;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,10 +47,10 @@ import java.util.jar.JarFile;
 import java.util.stream.Collectors;
 
 public class ModsScreen extends Screen {
-	private static final ResourceLocation FILTERS_BUTTON_LOCATION = ResourceLocation.fromNamespaceAndPath(ModMenu.MOD_ID,
+	private static final ResourceLocation FILTERS_BUTTON_LOCATION = new ResourceLocation(ModMenu.MOD_ID,
 		"textures/gui/filters_button.png"
 	);
-	private static final ResourceLocation CONFIGURE_BUTTON_LOCATION = ResourceLocation.fromNamespaceAndPath(ModMenu.MOD_ID,
+	private static final ResourceLocation CONFIGURE_BUTTON_LOCATION = new ResourceLocation(ModMenu.MOD_ID,
 		"textures/gui/configure_button.png"
 	);
 
@@ -95,12 +95,12 @@ public class ModsScreen extends Screen {
 	}
 
 	@Override
-	public boolean mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
+	public boolean mouseScrolled(double mouseX, double mouseY, double horizontalAmount) {
 		if (modList.isMouseOver(mouseX, mouseY)) {
-			return this.modList.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
+			return this.modList.mouseScrolled(mouseX, mouseY, horizontalAmount);
 		}
 		if (descriptionListWidget.isMouseOver(mouseX, mouseY)) {
-			return this.descriptionListWidget.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
+			return this.descriptionListWidget.mouseScrolled(mouseX, mouseY, horizontalAmount);
 		}
 
 		return false;
@@ -144,7 +144,7 @@ public class ModsScreen extends Screen {
 			this.modList,
 			this
 		);
-		this.modList.setX(0);
+		this.modList.setLeftPos(0);
 
 		// Search box
 		int filtersButtonSize = (ModMenu.getConfig().CONFIG_MODE.get() ? 0 : 22);
@@ -236,10 +236,10 @@ public class ModsScreen extends Screen {
 
 				if (isMinecraft) {
 					var url = SharedConstants.getCurrentVersion().isStable() ? CommonLinks.RELEASE_FEEDBACK : CommonLinks.SNAPSHOT_FEEDBACK;
-					ConfirmLinkScreen.confirmLinkNow(this, url, true);
+					ConfirmLinkScreen.confirmLinkNow(url, this, true);
 				} else {
 					var url = mod.getWebsite();
-					ConfirmLinkScreen.confirmLinkNow(this, url, false);
+					ConfirmLinkScreen.confirmLinkNow(url, this, false);
 				}
 			})
 			.pos(this.rightPaneX + (urlButtonWidths / 2) - (cappedButtonWidth / 2), RIGHT_PANE_Y + 36)
@@ -252,10 +252,10 @@ public class ModsScreen extends Screen {
 				boolean isMinecraft = selected.getMod().getId().equals("minecraft");
 
 				if (isMinecraft) {
-					ConfirmLinkScreen.confirmLinkNow(this, CommonLinks.SNAPSHOT_BUGS_FEEDBACK, true);
+					ConfirmLinkScreen.confirmLinkNow(CommonLinks.SNAPSHOT_BUGS_FEEDBACK, this, true);
 				} else {
 					var url = mod.getIssueTracker();
-					ConfirmLinkScreen.confirmLinkNow(this, url, false);
+					ConfirmLinkScreen.confirmLinkNow(url, this, false);
 				}
 			})
 			.pos(this.rightPaneX + urlButtonWidths + 4 + (urlButtonWidths / 2) - (cappedButtonWidth / 2),
@@ -272,7 +272,7 @@ public class ModsScreen extends Screen {
 			font.lineHeight + 1,
 			this
 		);
-		this.descriptionListWidget.setX(this.rightPaneX);
+		this.descriptionListWidget.setLeftPos(this.rightPaneX);
 
 		// Mods folder button
 		this.modsFolderButton = Button.builder(ModMenuScreenTexts.MODS_FOLDER, button -> {
@@ -645,7 +645,7 @@ public class ModsScreen extends Screen {
 
 				if (allSuccessful) {
 					SystemToast.add(minecraft.getToasts(),
-						SystemToast.SystemToastId.PERIODIC_NOTIFICATION,
+						SystemToast.SystemToastIds.PERIODIC_NOTIFICATION,
 						ModMenuScreenTexts.DROP_SUCCESSFUL_LINE_1,
 						ModMenuScreenTexts.DROP_SUCCESSFUL_LINE_1
 					);
@@ -669,7 +669,7 @@ public class ModsScreen extends Screen {
 
 	private static boolean isNeoforgeMod(Path mod) {
 		try (JarFile jarFile = new JarFile(mod.toFile())) {
-			return jarFile.getEntry("META-INF/neoforge.mods.toml") != null;
+			return jarFile.getEntry("META-INF/mods.toml") != null;
 		} catch (IOException e) {
 			return false;
 		}

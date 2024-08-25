@@ -15,9 +15,6 @@ issueTrackerURL="https://github.com/1foxy2/neo_mod_menu/issues" #optional
 authors="${mod_authors}" #optional
 description='''${mod_description}'''
 
-[[mixins]]
-config="${mod_id}.mixins.json"
-
 [modproperties.modmenu]
 badges=["client"]
 links=["mod_menu.original=https://modrinth.com/mod/modmenu"]
@@ -90,22 +87,22 @@ contributors=[
 sources="https://github.com/1foxy2/neo_mod_menu"
 
 [[dependencies.${mod_id}]] #optional
-    modId="neoforge" #mandatory
-    type="required" #mandatory
-    versionRange="${neo_version_range}" #mandatory
+    modId="forge" #mandatory
+mandatory=true
+    versionRange="${forge_version_range}" #mandatory
     ordering="NONE"
     side="BOTH"
 
 [[dependencies.${mod_id}]]
     modId="minecraft"
-    type="required"
+mandatory=true
     versionRange="${minecraft_version_range}"
     ordering="NONE"
     side="BOTH"
 
 [[dependencies.${mod_id}]]
     modId="connector"
-    type="optional"
+mandatory=false
     versionRange="[1,)"
     ordering="AFTER"
     side="BOTH"

@@ -7,13 +7,13 @@ import eu.pb4.placeholders.api.node.TextNode;
 import eu.pb4.placeholders.impl.GeneralUtils;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.ApiStatus;
-import org.jetbrains.annotations.Nullable;
 
+import javax.annotation.Nullable;
 
 @ApiStatus.Internal
 public record PlaceholderNode(ParserContext.Key<PlaceholderContext> contextKey, String placeholder, Placeholders.PlaceholderGetter getter, boolean optionalContext, @Nullable String argument) implements TextNode {
     @Override
-    public Component toComponent(ParserContext context, boolean removeBackslashes) {
+    public Component toText(ParserContext context, boolean removeBackslashes) {
         var ctx = context.get(contextKey);
         var handler = getter.getPlaceholder(placeholder, context);
         if ((ctx != null || this.optionalContext) && handler != null) {

@@ -3,12 +3,13 @@ package eu.pb4.placeholders.api.node.parent;
 import eu.pb4.placeholders.api.ParserContext;
 import eu.pb4.placeholders.api.node.TextNode;
 import net.minecraft.ChatFormatting;
-import net.minecraft.network.chat.Style;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 
 import java.util.Arrays;
 
 
-public final class FormattingNode extends SimpleStylingNode {
+public final class FormattingNode extends ParentNode {
     private final ChatFormatting[] formatting;
 
     public FormattingNode(TextNode[] children, ChatFormatting formatting) {
@@ -21,8 +22,8 @@ public final class FormattingNode extends SimpleStylingNode {
     }
 
     @Override
-    protected Style style(ParserContext context) {
-        return Style.EMPTY.applyFormats(this.formatting);
+    protected Component applyFormatting(MutableComponent out, ParserContext context) {
+        return out.withStyle(this.formatting);
     }
 
     @Override

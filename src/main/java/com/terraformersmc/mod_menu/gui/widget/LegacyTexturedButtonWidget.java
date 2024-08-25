@@ -1,7 +1,6 @@
 package com.terraformersmc.mod_menu.gui.widget;
 
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.ImageButton;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -27,10 +26,10 @@ public class LegacyTexturedButtonWidget extends ImageButton {
 		ResourceLocation texture,
 		int textureWidth,
 		int textureHeight,
-		Button.OnPress pressAction,
+		OnPress pressAction,
 		Component message
 	) {
-		super(x, y, width, height, null, pressAction, message);
+		super(x, y, width, height, 0, 0, 0, null, 0, 0, pressAction, message);
 
 		this.u = u;
 		this.v = v;
@@ -64,13 +63,13 @@ public class LegacyTexturedButtonWidget extends ImageButton {
 		);
 	}
 
-	public static Builder legacyTexturedBuilder(Component message, Button.OnPress onPress) {
+	public static Builder legacyTexturedBuilder(Component message, OnPress onPress) {
 		return new Builder(message, onPress);
 	}
 
 	public static class Builder {
 		private final Component message;
-		private final Button.OnPress onPress;
+		private final OnPress onPress;
 
 		private int x;
 		private int y;

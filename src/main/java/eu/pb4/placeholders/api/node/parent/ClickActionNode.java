@@ -4,9 +4,10 @@ import eu.pb4.placeholders.api.ParserContext;
 import eu.pb4.placeholders.api.node.TextNode;
 import eu.pb4.placeholders.api.parsers.NodeParser;
 import net.minecraft.network.chat.ClickEvent;
-import net.minecraft.network.chat.Style;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 
-public final class ClickActionNode extends SimpleStylingNode {
+public final class ClickActionNode extends ParentNode {
     private final ClickEvent.Action action;
     private final TextNode value;
 
@@ -25,8 +26,8 @@ public final class ClickActionNode extends SimpleStylingNode {
     }
 
     @Override
-    protected Style style(ParserContext context) {
-        return Style.EMPTY.withClickEvent(new ClickEvent(this.action, this.value.toComponent(context, true).getString()));
+    protected Component applyFormatting(MutableComponent out, ParserContext context) {
+        return out.setStyle(out.getStyle().withClickEvent(new ClickEvent(this.action, this.value.toText(context, true).getString())));
     }
 
     @Override

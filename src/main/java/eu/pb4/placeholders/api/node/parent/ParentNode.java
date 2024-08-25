@@ -5,7 +5,6 @@ import eu.pb4.placeholders.api.node.TextNode;
 import eu.pb4.placeholders.impl.GeneralUtils;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.network.chat.Style;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -33,13 +32,13 @@ public class ParentNode implements ParentTextNode {
     }
 
     @Override
-    public final Component toComponent(ParserContext context, boolean removeBackslashes) {
+    public final Component toText(ParserContext context, boolean removeBackslashes) {
         var compact = context != null && context.get(ParserContext.Key.COMPACT_TEXT) != Boolean.FALSE;
 
         if (this.children.length == 0) {
             return Component.empty();
         } else if ((this.children.length == 1 && this.children[0] != null) && compact) {
-            var out = this.children[0].toComponent(context, true);
+            var out = this.children[0].toText(context, true);
             if (GeneralUtils.isEmpty(out)) {
                 return out;
             }
@@ -50,7 +49,7 @@ public class ParentNode implements ParentTextNode {
 
             for (int i = 0; i < this.children.length; i++) {
                 if (this.children[i] != null) {
-                    var child = this.children[i].toComponent(context, true);
+                    var child = this.children[i].toText(context, true);
 
                     if (!GeneralUtils.isEmpty(child)) {
                         if (base == null) {
@@ -75,11 +74,7 @@ public class ParentNode implements ParentTextNode {
         }
     }
 
-    protected Component applyFormatting(MutableComponent out, ParserContext context) { return out.setStyle(applyFormatting(out.getStyle(), context)); };
-
-    protected Style applyFormatting(Style style, ParserContext context) {
-        return style;
-    }
+    protected Component applyFormatting(MutableComponent out, ParserContext context) { return out; };
 
     @Override
     public String toString() {

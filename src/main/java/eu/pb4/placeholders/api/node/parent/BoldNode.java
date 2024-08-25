@@ -2,18 +2,22 @@ package eu.pb4.placeholders.api.node.parent;
 
 import eu.pb4.placeholders.api.ParserContext;
 import eu.pb4.placeholders.api.node.TextNode;
-import net.minecraft.network.chat.Style;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 
 import java.util.Arrays;
 
-public final class BoldNode extends SimpleStylingNode {
-    private static final Style TRUE = Style.EMPTY.withBold(true);
-    private static final Style FALSE = Style.EMPTY.withBold(false);
+public final class BoldNode extends ParentNode {
     private final boolean value;
 
     public BoldNode(TextNode[] nodes, boolean value) {
         super(nodes);
         this.value = value;
+    }
+
+    @Override
+    protected Component applyFormatting(MutableComponent out, ParserContext context) {
+        return out.setStyle(out.getStyle().withBold(this.value));
     }
 
     @Override
@@ -27,10 +31,5 @@ public final class BoldNode extends SimpleStylingNode {
                 "value=" + value +
                 ", children=" + Arrays.toString(children) +
                 '}';
-    }
-
-    @Override
-    protected Style style(ParserContext context) {
-        return this.value ? TRUE : FALSE;
     }
 }

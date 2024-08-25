@@ -9,18 +9,18 @@ import net.minecraft.network.chat.Component;
 import java.util.List;
 
 public interface TextNode {
-    Component toComponent(ParserContext context, boolean removeBackslashes);
+    Component toText(ParserContext context, boolean removeBackslashes);
 
-    default Component toComponent(ParserContext context) {
-        return toComponent(context, true);
+    default Component toText(ParserContext context) {
+        return toText(context, true);
     }
 
-    default Component toComponent(PlaceholderContext context) {
-        return toComponent(context.asParserContext(), true);
+    default Component toText(PlaceholderContext context) {
+        return toText(context.asParserContext(), true);
     }
 
-    default Component toComponent() {
-        return toComponent(ParserContext.of(), true);
+    default Component toText() {
+        return toText(ParserContext.of(), true);
     }
 
     default boolean isDynamic() {

@@ -9,7 +9,7 @@ public record LiteralNode(String value) implements TextNode {
         this(builder.toString());
     }
     @Override
-    public Component toComponent(ParserContext context, boolean removeBackslashes) {
+    public Component toText(ParserContext context, boolean removeBackslashes) {
         if (this.value.isEmpty()) {
             return Component.empty();
         }

@@ -12,7 +12,9 @@ import it.unimi.dsi.fastutil.chars.Char2ObjectOpenHashMap;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.TextColor;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Parser that can read legacy (and legacy like) format and convert it into TextNodes
@@ -31,14 +33,6 @@ public class LegacyFormattingParser implements NodeParser {
         }
     }
 
-    public boolean allowRGB() {
-        return allowRgb;
-    }
-
-    public Collection<ChatFormatting> formatting() {
-        return Collections.unmodifiableCollection(this.map.values());
-    }
-
     @Override
     public TextNode[] parseNodes(TextNode input) {
         return parseNodes(input, new ArrayList<>());
@@ -48,7 +42,15 @@ public class LegacyFormattingParser implements NodeParser {
         if (input instanceof LiteralNode literalNode) {
             return parseLiteral(literalNode, nextNodes);
         } else if (input instanceof TranslatedNode translatedNode) {
-            return new TextNode[] { translatedNode.transform(this) };
+            var list = new ArrayList<>();
+            for (var arg : translatedNode.args()) {
+                if (arg instanceof TextNode textNode) {
+                    list.add(TextNode.asSingle(this.parseNodes(textNode)));
+                } else {
+                    list.add(arg);
+                }
+            }
+            return new TextNode[] { TranslatedNode.ofFallback(translatedNode.key(), translatedNode.fallback(), list.toArray()) };
         } else if (input instanceof ParentTextNode parentTextNode) {
             return parseParents(parentTextNode);
         } else {

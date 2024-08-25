@@ -13,13 +13,14 @@ import net.minecraft.stats.Stats;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.scores.Objective;
 import net.minecraft.world.scores.PlayerTeam;
-import net.minecraft.world.scores.ReadOnlyScoreInfo;
+import net.minecraft.world.scores.Score;
+import net.minecraft.world.scores.Team;
 import org.apache.commons.lang3.time.DurationFormatUtils;
 
 
 public class PlayerPlaceholders {
     public static void register() {
-        Placeholders.register(ResourceLocation.fromNamespaceAndPath("player", "name"), (ctx, arg) -> {
+        Placeholders.register(new ResourceLocation("player", "name"), (ctx, arg) -> {
             if (ctx.hasPlayer()) {
                 return PlaceholderResult.value(ctx.player().getName());
             } else if (ctx.hasGameProfile()) {
@@ -29,7 +30,7 @@ public class PlayerPlaceholders {
             }
         });
 
-        Placeholders.register(ResourceLocation.fromNamespaceAndPath("player", "name_visual"), (ctx, arg) -> {
+        Placeholders.register(new ResourceLocation("player", "name_visual"), (ctx, arg) -> {
             if (ctx.hasPlayer()) {
                 return PlaceholderResult.value(GeneralUtils.removeHoverAndClick(ctx.player().getName()));
             } else if (ctx.hasGameProfile()) {
@@ -39,7 +40,7 @@ public class PlayerPlaceholders {
             }
         });
 
-        Placeholders.register(ResourceLocation.fromNamespaceAndPath("player", "name_unformatted"), (ctx, arg) -> {
+        Placeholders.register(new ResourceLocation("player", "name_unformatted"), (ctx, arg) -> {
             if (ctx.hasPlayer()) {
                 return PlaceholderResult.value(ctx.player().getName().getString());
             } else if (ctx.hasGameProfile()) {
@@ -49,24 +50,24 @@ public class PlayerPlaceholders {
             }
         });
 
-        Placeholders.register(ResourceLocation.fromNamespaceAndPath("player", "ping"), (ctx, arg) -> {
+        Placeholders.register(new ResourceLocation("player", "ping"), (ctx, arg) -> {
             if (ctx.hasPlayer()) {
-                return PlaceholderResult.value(String.valueOf(ctx.player().connection.latency()));
+                return PlaceholderResult.value(String.valueOf(ctx.player().latency));
             } else {
                 return PlaceholderResult.invalid("No player!");
             }
         });
 
-        Placeholders.register(ResourceLocation.fromNamespaceAndPath("player", "ping_colored"), (ctx, arg) -> {
+        Placeholders.register(new ResourceLocation("player", "ping_colored"), (ctx, arg) -> {
             if (ctx.hasPlayer()) {
-                int x = ctx.player().connection.latency();
+                int x = ctx.player().latency;
                 return PlaceholderResult.value(Component.literal(String.valueOf(x)).withStyle(x < 100 ? ChatFormatting.GREEN : x < 200 ? ChatFormatting.GOLD : ChatFormatting.RED));
             } else {
                 return PlaceholderResult.invalid("No player!");
             }
         });
 
-        Placeholders.register(ResourceLocation.fromNamespaceAndPath("player", "displayname"), (ctx, arg) -> {
+        Placeholders.register(new ResourceLocation("player", "displayname"), (ctx, arg) -> {
             if (ctx.hasPlayer()) {
                 return PlaceholderResult.value(ctx.player().getDisplayName());
             } else if (ctx.hasGameProfile()) {
@@ -76,9 +77,9 @@ public class PlayerPlaceholders {
             }
         });
 
-        Placeholders.register(ResourceLocation.fromNamespaceAndPath("player", "display_name"), Placeholders.getPlaceholders().get(ResourceLocation.fromNamespaceAndPath("player", "displayname")));
+        Placeholders.register(new ResourceLocation("player", "display_name"), Placeholders.getPlaceholders().get(new ResourceLocation("player", "displayname")));
 
-        Placeholders.register(ResourceLocation.fromNamespaceAndPath("player", "displayname_visual"), (ctx, arg) -> {
+        Placeholders.register(new ResourceLocation("player", "displayname_visual"), (ctx, arg) -> {
             if (ctx.hasPlayer()) {
                 return PlaceholderResult.value(GeneralUtils.removeHoverAndClick(ctx.player().getDisplayName()));
             } else if (ctx.hasGameProfile()) {
@@ -88,9 +89,9 @@ public class PlayerPlaceholders {
             }
         });
 
-        Placeholders.register(ResourceLocation.fromNamespaceAndPath("player", "display_name_visual"), Placeholders.getPlaceholders().get(ResourceLocation.fromNamespaceAndPath("player", "displayname_visual")));
+        Placeholders.register(new ResourceLocation("player", "display_name_visual"), Placeholders.getPlaceholders().get(new ResourceLocation("player", "displayname_visual")));
 
-        Placeholders.register(ResourceLocation.fromNamespaceAndPath("player", "displayname_unformatted"), (ctx, arg) -> {
+        Placeholders.register(new ResourceLocation("player", "displayname_unformatted"), (ctx, arg) -> {
             if (ctx.hasPlayer()) {
                 return PlaceholderResult.value(Component.literal(ctx.player().getDisplayName().getString()));
             } else if (ctx.hasGameProfile()) {
@@ -99,9 +100,9 @@ public class PlayerPlaceholders {
                 return PlaceholderResult.invalid("No player!");
             }
         });
-        Placeholders.register(ResourceLocation.fromNamespaceAndPath("player", "display_name_unformatted"), Placeholders.getPlaceholders().get(ResourceLocation.fromNamespaceAndPath("player", "displayname_unformatted")));
+        Placeholders.register(new ResourceLocation("player", "display_name_unformatted"), Placeholders.getPlaceholders().get(new ResourceLocation("player", "displayname_unformatted")));
 
-        Placeholders.register(ResourceLocation.fromNamespaceAndPath("player", "inventory_slot"), (ctx, arg) -> {
+        Placeholders.register(new ResourceLocation("player", "inventory_slot"), (ctx, arg) -> {
             if (ctx.hasPlayer() && arg != null) {
                 try {
                     int slot = Integer.parseInt(arg);
@@ -123,7 +124,7 @@ public class PlayerPlaceholders {
             }
         });
 
-        Placeholders.register(ResourceLocation.fromNamespaceAndPath("player", "inventory_slot_no_rarity"), (ctx, arg) -> {
+        Placeholders.register(new ResourceLocation("player", "inventory_slot_no_rarity"), (ctx, arg) -> {
             if (ctx.hasPlayer() && arg != null) {
                 try {
                     int slot = Integer.parseInt(arg);
@@ -145,7 +146,7 @@ public class PlayerPlaceholders {
             }
         });
 
-        Placeholders.register(ResourceLocation.fromNamespaceAndPath("player", "equipment_slot"), (ctx, arg) -> {
+        Placeholders.register(new ResourceLocation("player", "equipment_slot"), (ctx, arg) -> {
             if (ctx.hasPlayer() && arg != null) {
                 try {
                     var slot = EquipmentSlot.byName(arg);
@@ -161,7 +162,7 @@ public class PlayerPlaceholders {
             }
         });
 
-        Placeholders.register(ResourceLocation.fromNamespaceAndPath("player", "equipment_slot_no_rarity"), (ctx, arg) -> {
+        Placeholders.register(new ResourceLocation("player", "equipment_slot_no_rarity"), (ctx, arg) -> {
             if (ctx.hasPlayer() && arg != null) {
                 try {
                     var slot = EquipmentSlot.byName(arg);
@@ -177,7 +178,7 @@ public class PlayerPlaceholders {
             }
         });
 
-        Placeholders.register(ResourceLocation.fromNamespaceAndPath("player", "playtime"), (ctx, arg) -> {
+        Placeholders.register(new ResourceLocation("player", "playtime"), (ctx, arg) -> {
             if (ctx.hasPlayer()) {
                 int x = ctx.player().getStats().getValue(Stats.CUSTOM.get(Stats.PLAY_TIME));
                 return PlaceholderResult.value(arg != null
@@ -189,7 +190,7 @@ public class PlayerPlaceholders {
             }
         });
 
-        Placeholders.register(ResourceLocation.fromNamespaceAndPath("player", "statistic"), (ctx, arg) -> {
+        Placeholders.register(new ResourceLocation("player", "statistic"), (ctx, arg) -> {
             if (ctx.hasPlayer() && arg != null) {
                 try {
                     var args = arg.split(" ");
@@ -226,7 +227,7 @@ public class PlayerPlaceholders {
             }
         });
 
-        Placeholders.register(ResourceLocation.fromNamespaceAndPath("player", "statistic_raw"), (ctx, arg) -> {
+        Placeholders.register(new ResourceLocation("player", "statistic_raw"), (ctx, arg) -> {
             if (ctx.hasPlayer() && arg != null) {
                 try {
                     var args = arg.split(" ");
@@ -263,7 +264,7 @@ public class PlayerPlaceholders {
             }
         });
 
-        Placeholders.register(ResourceLocation.fromNamespaceAndPath("player", "objective"), (ctx, arg) -> {
+        Placeholders.register(new ResourceLocation("player", "objective"), (ctx, arg) -> {
             if (ctx.hasPlayer() && arg != null) {
                 try {
                     ServerScoreboard scoreboard = ctx.server().getScoreboard();
@@ -271,8 +272,8 @@ public class PlayerPlaceholders {
                     if (scoreboardObjective == null) {
                         return PlaceholderResult.invalid("Invalid objective!");
                     }
-                    ReadOnlyScoreInfo score = scoreboard.getPlayerScoreInfo(ctx.player(), scoreboardObjective);
-                    return PlaceholderResult.value(String.valueOf(score.value()));
+                    Score score = scoreboard.getOrCreatePlayerScore(ctx.player().getScoreboardName(), scoreboardObjective);
+                    return PlaceholderResult.value(String.valueOf(score.getScore()));
                 } catch (Exception e) {
                     /* Into the void you go! */
                 }
@@ -282,7 +283,7 @@ public class PlayerPlaceholders {
             }
         });
 
-        Placeholders.register(ResourceLocation.fromNamespaceAndPath("player", "pos_x"), (ctx, arg) -> {
+        Placeholders.register(new ResourceLocation("player", "pos_x"), (ctx, arg) -> {
             if (ctx.hasPlayer()) {
                 double value = ctx.player().getX();
                 String format = "%.2f";
@@ -302,7 +303,7 @@ public class PlayerPlaceholders {
             }
         });
 
-        Placeholders.register(ResourceLocation.fromNamespaceAndPath("player", "pos_y"), (ctx, arg) -> {
+        Placeholders.register(new ResourceLocation("player", "pos_y"), (ctx, arg) -> {
             if (ctx.hasPlayer()) {
                 double value = ctx.player().getY();
                 String format = "%.2f";
@@ -322,7 +323,7 @@ public class PlayerPlaceholders {
             }
         });
 
-        Placeholders.register(ResourceLocation.fromNamespaceAndPath("player", "pos_z"), (ctx, arg) -> {
+        Placeholders.register(new ResourceLocation("player", "pos_z"), (ctx, arg) -> {
             if (ctx.hasPlayer()) {
                 double value = ctx.player().getZ();
                 String format = "%.2f";
@@ -342,7 +343,7 @@ public class PlayerPlaceholders {
             }
         });
 
-        Placeholders.register(ResourceLocation.fromNamespaceAndPath("player", "uuid"), (ctx, arg) -> {
+        Placeholders.register(new ResourceLocation("player", "uuid"), (ctx, arg) -> {
             if (ctx.hasPlayer()) {
                 return PlaceholderResult.value(ctx.player().getStringUUID());
             } else if (ctx.hasGameProfile()) {
@@ -352,7 +353,7 @@ public class PlayerPlaceholders {
             }
         });
 
-        Placeholders.register(ResourceLocation.fromNamespaceAndPath("player", "health"), (ctx, arg) -> {
+        Placeholders.register(new ResourceLocation("player", "health"), (ctx, arg) -> {
             if (ctx.hasPlayer()) {
                 return PlaceholderResult.value(String.format("%.0f", ctx.player().getHealth()));
             } else {
@@ -360,7 +361,7 @@ public class PlayerPlaceholders {
             }
         });
 
-        Placeholders.register(ResourceLocation.fromNamespaceAndPath("player", "max_health"), (ctx, arg) -> {
+        Placeholders.register(new ResourceLocation("player", "max_health"), (ctx, arg) -> {
             if (ctx.hasPlayer()) {
                 return PlaceholderResult.value(String.format("%.0f", ctx.player().getMaxHealth()));
             } else {
@@ -368,15 +369,15 @@ public class PlayerPlaceholders {
             }
         });
 
-        Placeholders.register(ResourceLocation.fromNamespaceAndPath("player", "hunger"), (ctx, arg) -> {
+        Placeholders.register(new ResourceLocation("player", "hunger"), (ctx, arg) -> {
             if (ctx.hasPlayer()) {
-                return PlaceholderResult.value(String.valueOf(ctx.player().getFoodData().getFoodLevel()));
+                return PlaceholderResult.value(String.format("%.0f", ctx.player().getFoodData().getFoodLevel()));
             } else {
                 return PlaceholderResult.invalid("No player!");
             }
         });
 
-        Placeholders.register(ResourceLocation.fromNamespaceAndPath("player", "saturation"), (ctx, arg) -> {
+        Placeholders.register(new ResourceLocation("player", "saturation"), (ctx, arg) -> {
             if (ctx.hasPlayer()) {
                 return PlaceholderResult.value(String.format("%.0f", ctx.player().getFoodData().getSaturationLevel()));
             } else {
@@ -384,7 +385,7 @@ public class PlayerPlaceholders {
             }
         });
 
-        Placeholders.register(ResourceLocation.fromNamespaceAndPath("player", "team_name"), (ctx, arg) -> {
+        Placeholders.register(new ResourceLocation("player", "team_name"), (ctx, arg) -> {
             if (ctx.hasPlayer()) {
                 var team = ctx.player().getTeam();
                 return PlaceholderResult.value(team==null ? Component.empty() : Component.nullToEmpty(team.getName()));
@@ -393,7 +394,7 @@ public class PlayerPlaceholders {
             }
         });
 
-        Placeholders.register(ResourceLocation.fromNamespaceAndPath("player", "team_displayname"), (ctx, arg) -> {
+        Placeholders.register(new ResourceLocation("player", "team_displayname"), (ctx, arg) -> {
             if (ctx.hasPlayer()) {
                 var team = (PlayerTeam) ctx.player().getTeam();
                 return PlaceholderResult.value(team==null ? Component.empty() : team.getDisplayName());
@@ -402,10 +403,10 @@ public class PlayerPlaceholders {
             }
         });
 
-        Placeholders.register(ResourceLocation.fromNamespaceAndPath("player", "team_displayname_formatted"), (ctx, arg) -> {
+        Placeholders.register(new ResourceLocation("player", "team_displayname_formatted"), (ctx, arg) -> {
             if (ctx.hasPlayer()) {
                 var team = (PlayerTeam) ctx.player().getTeam();
-                return PlaceholderResult.value(team==null ? Component.empty() : team.getFormattedDisplayName());
+                return PlaceholderResult.value(team==null ? Component.empty() : team.getDisplayName());
             } else {
                 return PlaceholderResult.invalid("No player!");
             }

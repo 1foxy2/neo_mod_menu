@@ -41,7 +41,7 @@ public class ModListWidget extends ObjectSelectionList<ModListEntry> implements 
 		ModListWidget list,
 		ModsScreen parent
 	) {
-		super(client, width, height, y, itemHeight);
+		super(client, width, height, y, y + height, itemHeight);
 		this.parent = parent;
 		if (list != null) {
 			this.mods = list.mods;
@@ -51,13 +51,13 @@ public class ModListWidget extends ObjectSelectionList<ModListEntry> implements 
 	@Override
 	public void setScrollAmount(double amount) {
 		super.setScrollAmount(amount);
-		int denominator = Math.max(0, this.getMaxPosition() - (this.getBottom() - this.getY() - 4));
+		int denominator = Math.max(0, this.getMaxPosition() - (this.getBottom() - this.getTop() - 4));
 		if (denominator <= 0) {
 			parent.updateScrollPercent(0);
 		} else {
 			parent.updateScrollPercent(getScrollAmount() / Math.max(
 				0,
-				this.getMaxPosition() - (this.getBottom() - this.getY() - 4)
+				this.getMaxPosition() - (this.getBottom() - this.getTop() - 4)
 			));
 		}
 	}
@@ -205,14 +205,13 @@ public class ModListWidget extends ObjectSelectionList<ModListEntry> implements 
 			}
 		}
 
-		if (getScrollAmount() > Math.max(0, this.getMaxPosition() - (this.getBottom() - this.getY() - 4))) {
-			setScrollAmount(Math.max(0, this.getMaxPosition() - (this.getBottom() - this.getY() - 4)));
+		if (getScrollAmount() > Math.max(0, this.getMaxPosition() - (this.getBottom() - this.getTop() - 4))) {
+			setScrollAmount(Math.max(0, this.getMaxPosition() - (this.getBottom() - this.getTop() - 4)));
 		}
 	}
 
-
 	@Override
-	protected void renderListItems(GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
+	protected void renderList(GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
 		int entryCount = this.getItemCount();
 		Tesselator tessellator = Tesselator.getInstance();
 		BufferBuilder buffer;
@@ -220,7 +219,7 @@ public class ModListWidget extends ObjectSelectionList<ModListEntry> implements 
 		for (int index = 0; index < entryCount; ++index) {
 			int entryTop = this.getRowTop(index) + 2;
 			int entryBottom = this.getRowTop(index) + this.itemHeight;
-			if (entryBottom >= this.getY() && entryTop <= this.getBottom()) {
+			if (entryBottom >= this.getTop() && entryTop <= this.getBottom()) {
 				int entryHeight = this.itemHeight - 4;
 				ModListEntry entry = this.getEntry(index);
 				int rowWidth = this.getRowWidth();
@@ -232,30 +231,32 @@ public class ModListWidget extends ObjectSelectionList<ModListEntry> implements 
 					RenderSystem.setShader(GameRenderer::getPositionShader);
 					RenderSystem.setShaderColor(float_2, float_2, float_2, 1.0F);
 					Matrix4f matrix = guiGraphics.pose().last().pose();
-					MeshData builtBuffer;
-					buffer = tessellator.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION);
-					buffer.addVertex(matrix, entryLeft, entryTop + entryHeight + 2, 0.0F);
-					buffer.addVertex(matrix, selectionRight, entryTop + entryHeight + 2, 0.0F);
-					buffer.addVertex(matrix, selectionRight, entryTop - 2, 0.0F);
-					buffer.addVertex(matrix, entryLeft, entryTop - 2, 0.0F);
+					BufferBuilder.RenderedBuffer builtBuffer;
+					buffer = tessellator.getBuilder();
+					buffer.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION);
+					buffer.vertex(matrix, entryLeft, entryTop + entryHeight + 2, 0.0F);
+					buffer.vertex(matrix, selectionRight, entryTop + entryHeight + 2, 0.0F);
+					buffer.vertex(matrix, selectionRight, entryTop - 2, 0.0F);
+					buffer.vertex(matrix, entryLeft, entryTop - 2, 0.0F);
 					try {
-						builtBuffer = buffer.buildOrThrow();
+						builtBuffer = buffer.end();
 						BufferUploader.drawWithShader(builtBuffer);
-						builtBuffer.close();
+						builtBuffer.release();
 					} catch (Exception e) {
 						// Ignored
 					}
 					RenderSystem.setShader(GameRenderer::getPositionShader);
 					RenderSystem.setShaderColor(0.0F, 0.0F, 0.0F, 1.0F);
-					buffer = tessellator.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION);
-					buffer.addVertex(matrix, entryLeft + 1, entryTop + entryHeight + 1, 0.0F);
-					buffer.addVertex(matrix, selectionRight - 1, entryTop + entryHeight + 1, 0.0F);
-					buffer.addVertex(matrix, selectionRight - 1, entryTop - 1, 0.0F);
-					buffer.addVertex(matrix, entryLeft + 1, entryTop - 1, 0.0F);
+					buffer = tessellator.getBuilder();
+					buffer.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION);
+					buffer.vertex(matrix, entryLeft + 1, entryTop + entryHeight + 1, 0.0F);
+					buffer.vertex(matrix, selectionRight - 1, entryTop + entryHeight + 1, 0.0F);
+					buffer.vertex(matrix, selectionRight - 1, entryTop - 1, 0.0F);
+					buffer.vertex(matrix, entryLeft + 1, entryTop - 1, 0.0F);
 					try {
-						builtBuffer = buffer.buildOrThrow();
+						builtBuffer = buffer.end();
 						BufferUploader.drawWithShader(builtBuffer);
-						builtBuffer.close();
+						builtBuffer.release();
 					} catch (Exception e) {
 						// Ignored
 					}
@@ -300,9 +301,9 @@ public class ModListWidget extends ObjectSelectionList<ModListEntry> implements 
 					this.setDragging(true);
 					return true;
 				}
-			} else if (int_1 == 0 && this.clickedHeader((int) (double_1 - (double) (this.getX() + this.width / 2 - this.getRowWidth() / 2)),
-				(int) (double_2 - (double) this.getY()) + (int) this.getScrollAmount() - 4
-			)) {
+			} else if (int_1 == 0) {
+				this.clickedHeader((int) (double_1 - (double) (this.getLeft() + this.width / 2 - this.getRowWidth() / 2)),
+						(int) (double_2 - (double) this.getTop()) + (int) this.getScrollAmount() - 4);
 				return true;
 			}
 
@@ -321,7 +322,7 @@ public class ModListWidget extends ObjectSelectionList<ModListEntry> implements 
 	}
 
 	public final ModListEntry getEntryAtPos(double x, double y) {
-		int int_5 = Mth.floor(y - (double) this.getY()) - this.headerHeight + (int) this.getScrollAmount() - 4;
+		int int_5 = Mth.floor(y - (double) this.getTop()) - this.headerHeight + (int) this.getScrollAmount() - 4;
 		int index = int_5 / this.itemHeight;
 		return x < (double) this.getScrollbarPosition() && x >= (double) getRowLeft() && x <= (double) (getRowLeft() + getRowWidth()) && index >= 0 && int_5 >= 0 && index < this.getItemCount() ?
 			this.children().get(index) :
@@ -335,20 +336,16 @@ public class ModListWidget extends ObjectSelectionList<ModListEntry> implements 
 
 	@Override
 	public int getRowWidth() {
-		return this.width - (Math.max(0, this.getMaxPosition() - (this.getBottom() - this.getY() - 4)) > 0 ? 18 : 12);
+		return this.width - (Math.max(0, this.getMaxPosition() - (this.getBottom() - this.getTop() - 4)) > 0 ? 18 : 12);
 	}
 
 	@Override
 	public int getRowLeft() {
-		return this.getX() + 6;
+		return this.getLeft() + 6;
 	}
 
 	public int getWidth() {
 		return width;
-	}
-
-	public int getTop() {
-		return this.getY();
 	}
 
 	public ModsScreen getParent() {

@@ -21,7 +21,7 @@ public final class PlaceholderResult {
     }
 
     /**
-     * Returns component component from placeholder
+     * Returns text component from placeholder
      *
      * @return Text
      */
@@ -30,8 +30,8 @@ public final class PlaceholderResult {
     }
 
     /**
-     * Returns component component as String (without formatting) from placeholder
-     * It's not recommended for general usage, as it makes it component static/unable to change depending on player's language or other settings
+     * Returns text component as String (without formatting) from placeholder
+     * It's not recommended for general usage, as it makes it text static/unable to change depending on player's language or other settings
      * and removes all styling.
      *
      * @return String

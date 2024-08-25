@@ -2,12 +2,13 @@ package eu.pb4.placeholders.api.node.parent;
 
 import eu.pb4.placeholders.api.ParserContext;
 import eu.pb4.placeholders.api.node.TextNode;
-import net.minecraft.network.chat.Style;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 
 import java.util.Arrays;
 
-public final class FontNode extends SimpleStylingNode {
+public final class FontNode extends ParentNode {
     private final ResourceLocation font;
 
     public FontNode(TextNode[] children, ResourceLocation font) {
@@ -16,8 +17,8 @@ public final class FontNode extends SimpleStylingNode {
     }
 
     @Override
-    protected Style style(ParserContext context) {
-        return Style.EMPTY.withFont(font);
+    protected Component applyFormatting(MutableComponent out, ParserContext context) {
+        return out.setStyle(out.getStyle().withFont(font));
     }
 
     @Override

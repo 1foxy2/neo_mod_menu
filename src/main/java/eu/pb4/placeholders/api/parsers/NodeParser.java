@@ -22,7 +22,7 @@ public interface NodeParser {
     }
 
     default Component parseText(TextNode input, ParserContext context) {
-        return TextNode.asSingle(this.parseNodes(input)).toComponent(context, true);
+        return TextNode.asSingle(this.parseNodes(input)).toText(context, true);
     }
 
     default Component parseText(String input, ParserContext context) {
@@ -47,9 +47,5 @@ public interface NodeParser {
             case 1 -> parsers.get(0);
             default -> new MergedParser(parsers.toArray(new NodeParser[0]));
         };
-    }
-
-    static ParserBuilder builder() {
-        return new ParserBuilder();
     }
 }

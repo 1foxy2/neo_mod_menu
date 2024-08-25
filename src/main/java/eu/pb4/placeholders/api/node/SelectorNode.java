@@ -7,8 +7,8 @@ import java.util.Optional;
 
 public record SelectorNode(String pattern, Optional<TextNode> separator) implements TextNode {
     @Override
-    public Component toComponent(ParserContext context, boolean removeBackslashes) {
-        return Component.selector(pattern, separator.map(x -> x.toComponent(context, removeBackslashes)));
+    public Component toText(ParserContext context, boolean removeBackslashes) {
+        return Component.selector(pattern, separator.map(x -> x.toText(context, removeBackslashes)));
     }
 
     @Override

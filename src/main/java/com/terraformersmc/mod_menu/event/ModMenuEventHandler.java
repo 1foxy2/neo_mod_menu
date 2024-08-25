@@ -19,22 +19,22 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.ComponentContents;
 import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.resources.ResourceLocation;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.event.ClientTickEvent;
-import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
-import net.neoforged.neoforge.client.event.ScreenEvent;
-import net.neoforged.neoforge.client.settings.KeyConflictContext;
-import net.neoforged.neoforge.common.util.Lazy;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
+import net.minecraftforge.client.event.ScreenEvent;
+import net.minecraftforge.client.settings.KeyConflictContext;
+import net.minecraftforge.common.util.Lazy;
+import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.Arrays;
 import java.util.List;
 
-@EventBusSubscriber(modid = ModMenu.MOD_ID, value = Dist.CLIENT)
+@Mod.EventBusSubscriber(modid = ModMenu.MOD_ID, value = Dist.CLIENT)
 public class ModMenuEventHandler {
-	public static final ResourceLocation MODS_BUTTON_TEXTURE = ResourceLocation.fromNamespaceAndPath(ModMenu.MOD_ID, "textures/gui/mods_button.png");
+	public static final ResourceLocation MODS_BUTTON_TEXTURE = new ResourceLocation(ModMenu.MOD_ID, "textures/gui/mods_button.png");
 	private static final Lazy<KeyMapping> MENU_KEY_BIND = Lazy.of(() -> new KeyMapping("key.modmenu.open_menu",
 			KeyConflictContext.IN_GAME, InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_UNKNOWN, "key.categories.misc"));;
 
@@ -140,7 +140,7 @@ public class ModMenuEventHandler {
 	}
 
 	@SubscribeEvent
-	public static void onClientTick(ClientTickEvent.Post event) {
+	public static void onClientTick(TickEvent.ClientTickEvent event) {
 		while (MENU_KEY_BIND.get().consumeClick()) {
 			Minecraft.getInstance().setScreen(new ModsScreen(Minecraft.getInstance().screen));
 		}
@@ -221,7 +221,7 @@ public class ModMenuEventHandler {
 		throw new IndexOutOfBoundsException(String.format("Index: %d, Size: %d", index, index - remaining));
 	}
 
-	@EventBusSubscriber(modid = ModMenu.MOD_ID, bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
+	@Mod.EventBusSubscriber(modid = ModMenu.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
 	public static class modBusEvents {
 		@SubscribeEvent
 		public static void registerKeyMapping(RegisterKeyMappingsEvent event) {

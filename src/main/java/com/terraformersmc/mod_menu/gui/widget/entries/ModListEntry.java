@@ -22,12 +22,12 @@ import net.minecraft.util.Tuple;
 import java.awt.*;
 
 public class ModListEntry extends ObjectSelectionList.Entry<ModListEntry> {
-	public static final ResourceLocation UNKNOWN_ICON = ResourceLocation.withDefaultNamespace("textures/misc/unknown_pack.png");
-	private static final ResourceLocation MOD_CONFIGURATION_ICON = ResourceLocation.fromNamespaceAndPath(ModMenu.MOD_ID,
+	public static final ResourceLocation UNKNOWN_ICON = new ResourceLocation("minecraft", "textures/misc/unknown_pack.png");
+	private static final ResourceLocation MOD_CONFIGURATION_ICON = new ResourceLocation(ModMenu.MOD_ID,
 		"textures/gui/mod_configuration.png"
 	);
-	private static final ResourceLocation ERROR_ICON = ResourceLocation.withDefaultNamespace("world_list/error");
-	private static final ResourceLocation ERROR_HIGHLIGHTED_ICON = ResourceLocation.withDefaultNamespace("world_list/error_highlighted");
+	private static final ResourceLocation ERROR_ICON = new ResourceLocation("minecraft", "world_list/error");
+	private static final ResourceLocation ERROR_HIGHLIGHTED_ICON = new ResourceLocation("minecraft", "world_list/error_highlighted");
 
 	protected final Minecraft client;
 	public final Mod mod;
@@ -152,9 +152,11 @@ public class ModListEntry extends ObjectSelectionList.Entry<ModListEntry> {
 				guiGraphics.fill(x, y, x + iconSize, y + iconSize, -1601138544);
 				boolean hoveringIcon = mouseX - x < iconSize;
 				if (this.list.getParent().modScreenErrors.containsKey(modId)) {
-					guiGraphics.blitSprite(hoveringIcon ? ERROR_HIGHLIGHTED_ICON : ERROR_ICON,
+					guiGraphics.blit(hoveringIcon ? ERROR_HIGHLIGHTED_ICON : ERROR_ICON,
 						x,
 						y,
+						0,
+						0,
 						iconSize,
 						iconSize
 					);
@@ -210,7 +212,7 @@ public class ModListEntry extends ObjectSelectionList.Entry<ModListEntry> {
 
 	public Tuple<ResourceLocation, Dimension> getIconTexture() {
 		if (this.iconLocation == null) {
-			this.iconLocation = new Tuple<>(ResourceLocation.fromNamespaceAndPath(ModMenu.MOD_ID, mod.getId() + "_icon"), new Dimension());
+			this.iconLocation = new Tuple<>(new ResourceLocation(ModMenu.MOD_ID, mod.getId() + "_icon"), new Dimension());
 			Tuple<DynamicTexture, Dimension> icon = mod.getIcon(list.getNeoforgeIconHandler(),
 				64 * this.client.options.guiScale().get(), false);
 
@@ -240,7 +242,7 @@ public class ModListEntry extends ObjectSelectionList.Entry<ModListEntry> {
 
 	public Tuple<ResourceLocation, Dimension> getSquareIconTexture() {
 		if (this.smallIconLocation == null) {
-			this.smallIconLocation = new Tuple<>(ResourceLocation.fromNamespaceAndPath(ModMenu.MOD_ID, mod.getId() + "_icon_small"), new Dimension());
+			this.smallIconLocation = new Tuple<>(new ResourceLocation(ModMenu.MOD_ID, mod.getId() + "_icon_small"), new Dimension());
 			Tuple<DynamicTexture, Dimension> icon = mod.getIcon(list.getNeoforgeIconHandler(),
 				64 * this.client.options.guiScale().get(), true);
 			if (icon != null) {

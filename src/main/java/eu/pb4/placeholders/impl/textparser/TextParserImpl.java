@@ -1,8 +1,16 @@
 package eu.pb4.placeholders.impl.textparser;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import eu.pb4.placeholders.api.node.LiteralNode;
 import eu.pb4.placeholders.api.node.TextNode;
 import eu.pb4.placeholders.api.parsers.TextParserV1;
+import io.netty.util.internal.UnstableApi;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.Style;
+import net.minecraft.network.chat.contents.KeybindContents;
+import net.minecraft.network.chat.contents.LiteralContents;
+import net.minecraft.network.chat.contents.TranslatableContents;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.util.ArrayList;
@@ -13,14 +21,13 @@ import java.util.regex.Pattern;
 
 import static eu.pb4.placeholders.impl.GeneralUtils.Pair;
 
-
-@Deprecated
 @ApiStatus.Internal
 public class TextParserImpl {
     // Based on minimessage's regex, modified to fit more parsers needs
     public static final Pattern STARTING_PATTERN = Pattern.compile("<(?<id>[^<>/]+)(?<data>([:]([']?([^'](\\\\\\\\['])?)+[']?))*)>");
     @Deprecated
     public static final List<Pair<String, String>> ESCAPED_CHARS = new ArrayList<>();
+    private static final Gson GSON = new GsonBuilder().disableHtmlEscaping().registerTypeHierarchyAdapter(Style.class, new Style.Serializer()).create();
 
     static {
         ESCAPED_CHARS.add(new Pair<>("\\", "&slsh;\002"));
@@ -186,4 +193,50 @@ public class TextParserImpl {
     }
 
     public static final TextNode[] CASTER = new TextNode[0];
+
+    // Cursed don't touch this
+    @ApiStatus.Experimental
+    @UnstableApi
+    public static String convertToString(Component text) {
+        StringBuilder builder = new StringBuilder();
+        String style = GSON.toJson(text.getStyle());
+        if (style != null && !style.equals("null")) {
+            builder.append("<style:").append(style).append(">");
+        }
+        if (text.getContents() instanceof LiteralContents literalText) {
+            builder.append(escapeCharacters(literalText.text()));
+        } else if (text.getContents() instanceof TranslatableContents translatableText) {
+            List<String> stringList = new ArrayList<>();
+
+            for (Object arg : translatableText.getArgs()) {
+                if (arg instanceof Component text1) {
+                    stringList.add("'" + escapeCharacters(convertToString(text1)) + "'");
+                } else {
+                    stringList.add("'" + escapeCharacters(arg.toString()) + "'");
+                }
+            }
+
+            if (!stringList.isEmpty()) {
+                stringList.add(0, "");
+            }
+
+            String additional = String.join(":", stringList);
+
+            builder.append("<lang:'").append(translatableText.getKey()).append("'").append(additional).append(">");
+        } else if (text.getContents() instanceof KeybindContents keybindText) {
+            builder.append("<key:'").append(keybindText.getName()).append("'>");
+        } else {
+            builder.append("<raw:'").append(escapeCharacters(Component.Serializer.toJson(text.copy()))).append("'>");
+        }
+
+        for (Component text1 : text.getSiblings()) {
+            builder.append(convertToString(text1));
+        }
+
+        if (style != null && !style.equals("null")) {
+            builder.append("</style>");
+        }
+        return builder.toString();
+    }
+
 }

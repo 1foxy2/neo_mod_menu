@@ -12,8 +12,8 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
-import org.jetbrains.annotations.Nullable;
 
+import javax.annotation.Nullable;
 import java.util.function.Supplier;
 
 public record PlaceholderContext(MinecraftServer server,
@@ -128,10 +128,10 @@ public record PlaceholderContext(MinecraftServer server,
 
 
     public interface ViewObject {
-        ViewObject DEFAULT = of(ResourceLocation.fromNamespaceAndPath("placeholder_api", "default"));
+        ViewObject DEFAULT = of(new ResourceLocation("placeholder_api", "default"));
 
-        static ViewObject of(ResourceLocation rl) {
-            return new ViewObjectImpl(rl);
+        static ViewObject of(ResourceLocation identifier) {
+            return new ViewObjectImpl(identifier);
         }
 
         ResourceLocation identifier();
