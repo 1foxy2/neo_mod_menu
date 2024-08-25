@@ -73,7 +73,6 @@ public class ModListEntry extends ObjectSelectionList.Entry<ModListEntry> {
 		RenderSystem.enableBlend();
 
 		if (this.getIconTexture().getB().height == this.getIconTexture().getB().width) {
-			ModMenu.LOGGER.debug(modId + "1");
 			guiGraphics.blit(
 					this.getIconTexture().getA(),
 					x, y, 0.0f, 0.0f,
@@ -245,11 +244,9 @@ public class ModListEntry extends ObjectSelectionList.Entry<ModListEntry> {
 			Tuple<DynamicTexture, Dimension> icon = mod.getIcon(list.getNeoforgeIconHandler(),
 				64 * this.client.options.guiScale().get(), true);
 			if (icon != null) {
-				ModMenu.LOGGER.debug(ModMenu.MOD_ID + "1c");
 				this.smallIconLocation.setB(new Dimension());
 				this.client.getTextureManager().register(this.smallIconLocation.getA(), icon.getA());
 			} else {
-				ModMenu.LOGGER.debug(ModMenu.MOD_ID + "2c");
 				this.smallIconLocation = this.getSquaredIconTexture();
 			}
 		}

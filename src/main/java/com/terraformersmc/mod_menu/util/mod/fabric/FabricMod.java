@@ -98,6 +98,12 @@ public class FabricMod implements Mod {
 			modMenuData.getBadges().add(Badge.LIBRARY);
 		}
 
+		/* Hardcode parents and badges for Kotlin */
+		if (id.startsWith("org_jetbrains_kotlin")) {
+			modMenuData.fillParentIfEmpty("fabric_language_kotlin");
+			modMenuData.getBadges().add(Badge.LIBRARY);
+		}
+
 		/* Add additional badges */
 		this.badges = modMenuData.getBadges();
 		if (this.metadata.getEnvironment() == ModEnvironment.CLIENT) {
@@ -268,7 +274,7 @@ public class FabricMod implements Mod {
 	@Override
 	public void reCalculateLibraries() {
 		boolean isInLibraries = ModMenu.getConfig().LIBRARY_LIST.get().contains(getId());
-		if (getModMenuData().getBadges().contains(Badge.LIBRARY) && isInLibraries && !wasInLibraries) {
+		if (!getModMenuData().getBadges().contains(Badge.LIBRARY) && isInLibraries && !wasInLibraries) {
 			this.modMenuData.addLibraryBadge(true);
 			wasInLibraries = true;
 		} else if (!isInLibraries && wasInLibraries) {

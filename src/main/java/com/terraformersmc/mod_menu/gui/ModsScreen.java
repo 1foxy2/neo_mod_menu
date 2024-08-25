@@ -425,11 +425,7 @@ public class ModsScreen extends Screen {
 					imageOffset, imageHeight);
 
 			imageOffset += 4;
-//			guiGraphics.blit(iconProperties.getA(),
-//					(int) (x + (iconSize - iconProperties.getB().width) / 2f),
-//					(int) (RIGHT_PANE_Y + (iconSize - iconProperties.getB().height) / 2f), 0.0F, 0.0F,
-//                    (int) (iconProperties.getB().width / iconSize * 32f), (int) (iconProperties.getB().height / iconSize * 32f),
-//                    (int) (iconProperties.getB().width / iconSize * 32f), (int) (iconProperties.getB().height / iconSize * 32f));
+
 			RenderSystem.disableBlend();
 			int lineSpacing = font.lineHeight + 1;
 			Component name = Component.literal(mod.getTranslatedName());
