@@ -10,8 +10,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.awt.*;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 
 public class NeoforgeDummyParentMod implements Mod {
 	private final String id;
@@ -42,7 +42,7 @@ public class NeoforgeDummyParentMod implements Mod {
 	}
 
 	@Override
-	public @NotNull Tuple<DynamicTexture, Dimension> getIcon(NeoforgeIconHandler iconHandler, int i) {
+	public @NotNull Tuple<DynamicTexture, Dimension> getIcon(NeoforgeIconHandler iconHandler, int i, boolean isSmall) {
 		String iconSourceId = host.getId();
 		NeoforgeMod.ModMenuData.DummyParentData parentData = host.getModMenuData().getDummyParentData();
 		String iconPath = null;
@@ -50,7 +50,7 @@ public class NeoforgeDummyParentMod implements Mod {
 			iconPath = parentData.getIcon().orElse(null);
 		}
 		if ("inherit".equals(iconPath)) {
-			return host.getIcon(iconHandler, i);
+			return host.getIcon(iconHandler, i, isSmall);
 		}
 		if (iconPath == null) {
 			iconSourceId = ModMenu.MOD_ID;

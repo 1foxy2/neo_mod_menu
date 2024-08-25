@@ -13,8 +13,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.awt.*;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public interface Mod {
@@ -33,8 +33,7 @@ public interface Mod {
 		return getName();
 	}
 
-	@NotNull
-	Tuple<DynamicTexture, Dimension> getIcon(NeoforgeIconHandler iconHandler, int i);
+	@NotNull Tuple<DynamicTexture, Dimension> getIcon(NeoforgeIconHandler iconHandler, int i, boolean isSmall);
 
 	@NotNull
 	default String getSummary() {

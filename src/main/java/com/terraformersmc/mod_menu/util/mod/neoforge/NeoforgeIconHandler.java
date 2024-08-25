@@ -6,7 +6,6 @@ import com.terraformersmc.mod_menu.gui.widget.entries.ModListEntry;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.util.Tuple;
 import net.neoforged.fml.ModContainer;
-import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,18 +36,15 @@ public class NeoforgeIconHandler implements Closeable {
 			}
 			try (InputStream inputStream = Files.newInputStream(path)) {
 				NativeImage image = NativeImage.read(Objects.requireNonNull(inputStream));
-				int iconSize = ModMenu.getConfig().COMPACT_LIST.get() ? ModListEntry.COMPACT_ICON_SIZE : ModListEntry.FULL_ICON_SIZE;
-				double biggerValue = Math.max(image.getWidth(), image.getHeight());
 				Tuple<DynamicTexture, Dimension> tex = new Tuple<>(new DynamicTexture(image),
-						new Dimension((int) (image.getWidth() / biggerValue * iconSize), (int) (image.getHeight() / biggerValue * iconSize))) ;
+						new Dimension(image.getWidth(), image.getHeight())) ;
 				cacheModIcon(path, tex);
 				return tex;
 			}
-
 		} catch (IllegalStateException e) {
 			return null;
 		} catch (Throwable t) {
-			if (!iconPath.equals("assets/" + iconSource.getModId() + "/icon.png") && !iconPath.equals("icon.png")) {
+			if (!iconPath.equals("assets/" + iconSource.getModId() + "/icon.png") && !iconPath.equals("icon.png") && !iconPath.contains("_small.png")) {
 				LOGGER.error("Invalid mod icon for icon source {}: {}", iconSource.getModId(), iconPath, t);
 			}
 			return null;

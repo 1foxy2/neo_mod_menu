@@ -20,8 +20,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.awt.*;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class FabricMod implements Mod {
@@ -92,9 +92,9 @@ public class FabricMod implements Mod {
 
 		/* Hardcode parents and badges for Fabric API & Fabric Loader */
 		if (id.startsWith("fabric") && (id.equals("fabricloader") || metadata.getProvides()
-			.contains("fabricloader") || id.equals("fabric") || id.equals("fabric-api") || metadata.getProvides()
+			.contains("fabricloader") || id.equals("fabric") || id.equals("fabric_api") || metadata.getProvides()
 			.contains("fabric") || metadata.getProvides()
-			.contains("fabric-api") || id.equals("fabric-language-kotlin"))) {
+			.contains("fabric_api") || id.equals("fabric_language_kotlin"))) {
 			modMenuData.getBadges().add(Badge.LIBRARY);
 		}
 
@@ -123,17 +123,18 @@ public class FabricMod implements Mod {
 	}
 
 	@Override
-	public @NotNull Tuple<DynamicTexture, Dimension> getIcon(NeoforgeIconHandler iconHandler, int i) {
+	public @NotNull Tuple<DynamicTexture, Dimension> getIcon(NeoforgeIconHandler iconHandler, int i, boolean isSmall) {
 		String iconSourceId = getId();
 		String iconPath = metadata.getIconPath(i).orElse("assets/" + getId() + "/icon.png");
 
 		final String finalIconSourceId = iconSourceId;
+		if (isSmall) iconPath = iconPath.replace(".png", "_small.png");
 		net.neoforged.fml.ModContainer iconSource = ModList.get()
 				.getModContainerById(iconSourceId)
 			.orElseThrow(() -> new RuntimeException("Cannot get ModContainer for Fabric mod with id " + finalIconSourceId));
 		Tuple<DynamicTexture, Dimension> icon = iconHandler.createIcon(iconSource, iconPath);
 		if (icon == null) {
-			if (defaultIconWarning) {
+			if (defaultIconWarning && !isSmall) {
 				LOGGER.warn("Warning! Mod {} has a broken icon, loading default icon", metadata.getId());
 				defaultIconWarning = false;
 			}
@@ -267,7 +268,7 @@ public class FabricMod implements Mod {
 	@Override
 	public void reCalculateLibraries() {
 		boolean isInLibraries = ModMenu.getConfig().LIBRARY_LIST.get().contains(getId());
-		if (isInLibraries && !wasInLibraries) {
+		if (getModMenuData().getBadges().contains(Badge.LIBRARY) && isInLibraries && !wasInLibraries) {
 			this.modMenuData.addLibraryBadge(true);
 			wasInLibraries = true;
 		} else if (!isInLibraries && wasInLibraries) {

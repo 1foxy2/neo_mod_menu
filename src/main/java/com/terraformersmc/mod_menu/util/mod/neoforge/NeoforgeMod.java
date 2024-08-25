@@ -17,8 +17,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.awt.*;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 
 public class NeoforgeMod implements Mod {
 	private static final Logger LOGGER = LoggerFactory.getLogger("Mod Menu | NeoforgeMod");
@@ -111,8 +111,8 @@ public class NeoforgeMod implements Mod {
 
 		/* Hardcode parents and badges for Fabric API & Fabric Loader */
 		if (id.startsWith("fabric")) {
-			if (ModList.get().isLoaded("fabric-api") || !ModList.get().isLoaded("fabric")) {
-				modMenuData.fillParentIfEmpty("fabric-api");
+			if (ModList.get().isLoaded("fabric_api") || !ModList.get().isLoaded("fabric")) {
+				modMenuData.fillParentIfEmpty("fabric_api");
 			} else {
 				modMenuData.fillParentIfEmpty("fabric");
 			}
@@ -155,23 +155,26 @@ public class NeoforgeMod implements Mod {
 	}
 
 	@Override
-	public @NotNull Tuple<DynamicTexture, Dimension> getIcon(NeoforgeIconHandler iconHandler, int i) {
+	public @NotNull Tuple<DynamicTexture, Dimension> getIcon(NeoforgeIconHandler iconHandler, int i, boolean isSmall) {
 		String iconSourceId = getId();
 		String iconPath = modInfo.getLogoFile().orElse("assets/" + getId() + "/icon.png");
+
+		if (isSmall) iconPath = iconPath.replace(".png", "_small.png");
 		if ("minecraft".equals(getId())) {
 			iconSourceId = ModMenu.MOD_ID;
 			iconPath = "assets/" + ModMenu.MOD_ID + "/minecraft_icon.png";
-		} else if ("neoforge".equals(getId())) {
+		} else if ("neoforge".equals(getId()) && isSmall) {
 			iconSourceId = ModMenu.MOD_ID;
 			iconPath = "assets/" + ModMenu.MOD_ID + "/neoforge.png";
 		}
+
 		final String finalIconSourceId = iconSourceId;
 		ModContainer iconSource = ModList.get()
 				.getModContainerById(iconSourceId)
 			.orElseThrow(() -> new RuntimeException("Cannot get ModContainer for Neoforge mod with id " + finalIconSourceId));
 		Tuple<DynamicTexture, Dimension> icon = iconHandler.createIcon(iconSource, iconPath);
 		if (icon == null) {
-			if (defaultIconWarning) {
+			if (defaultIconWarning && !isSmall) {
 				LOGGER.warn("Warning! Mod {} has a broken icon, loading default icon", modInfo.getModId());
 				defaultIconWarning = false;
 			}
@@ -266,7 +269,6 @@ public class NeoforgeMod implements Mod {
 		if ("minecraft".equals(getId())) {
 			return "https://aka.ms/snapshotbugs?ref=game";
 		}
-		LOGGER.debug(modInfo.getConfig().toString());
 
 		return issueTrackerUrl;
 	}
@@ -321,7 +323,7 @@ public class NeoforgeMod implements Mod {
 	@Override
 	public void reCalculateLibraries() {
 		boolean isInLibraries = ModMenu.getConfig().LIBRARY_LIST.get().contains(getId());
-		if (isInLibraries && !wasInLibraries) {
+		if (getModMenuData().getBadges().contains(Badge.LIBRARY) && isInLibraries && !wasInLibraries) {
 			this.modMenuData.addLibraryBadge(true);
 			wasInLibraries = true;
 		} else if (!isInLibraries && wasInLibraries) {

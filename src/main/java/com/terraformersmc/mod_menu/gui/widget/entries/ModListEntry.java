@@ -18,7 +18,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Tuple;
-import net.neoforged.fml.ModList;
 
 import java.awt.*;
 
@@ -34,6 +33,7 @@ public class ModListEntry extends ObjectSelectionList.Entry<ModListEntry> {
 	public final Mod mod;
 	protected final ModListWidget list;
 	protected Tuple<ResourceLocation, Dimension> iconLocation;
+	protected Tuple<ResourceLocation, Dimension> smallIconLocation;
 	public static final int FULL_ICON_SIZE = 32;
 	public static final int COMPACT_ICON_SIZE = 19;
 	protected long sinceLastClick;
@@ -71,12 +71,30 @@ public class ModListEntry extends ObjectSelectionList.Entry<ModListEntry> {
 		}
 		RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 		RenderSystem.enableBlend();
-		guiGraphics.blit(this.getIconTexture().getA(),
-				(int) (x + (iconSize - this.getIconTexture().getB().width) / 2f),
-                (int) (y + (iconSize - this.getIconTexture().getB().height) / 2f),
-				0.0f, 0.0f,
-				this.getIconTexture().getB().width, this.getIconTexture().getB().height,
-				this.getIconTexture().getB().width, this.getIconTexture().getB().height);
+
+		if (this.getIconTexture().getB().height == this.getIconTexture().getB().width) {
+			ModMenu.LOGGER.debug(modId + "1");
+			guiGraphics.blit(
+					this.getIconTexture().getA(),
+					x, y, 0.0f, 0.0f,
+					iconSize, iconSize,
+					iconSize, iconSize);
+		} else if (this.getSquareIconTexture().getB().height == this.getSquareIconTexture().getB().width) {
+			guiGraphics.blit(
+					this.getSquareIconTexture().getA(),
+					x, y, 0.0f, 0.0f,
+					iconSize, iconSize,
+					iconSize, iconSize);
+		} else {
+			guiGraphics.blit(this.getSquareIconTexture().getA(),
+					(int) (x + (iconSize - this.getSquareIconTexture().getB().width) / 2f),
+					(int) (y + (iconSize - this.getSquareIconTexture().getB().height) / 2f),
+					0.0f, 0.0f,
+					this.getSquareIconTexture().getB().width, this.getSquareIconTexture().getB().height,
+					this.getSquareIconTexture().getB().width, this.getSquareIconTexture().getB().height);
+		}
+
+
 		RenderSystem.disableBlend();
 		Component name = Component.literal(mod.getTranslatedName());
 		FormattedText trimmedName = name;
@@ -195,16 +213,47 @@ public class ModListEntry extends ObjectSelectionList.Entry<ModListEntry> {
 		if (this.iconLocation == null) {
 			this.iconLocation = new Tuple<>(ResourceLocation.fromNamespaceAndPath(ModMenu.MOD_ID, mod.getId() + "_icon"), new Dimension());
 			Tuple<DynamicTexture, Dimension> icon = mod.getIcon(list.getNeoforgeIconHandler(),
-				64 * this.client.options.guiScale().get()
-			);
+				64 * this.client.options.guiScale().get(), false);
+
+
 			if (icon != null) {
-				this.iconLocation.setB(icon.getB());
+				float multiplier = 32f / icon.getB().height;
+				this.iconLocation.setB(new Dimension(
+						(int) (icon.getB().width * multiplier),
+						(int) (icon.getB().height * multiplier)));
+
 				this.client.getTextureManager().register(this.iconLocation.getA(), icon.getA());
 			} else {
 				this.iconLocation.setA(UNKNOWN_ICON);
 			}
 		}
 		return iconLocation;
+	}
+
+	public Tuple<ResourceLocation, Dimension> getSquaredIconTexture() {
+		Tuple<ResourceLocation, Dimension> icon = new Tuple<>(getIconTexture().getA(), iconLocation.getB().getSize()) ;
+		int iconSize = ModMenu.getConfig().COMPACT_LIST.get() ? ModListEntry.COMPACT_ICON_SIZE : ModListEntry.FULL_ICON_SIZE;
+		int biggerValue = Math.max(icon.getB().width, icon.getB().height);
+		icon.getB().setSize(icon.getB().width / biggerValue * iconSize, icon.getB().height / biggerValue * iconSize);
+		return icon;
+	}
+
+
+	public Tuple<ResourceLocation, Dimension> getSquareIconTexture() {
+		if (this.smallIconLocation == null) {
+			this.smallIconLocation = new Tuple<>(ResourceLocation.fromNamespaceAndPath(ModMenu.MOD_ID, mod.getId() + "_icon_small"), new Dimension());
+			Tuple<DynamicTexture, Dimension> icon = mod.getIcon(list.getNeoforgeIconHandler(),
+				64 * this.client.options.guiScale().get(), true);
+			if (icon != null) {
+				ModMenu.LOGGER.debug(ModMenu.MOD_ID + "1c");
+				this.smallIconLocation.setB(new Dimension());
+				this.client.getTextureManager().register(this.smallIconLocation.getA(), icon.getA());
+			} else {
+				ModMenu.LOGGER.debug(ModMenu.MOD_ID + "2c");
+				this.smallIconLocation = this.getSquaredIconTexture();
+			}
+		}
+		return smallIconLocation;
 	}
 
 	public int getXOffset() {

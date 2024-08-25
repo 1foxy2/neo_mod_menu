@@ -12,8 +12,6 @@ import com.terraformersmc.mod_menu.util.ModMenuScreenTexts;
 import com.terraformersmc.mod_menu.util.TranslationUtil;
 import com.terraformersmc.mod_menu.util.mod.Mod;
 import com.terraformersmc.mod_menu.util.mod.ModBadgeRenderer;
-import com.terraformersmc.mod_menu.util.mod.fabric.FabricMod;
-import com.terraformersmc.mod_menu.util.mod.neoforge.NeoforgeMod;
 import net.minecraft.ChatFormatting;
 import net.minecraft.SharedConstants;
 import net.minecraft.Util;
@@ -34,7 +32,6 @@ import net.minecraft.network.chat.FormattedText;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.CommonLinks;
 import net.minecraft.util.Tuple;
-import net.neoforged.fml.ModList;
 import net.neoforged.fml.loading.FMLPaths;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -44,8 +41,8 @@ import java.awt.*;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 import java.util.jar.JarFile;
 import java.util.stream.Collectors;
 
@@ -419,14 +416,15 @@ public class ModsScreen extends Screen {
 			}
 			RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 			RenderSystem.enableBlend();
-			Tuple<ResourceLocation, Dimension> iconProperties = this.selected.getIconTexture();
-			float iconSize = ModMenu.getConfig().COMPACT_LIST.get() ? ModListEntry.COMPACT_ICON_SIZE : ModListEntry.FULL_ICON_SIZE;
-			float multiplier = 32f / iconProperties.getB().height / iconSize * 32;
-			int imageOffset = (int) (4 + (iconProperties.getB().width / iconSize * 32f * multiplier));
-			int imageHeight = (int) (iconProperties.getB().height / iconSize * 32f * multiplier);
+			Tuple<ResourceLocation, Dimension> iconProperties = selectedEntry.getIconTexture();
+
+			int imageOffset = iconProperties.getB().width;
+			int imageHeight = iconProperties.getB().height;
 			guiGraphics.blit(iconProperties.getA(), x, RIGHT_PANE_Y, 0.0F, 0.0F,
-					imageOffset - 4, imageHeight,
-					imageOffset - 4, imageHeight);
+					imageOffset, imageHeight,
+					imageOffset, imageHeight);
+
+			imageOffset += 4;
 //			guiGraphics.blit(iconProperties.getA(),
 //					(int) (x + (iconSize - iconProperties.getB().width) / 2f),
 //					(int) (RIGHT_PANE_Y + (iconSize - iconProperties.getB().height) / 2f), 0.0F, 0.0F,
