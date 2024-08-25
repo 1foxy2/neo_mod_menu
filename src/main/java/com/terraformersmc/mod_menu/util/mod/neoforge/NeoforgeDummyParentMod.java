@@ -3,12 +3,15 @@ package com.terraformersmc.mod_menu.util.mod.neoforge;
 import com.terraformersmc.mod_menu.ModMenu;
 import com.terraformersmc.mod_menu.util.mod.Mod;
 import net.minecraft.client.renderer.texture.DynamicTexture;
+import net.minecraft.util.Tuple;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.ModList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.awt.*;
 import java.util.*;
+import java.util.List;
 
 public class NeoforgeDummyParentMod implements Mod {
 	private final String id;
@@ -39,7 +42,7 @@ public class NeoforgeDummyParentMod implements Mod {
 	}
 
 	@Override
-	public @NotNull DynamicTexture getIcon(NeoforgeIconHandler iconHandler, int i) {
+	public @NotNull Tuple<DynamicTexture, Dimension> getIcon(NeoforgeIconHandler iconHandler, int i) {
 		String iconSourceId = host.getId();
 		NeoforgeMod.ModMenuData.DummyParentData parentData = host.getModMenuData().getDummyParentData();
 		String iconPath = null;
@@ -188,7 +191,7 @@ public class NeoforgeDummyParentMod implements Mod {
 	@Override
 	public void reCalculateLibraries() {
 		boolean isInLibraries = ModMenu.getConfig().LIBRARY_LIST.get().contains(getId());
-		if (isInLibraries && !wasInLibraries) {
+		if (getModMenuData().getBadges().contains(Badge.LIBRARY) && isInLibraries && !wasInLibraries) {
 			this.getModMenuData().addLibraryBadge(true);
 			wasInLibraries = true;
 		} else if (!isInLibraries && wasInLibraries) {

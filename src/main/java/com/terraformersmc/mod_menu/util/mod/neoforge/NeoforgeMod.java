@@ -6,6 +6,7 @@ import com.terraformersmc.mod_menu.ModMenu;
 import com.terraformersmc.mod_menu.util.VersionUtil;
 import com.terraformersmc.mod_menu.util.mod.Mod;
 import net.minecraft.client.renderer.texture.DynamicTexture;
+import net.minecraft.util.Tuple;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.ModList;
 import net.neoforged.fml.loading.moddiscovery.ModFileInfo;
@@ -15,7 +16,9 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.awt.*;
 import java.util.*;
+import java.util.List;
 
 public class NeoforgeMod implements Mod {
 	private static final Logger LOGGER = LoggerFactory.getLogger("Mod Menu | NeoforgeMod");
@@ -152,7 +155,7 @@ public class NeoforgeMod implements Mod {
 	}
 
 	@Override
-	public @NotNull DynamicTexture getIcon(NeoforgeIconHandler iconHandler, int i) {
+	public @NotNull Tuple<DynamicTexture, Dimension> getIcon(NeoforgeIconHandler iconHandler, int i) {
 		String iconSourceId = getId();
 		String iconPath = modInfo.getLogoFile().orElse("assets/" + getId() + "/icon.png");
 		if ("minecraft".equals(getId())) {
@@ -166,7 +169,7 @@ public class NeoforgeMod implements Mod {
 		ModContainer iconSource = ModList.get()
 				.getModContainerById(iconSourceId)
 			.orElseThrow(() -> new RuntimeException("Cannot get ModContainer for Neoforge mod with id " + finalIconSourceId));
-		DynamicTexture icon = iconHandler.createIcon(iconSource, iconPath);
+		Tuple<DynamicTexture, Dimension> icon = iconHandler.createIcon(iconSource, iconPath);
 		if (icon == null) {
 			if (defaultIconWarning) {
 				LOGGER.warn("Warning! Mod {} has a broken icon, loading default icon", modInfo.getModId());

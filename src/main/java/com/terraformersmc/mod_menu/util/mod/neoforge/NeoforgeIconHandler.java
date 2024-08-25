@@ -1,12 +1,16 @@
 package com.terraformersmc.mod_menu.util.mod.neoforge;
 
 import com.mojang.blaze3d.platform.NativeImage;
+import com.terraformersmc.mod_menu.ModMenu;
+import com.terraformersmc.mod_menu.gui.widget.entries.ModListEntry;
 import net.minecraft.client.renderer.texture.DynamicTexture;
+import net.minecraft.util.Tuple;
 import net.neoforged.fml.ModContainer;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.awt.*;
 import java.io.Closeable;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -18,12 +22,12 @@ import java.util.Objects;
 public class NeoforgeIconHandler implements Closeable {
 	private static final Logger LOGGER = LoggerFactory.getLogger("Mod Menu | NeoforgeIconHandler");
 
-	private final Map<Path, DynamicTexture> modIconCache = new HashMap<>();
+	private final Map<Path, Tuple<DynamicTexture, Dimension>> modIconCache = new HashMap<>();
 
-	public DynamicTexture createIcon(ModContainer iconSource, String iconPath) {
+	public Tuple<DynamicTexture, Dimension> createIcon(ModContainer iconSource, String iconPath) {
 		try {
 			Path path = iconSource.getModInfo().getOwningFile().getFile().findResource(iconPath);
-			DynamicTexture cachedIcon = getCachedModIcon(path);
+			Tuple<DynamicTexture, Dimension> cachedIcon = getCachedModIcon(path);
 			if (cachedIcon != null) {
 				return cachedIcon;
 			}
@@ -33,21 +37,15 @@ public class NeoforgeIconHandler implements Closeable {
 			}
 			try (InputStream inputStream = Files.newInputStream(path)) {
 				NativeImage image = NativeImage.read(Objects.requireNonNull(inputStream));
-				Validate.validState(image.getHeight() == image.getWidth(), "Must be square icon");
-				DynamicTexture tex =new DynamicTexture(image);
+				int iconSize = ModMenu.getConfig().COMPACT_LIST.get() ? ModListEntry.COMPACT_ICON_SIZE : ModListEntry.FULL_ICON_SIZE;
+				double biggerValue = Math.max(image.getWidth(), image.getHeight());
+				Tuple<DynamicTexture, Dimension> tex = new Tuple<>(new DynamicTexture(image),
+						new Dimension((int) (image.getWidth() / biggerValue * iconSize), (int) (image.getHeight() / biggerValue * iconSize))) ;
 				cacheModIcon(path, tex);
 				return tex;
 			}
 
 		} catch (IllegalStateException e) {
-			if (e.getMessage().equals("Must be square icon")) {
-				LOGGER.error("Mod icon must be a square for icon source {}: {}",
-						iconSource.getModId(),
-						iconPath,
-						e
-				);
-			}
-
 			return null;
 		} catch (Throwable t) {
 			if (!iconPath.equals("assets/" + iconSource.getModId() + "/icon.png") && !iconPath.equals("icon.png")) {
@@ -59,16 +57,16 @@ public class NeoforgeIconHandler implements Closeable {
 
 	@Override
 	public void close() {
-		for (DynamicTexture tex : modIconCache.values()) {
-			tex.close();
+		for (Tuple<DynamicTexture, Dimension> tex : modIconCache.values()) {
+			tex.getA().close();
 		}
 	}
 
-	DynamicTexture getCachedModIcon(Path path) {
+	Tuple<DynamicTexture, Dimension> getCachedModIcon(Path path) {
 		return modIconCache.get(path);
 	}
 
-	void cacheModIcon(Path path, DynamicTexture tex) {
+	void cacheModIcon(Path path, Tuple<DynamicTexture, Dimension> tex) {
 		modIconCache.put(path, tex);
 	}
 }

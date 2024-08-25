@@ -33,16 +33,19 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.CommonLinks;
+import net.minecraft.util.Tuple;
 import net.neoforged.fml.ModList;
 import net.neoforged.fml.loading.FMLPaths;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.awt.*;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.List;
 import java.util.jar.JarFile;
 import java.util.stream.Collectors;
 
@@ -416,10 +419,21 @@ public class ModsScreen extends Screen {
 			}
 			RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 			RenderSystem.enableBlend();
-			guiGraphics.blit(this.selected.getIconTexture(), x, RIGHT_PANE_Y, 0.0F, 0.0F, 32, 32, 32, 32);
+			Tuple<ResourceLocation, Dimension> iconProperties = this.selected.getIconTexture();
+			float iconSize = ModMenu.getConfig().COMPACT_LIST.get() ? ModListEntry.COMPACT_ICON_SIZE : ModListEntry.FULL_ICON_SIZE;
+			float multiplier = 32f / iconProperties.getB().height / iconSize * 32;
+			int imageOffset = (int) (4 + (iconProperties.getB().width / iconSize * 32f * multiplier));
+			int imageHeight = (int) (iconProperties.getB().height / iconSize * 32f * multiplier);
+			guiGraphics.blit(iconProperties.getA(), x, RIGHT_PANE_Y, 0.0F, 0.0F,
+					imageOffset - 4, imageHeight,
+					imageOffset - 4, imageHeight);
+//			guiGraphics.blit(iconProperties.getA(),
+//					(int) (x + (iconSize - iconProperties.getB().width) / 2f),
+//					(int) (RIGHT_PANE_Y + (iconSize - iconProperties.getB().height) / 2f), 0.0F, 0.0F,
+//                    (int) (iconProperties.getB().width / iconSize * 32f), (int) (iconProperties.getB().height / iconSize * 32f),
+//                    (int) (iconProperties.getB().width / iconSize * 32f), (int) (iconProperties.getB().height / iconSize * 32f));
 			RenderSystem.disableBlend();
 			int lineSpacing = font.lineHeight + 1;
-			int imageOffset = 36;
 			Component name = Component.literal(mod.getTranslatedName());
 			FormattedText trimmedName = name;
 			int maxNameWidth = this.width - (x + imageOffset);

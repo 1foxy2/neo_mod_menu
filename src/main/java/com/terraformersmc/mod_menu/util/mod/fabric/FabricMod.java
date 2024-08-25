@@ -12,13 +12,16 @@ import net.fabricmc.loader.api.metadata.ModEnvironment;
 import net.fabricmc.loader.api.metadata.ModMetadata;
 import net.fabricmc.loader.api.metadata.Person;
 import net.minecraft.client.renderer.texture.DynamicTexture;
+import net.minecraft.util.Tuple;
 import net.neoforged.fml.ModList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.awt.*;
 import java.util.*;
+import java.util.List;
 import java.util.stream.Collectors;
 
 public class FabricMod implements Mod {
@@ -120,7 +123,7 @@ public class FabricMod implements Mod {
 	}
 
 	@Override
-	public @NotNull DynamicTexture getIcon(NeoforgeIconHandler iconHandler, int i) {
+	public @NotNull Tuple<DynamicTexture, Dimension> getIcon(NeoforgeIconHandler iconHandler, int i) {
 		String iconSourceId = getId();
 		String iconPath = metadata.getIconPath(i).orElse("assets/" + getId() + "/icon.png");
 
@@ -128,7 +131,7 @@ public class FabricMod implements Mod {
 		net.neoforged.fml.ModContainer iconSource = ModList.get()
 				.getModContainerById(iconSourceId)
 			.orElseThrow(() -> new RuntimeException("Cannot get ModContainer for Fabric mod with id " + finalIconSourceId));
-		DynamicTexture icon = iconHandler.createIcon(iconSource, iconPath);
+		Tuple<DynamicTexture, Dimension> icon = iconHandler.createIcon(iconSource, iconPath);
 		if (icon == null) {
 			if (defaultIconWarning) {
 				LOGGER.warn("Warning! Mod {} has a broken icon, loading default icon", metadata.getId());

@@ -17,7 +17,10 @@ import net.minecraft.locale.Language;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Tuple;
 import net.neoforged.fml.ModList;
+
+import java.awt.*;
 
 public class ModListEntry extends ObjectSelectionList.Entry<ModListEntry> {
 	public static final ResourceLocation UNKNOWN_ICON = ResourceLocation.withDefaultNamespace("textures/misc/unknown_pack.png");
@@ -30,9 +33,9 @@ public class ModListEntry extends ObjectSelectionList.Entry<ModListEntry> {
 	protected final Minecraft client;
 	public final Mod mod;
 	protected final ModListWidget list;
-	protected ResourceLocation iconLocation;
-	protected static final int FULL_ICON_SIZE = 32;
-	protected static final int COMPACT_ICON_SIZE = 19;
+	protected Tuple<ResourceLocation, Dimension> iconLocation;
+	public static final int FULL_ICON_SIZE = 32;
+	public static final int COMPACT_ICON_SIZE = 19;
 	protected long sinceLastClick;
 
 	public ModListEntry(Mod mod, ModListWidget list) {
@@ -68,8 +71,12 @@ public class ModListEntry extends ObjectSelectionList.Entry<ModListEntry> {
 		}
 		RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 		RenderSystem.enableBlend();
-
-		guiGraphics.blit(this.getIconTexture(), x, y, 0.0F, 0.0F, iconSize, iconSize, iconSize, iconSize);
+		guiGraphics.blit(this.getIconTexture().getA(),
+				(int) (x + (iconSize - this.getIconTexture().getB().width) / 2f),
+                (int) (y + (iconSize - this.getIconTexture().getB().height) / 2f),
+				0.0f, 0.0f,
+				this.getIconTexture().getB().width, this.getIconTexture().getB().height,
+				this.getIconTexture().getB().width, this.getIconTexture().getB().height);
 		RenderSystem.disableBlend();
 		Component name = Component.literal(mod.getTranslatedName());
 		FormattedText trimmedName = name;
@@ -184,16 +191,17 @@ public class ModListEntry extends ObjectSelectionList.Entry<ModListEntry> {
 		return mod;
 	}
 
-	public ResourceLocation getIconTexture() {
+	public Tuple<ResourceLocation, Dimension> getIconTexture() {
 		if (this.iconLocation == null) {
-			this.iconLocation = ResourceLocation.fromNamespaceAndPath(ModMenu.MOD_ID, mod.getId() + "_icon");
-			DynamicTexture icon = mod.getIcon(list.getNeoforgeIconHandler(),
+			this.iconLocation = new Tuple<>(ResourceLocation.fromNamespaceAndPath(ModMenu.MOD_ID, mod.getId() + "_icon"), new Dimension());
+			Tuple<DynamicTexture, Dimension> icon = mod.getIcon(list.getNeoforgeIconHandler(),
 				64 * this.client.options.guiScale().get()
 			);
 			if (icon != null) {
-				this.client.getTextureManager().register(this.iconLocation, icon);
+				this.iconLocation.setB(icon.getB());
+				this.client.getTextureManager().register(this.iconLocation.getA(), icon.getA());
 			} else {
-				this.iconLocation = UNKNOWN_ICON;
+				this.iconLocation.setA(UNKNOWN_ICON);
 			}
 		}
 		return iconLocation;

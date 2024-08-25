@@ -7,11 +7,14 @@ import eu.pb4.placeholders.api.ParserContext;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
+import net.minecraft.util.Tuple;
 import net.neoforged.fml.ModContainer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.awt.*;
 import java.util.*;
+import java.util.List;
 import java.util.stream.Collectors;
 
 public interface Mod {
@@ -31,7 +34,7 @@ public interface Mod {
 	}
 
 	@NotNull
-	DynamicTexture getIcon(NeoforgeIconHandler iconHandler, int i);
+	Tuple<DynamicTexture, Dimension> getIcon(NeoforgeIconHandler iconHandler, int i);
 
 	@NotNull
 	default String getSummary() {
