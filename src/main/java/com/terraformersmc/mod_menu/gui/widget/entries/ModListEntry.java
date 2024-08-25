@@ -231,8 +231,8 @@ public class ModListEntry extends ObjectSelectionList.Entry<ModListEntry> {
 
 	public Tuple<ResourceLocation, Dimension> getSquaredIconTexture() {
 		Tuple<ResourceLocation, Dimension> icon = new Tuple<>(getIconTexture().getA(), iconLocation.getB().getSize()) ;
-		int iconSize = ModMenu.getConfig().COMPACT_LIST.get() ? ModListEntry.COMPACT_ICON_SIZE : ModListEntry.FULL_ICON_SIZE;
-		int biggerValue = Math.max(icon.getB().width, icon.getB().height);
+		float iconSize = ModMenu.getConfig().COMPACT_LIST.get() ? ModListEntry.COMPACT_ICON_SIZE : ModListEntry.FULL_ICON_SIZE;
+		float biggerValue = Math.max(icon.getB().width, icon.getB().height);
 		icon.getB().setSize(icon.getB().width / biggerValue * iconSize, icon.getB().height / biggerValue * iconSize);
 		return icon;
 	}

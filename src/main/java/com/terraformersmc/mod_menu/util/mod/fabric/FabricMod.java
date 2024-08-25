@@ -139,8 +139,8 @@ public class FabricMod implements Mod {
 				.getModContainerById(iconSourceId)
 			.orElseThrow(() -> new RuntimeException("Cannot get ModContainer for Fabric mod with id " + finalIconSourceId));
 		Tuple<DynamicTexture, Dimension> icon = iconHandler.createIcon(iconSource, iconPath);
-		if (icon == null) {
-			if (defaultIconWarning && !isSmall) {
+		if (icon == null && !isSmall) {
+			if (defaultIconWarning) {
 				LOGGER.warn("Warning! Mod {} has a broken icon, loading default icon", metadata.getId());
 				defaultIconWarning = false;
 			}
