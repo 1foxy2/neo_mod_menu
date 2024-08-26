@@ -64,7 +64,7 @@ public class ModMenuEventHandler {
 		for (int i = 0; i < buttons.size(); i++) {
 			Renderable widget = buttons.get(i);
 			if (widget instanceof Button button && !(button instanceof PlainTextButton)) {
-				shiftButtons(button, replacedRealmButton, spacing + (replacedRealmButton ? -12 : 8));
+				//shiftButtons(button, replacedRealmButton, spacing + (replacedRealmButton ? -12 : 8));
 
 				isRealmsButton = buttonHasText(button, "menu.online");
 				if (isRealmsButton)
@@ -76,6 +76,10 @@ public class ModMenuEventHandler {
 						if (modsButtonIndex == -1) {
 							buttonsY = button.getY();
 						}
+					}
+					if (isRealmsButton) {
+						button.setWidth(200);
+						button.setX(screen.width / 2 - 100);
 					}
 				}
 				if (isRealmsButton) {

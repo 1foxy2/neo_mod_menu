@@ -71,7 +71,7 @@ public class ModMenu {
 	public static final Map<String, BiFunction<Minecraft, Screen, Screen>> configScreenFactories = new HashMap<>();
 
 	private static int cachedDisplayedModCount = -1;
-	public static final boolean HAS_SINYTRA = ModList.get().isLoaded("connector");
+	public static final boolean HAS_SINYTRA = ModList.get().isLoaded("connectormod");
 	public static final boolean TEXT_PLACEHOLDER_COMPAT = ModList.get().isLoaded("placeholder_api");
 
 	public static Screen getConfigScreen(ModContainer c, Screen menuScreen) {

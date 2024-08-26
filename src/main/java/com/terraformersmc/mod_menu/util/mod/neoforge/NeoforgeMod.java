@@ -117,8 +117,8 @@ public class NeoforgeMod implements Mod {
 
 		/* Hardcode parents and badges for connector-extras */
 		if (id.startsWith("connectorextras") || id.startsWith("modmenu")) {
-			if (ModList.get().isLoaded("connector")) {
-				modMenuData.fillParentIfEmpty("connector");
+			if (ModList.get().isLoaded("connectormod")) {
+				modMenuData.fillParentIfEmpty("connectormod");
 			}
 
 			modMenuData.getBadges().add(Badge.LIBRARY);
@@ -160,7 +160,7 @@ public class NeoforgeMod implements Mod {
 		if ("minecraft".equals(getId())) {
 			iconSourceId = ModMenu.MOD_ID;
 			iconPath = "assets/" + ModMenu.MOD_ID + "/minecraft_icon.png";
-		} else if ("neoforge".equals(getId()) && isSmall) {
+		} else if ("forge".equals(getId()) && isSmall && iconPath.contains("neoforge")) {
 			iconSourceId = ModMenu.MOD_ID;
 			iconPath = "assets/" + ModMenu.MOD_ID + "/neoforge.png";
 		}
