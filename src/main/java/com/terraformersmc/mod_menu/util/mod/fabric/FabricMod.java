@@ -85,7 +85,10 @@ public class FabricMod implements Mod {
 				}
 			}
 			badgeNames.addAll(CustomValueUtil.getStringSet("badges", modMenuObject).orElse(new HashSet<>()));
-			links.putAll(CustomValueUtil.getStringMap("links", modMenuObject).orElse(new HashMap<>()));
+			CustomValueUtil.getStringMap("links", modMenuObject).orElse(new HashMap<>()).forEach((key, vakue) -> {
+				if (key.startsWith("modmenu")) key = key.replace("modmenu", "mod_menu");
+				links.put(key, vakue);
+			});
 			allowsUpdateChecks = CustomValueUtil.getBoolean("update_checker", modMenuObject).orElse(true);
 		}
 		this.modMenuData = new ModMenuData(badgeNames, parentId, parentData, id);
@@ -109,9 +112,8 @@ public class FabricMod implements Mod {
 		if (this.metadata.getEnvironment() == ModEnvironment.CLIENT) {
 			badges.add(Badge.CLIENT);
 		}
-		if (metadata.containsCustomValue("patchwork:patcherMeta")) {
-			badges.add(Badge.PATCHWORK_FORGE);
-		}
+
+		badges.add(Badge.SINYTRA_FABRIC);
 	}
 
 	public Optional<net.neoforged.fml.ModContainer> getContainer() {

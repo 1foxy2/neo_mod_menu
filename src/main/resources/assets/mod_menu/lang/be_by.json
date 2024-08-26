@@ -16,7 +16,7 @@
   
   "mod_menu.search": "Пошук модаў",
   "mod_menu.searchTerms.library": "API бібліятэка",
-  "mod_menu.searchTerms.patchwork": "patchwork forge fml",
+  "mod_menu.searchTerms.sinytra": "sinytra fabric",
   "mod_menu.searchTerms.modpack": "зборка зборка",
   "mod_menu.searchTerms.deprecated": "састарэлы неактуальны стары",
   "mod_menu.searchTerms.clientside": "бок-кліента бок-гульні",
@@ -36,7 +36,7 @@
   "mod_menu.badge.library": "Бібліятэка",
   "mod_menu.badge.clientsideOnly": "Кліент",
   "mod_menu.badge.deprecated": "Састарэлы",
-  "mod_menu.badge.forge": "Forge",
+  "mod_menu.badge.fabric": "Fabric",
   "mod_menu.badge.modpack": "Зборка",
   "mod_menu.badge.minecraft": "Minecraft",
   

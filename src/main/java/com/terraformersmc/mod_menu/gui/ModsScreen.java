@@ -166,8 +166,8 @@ public class ModsScreen extends Screen {
 		});
 
 		// Filters button
-		Component sortingText = ModMenu.getSortingComponent();
-		Component librariesText = ModMenu.getLibrariesComponent();
+		Component sortingText = ModMenuScreenTexts.getSortingComponent();
+		Component librariesText = ModMenuScreenTexts.getLibrariesComponent();
 
 		int sortingWidth = font.width(sortingText) + 20;
 		int librariesWidth = font.width(librariesText) + 20;
@@ -197,7 +197,7 @@ public class ModsScreen extends Screen {
 			ModMenu.getConfig().SORTING.get().cycleValue();
 			ModMenu.CONFIG.getRight().save();
 			modList.reloadFilters();
-			button.setMessage(ModMenu.getSortingComponent());
+			button.setMessage(ModMenuScreenTexts.getSortingComponent());
 		}).pos(this.filtersX, 45).size(sortingWidth, 20).build();
 
 		// Show libraries button
@@ -205,7 +205,7 @@ public class ModsScreen extends Screen {
 			ModMenu.getConfig().SHOW_LIBRARIES.set(!ModMenu.getConfig().SHOW_LIBRARIES.get());
 			ModMenu.CONFIG.getRight().save();
 			modList.reloadFilters();
-			button.setMessage(ModMenu.getLibrariesComponent());
+			button.setMessage(ModMenuScreenTexts.getLibrariesComponent());
 		}).pos(this.filtersX + sortingWidth + 2, 45).size(librariesWidth, 20).build();
 
 		// Configure button

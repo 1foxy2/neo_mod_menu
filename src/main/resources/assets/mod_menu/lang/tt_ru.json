@@ -16,7 +16,7 @@
   
   "mod_menu.search": "Модлар эзләү",
   "mod_menu.searchTerms.library": "api апи апиай китапханә",
-  "mod_menu.searchTerms.patchwork": "patchwork forge fml фордж форҗ форж патчворк фмл патчуорк",
+  "mod_menu.searchTerms.sinytra": "sinytra fabric loader фордж форҗ форж патчворк фмл патчуорк",
   "mod_menu.searchTerms.modpack": "җыелма модпак модҗыелма җыелмасы",
   "mod_menu.searchTerms.deprecated": "искергән иске борынгы әүвәл",
   "mod_menu.searchTerms.clientside": "клиент клиентлы",
@@ -36,7 +36,7 @@
   "mod_menu.badge.library": "Китапханә",
   "mod_menu.badge.clientsideOnly": "Клиент",
   "mod_menu.badge.deprecated": "Искергән",
-  "mod_menu.badge.forge": "Forge",
+  "mod_menu.badge.fabric": "Fabric",
   "mod_menu.badge.modpack": "Мод җыелмасы",
   "mod_menu.badge.minecraft": "Minecraft",
   

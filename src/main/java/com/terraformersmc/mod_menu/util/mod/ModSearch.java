@@ -37,7 +37,7 @@ public class ModSearch {
 		String modSummary = mod.getSummary();
 
 		String library = I18n.get("mod_menu.searchTerms.library");
-		String patchwork = I18n.get("mod_menu.searchTerms.patchwork");
+		String sinytra = I18n.get("mod_menu.searchTerms.sinytra");
 		String modpack = I18n.get("mod_menu.searchTerms.modpack");
 		String deprecated = I18n.get("mod_menu.searchTerms.deprecated");
 		String clientside = I18n.get("mod_menu.searchTerms.clientside");
@@ -61,8 +61,8 @@ public class ModSearch {
 			|| modSummary.toLowerCase(Locale.ROOT).contains(query) // Search mod summary
 			|| authorMatches(mod, query) // Search via author
 			|| library.contains(query) && mod.getBadges().contains(Mod.Badge.LIBRARY) // Search for lib mods
-			|| patchwork.contains(query) && mod.getBadges()
-			.contains(Mod.Badge.PATCHWORK_FORGE) // Search for patchwork mods
+			|| sinytra.contains(query) && mod.getBadges()
+			.contains(Mod.Badge.SINYTRA_FABRIC) // Search for sinytra mods
 			|| modpack.contains(query) && mod.getBadges().contains(Mod.Badge.MODPACK) // Search for modpack mods
 			|| deprecated.contains(query) && mod.getBadges()
 			.contains(Mod.Badge.DEPRECATED) // Search for deprecated mods
