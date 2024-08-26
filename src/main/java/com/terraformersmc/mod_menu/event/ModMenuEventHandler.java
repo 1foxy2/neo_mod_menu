@@ -59,17 +59,10 @@ public class ModMenuEventHandler {
 		int modsButtonIndex = -1;
 		final int spacing = 24;
 		int buttonsY = screen.height / 4 + 48;
-		boolean replacedRealmButton = false;
 		boolean isRealmsButton;
 		for (int i = 0; i < buttons.size(); i++) {
 			Renderable widget = buttons.get(i);
 			if (widget instanceof Button button && !(button instanceof PlainTextButton)) {
-				//shiftButtons(button, replacedRealmButton, spacing + (replacedRealmButton ? -12 : 8));
-
-				isRealmsButton = buttonHasText(button, "menu.online");
-				if (isRealmsButton)
-					replacedRealmButton = true;
-
 				if (ModMenu.getConfig().MODS_BUTTON_STYLE.get() == ModMenuConfig.TitleMenuButtonStyle.CLASSIC) {
 					if (button.visible) {
 						shiftButtons(button, modsButtonIndex == -1, spacing);
@@ -77,17 +70,20 @@ public class ModMenuEventHandler {
 							buttonsY = button.getY();
 						}
 					}
-					if (isRealmsButton) {
+				}
+				if (buttonHasText(button, "menu.online")) {
+					if (ModMenu.getConfig().MODS_BUTTON_STYLE.get() == ModMenuConfig.TitleMenuButtonStyle.CLASSIC ||
+							ModMenu.getConfig().MODS_BUTTON_STYLE.get() == ModMenuConfig.TitleMenuButtonStyle.ICON) {
+
+
 						button.setWidth(200);
 						button.setX(screen.width / 2 - 100);
 					}
-				}
-				if (isRealmsButton) {
 					if (ModMenu.getConfig().MODS_BUTTON_STYLE.get() ==
 							ModMenuConfig.TitleMenuButtonStyle.REPLACE_REALMS) {
-						ModMenuEventHandler.set(screen, i, new ModMenuButtonWidget(button.getX(),
+						ModMenuEventHandler.set(screen, i, new ModMenuButtonWidget(button.getX() - 102,
 								button.getY(),
-								button.getWidth(),
+								200,
 								button.getHeight(),
 								ModMenu.createModsButtonText(true),
 								screen
@@ -117,7 +113,7 @@ public class ModMenuEventHandler {
 				));
 			} else if (ModMenu.getConfig().MODS_BUTTON_STYLE.get() == ModMenuConfig.TitleMenuButtonStyle.SHRINK) {
 				add(screen, modsButtonIndex,
-						new ModMenuButtonWidget(screen.width / 2 + 2,
+						new ModMenuButtonWidget(screen.width / 2 - 100,
 								buttonsY,
 								98,
 								20,
