@@ -4,7 +4,6 @@ import com.google.gson.annotations.SerializedName;
 import com.terraformersmc.mod_menu.ModMenu;
 import com.terraformersmc.mod_menu.util.mod.Mod;
 import net.neoforged.neoforge.common.ModConfigSpec;
-import net.neoforged.neoforge.common.TranslatableEnum;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -113,7 +112,7 @@ public class ModMenuConfig {
         //  UPDATE_CHANNEL
     }
 
-    public enum Sorting implements TranslatableEnum {
+    public enum Sorting {
         ASCENDING(Comparator.comparing(mod -> mod.getTranslatedName()
                 .toLowerCase(Locale.ROOT))), DESCENDING(ASCENDING.getComparator().reversed());
 
