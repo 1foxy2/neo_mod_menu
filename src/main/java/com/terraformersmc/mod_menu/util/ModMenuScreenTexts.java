@@ -1,5 +1,6 @@
 package com.terraformersmc.mod_menu.util;
 
+import com.terraformersmc.mod_menu.ModMenu;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
@@ -18,6 +19,9 @@ public final class ModMenuScreenTexts {
 	public static final Component TOGGLE_FILTER_OPTIONS = Component.translatable("mod_menu.toggleFilterOptions");
 	public static final Component WEBSITE = Component.translatable("mod_menu.website");
 
+	public static final String LIBRARIES = ModMenu.MOD_ID + ".configuration.show_libraries";
+	public static final String SORTING = ModMenu.MOD_ID + ".configuration.sorting";
+
 	private ModMenuScreenTexts() {
 	}
 
@@ -31,5 +35,15 @@ public final class ModMenuScreenTexts {
 			.append(CommonComponents.NEW_LINE)
 			.append(e.toString())
 			.withStyle(ChatFormatting.RED);
+	}
+
+	public static Component getLibrariesComponent() {
+		return CommonComponents.optionNameValue(Component.translatable(LIBRARIES),
+				Component.translatable(LIBRARIES + "." + ModMenu.getConfig().SHOW_LIBRARIES.get().toString().toLowerCase()));
+	}
+
+	public static Component getSortingComponent() {
+		return CommonComponents.optionNameValue(Component.translatable(SORTING),
+				Component.translatable(SORTING + "." + ModMenu.getConfig().SORTING.get().toString().toLowerCase()));
 	}
 }

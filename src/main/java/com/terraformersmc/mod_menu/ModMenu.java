@@ -45,13 +45,6 @@ public class ModMenu {
 	public static final Gson GSON_MINIFIED;
 	public static final Pair<ModMenuConfig, ForgeConfigSpec> CONFIG;
 
-	public static final Component LIBRARIES = Component.translatable(MOD_ID + ".configuration.show_libraries");
-	public static final Component SHOWN_LIBRARIES = Component.translatable( MOD_ID + ".configuration.show_libraries.true");
-	public static final Component HIDDEN_LIBRARIES = Component.translatable(MOD_ID + ".configuration.show_libraries.false");
-	public static final Component SORTING = Component.translatable(MOD_ID + ".configuration.sorting");
-	public static final Component ASCENDING = Component.translatable(MOD_ID + ".configuration.sorting.ascending");
-	public static final Component DESCENDING = Component.translatable(MOD_ID + ".configuration.sorting.descending");
-
 	static {
 		GsonBuilder builder = new GsonBuilder().registerTypeHierarchyAdapter(Enum.class,
 				new EnumToLowerCaseJsonConverter()
@@ -151,14 +144,6 @@ public class ModMenu {
 
 	public static void clearModCountCache() {
 		cachedDisplayedModCount = -1;
-	}
-
-	public static Component getLibrariesComponent() {
-		return CommonComponents.optionNameValue(LIBRARIES, ModMenu.getConfig().SHOW_LIBRARIES.get() ? SHOWN_LIBRARIES : HIDDEN_LIBRARIES);
-	}
-
-	public static Component getSortingComponent() {
-		return CommonComponents.optionNameValue(SORTING, ModMenu.getConfig().SORTING.get() == ModMenuConfig.Sorting.ASCENDING ? ASCENDING : DESCENDING);
 	}
 
 	public static String getDisplayedModCount() {

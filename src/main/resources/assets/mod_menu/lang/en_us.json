@@ -16,7 +16,7 @@
   
   "mod_menu.search": "Search for mods",
   "mod_menu.searchTerms.library": "api library",
-  "mod_menu.searchTerms.patchwork": "patchwork forge fml",
+  "mod_menu.searchTerms.sinytra": "sinytra fabric",
   "mod_menu.searchTerms.modpack": "modpack pack",
   "mod_menu.searchTerms.deprecated": "deprecated outdated old",
   "mod_menu.searchTerms.clientside": "clientside gameside",
@@ -36,7 +36,7 @@
   "mod_menu.badge.library": "Library",
   "mod_menu.badge.clientsideOnly": "Client",
   "mod_menu.badge.deprecated": "Deprecated",
-  "mod_menu.badge.forge": "Forge",
+  "mod_menu.badge.fabric": "Fabric",
   "mod_menu.badge.modpack": "Modpack",
   "mod_menu.badge.minecraft": "Minecraft",
   
@@ -70,7 +70,8 @@
   "mod_menu.coindrop": "Coindrop",
   "mod_menu.crowdin": "Crowdin",
   "mod_menu.curseforge": "CurseForge",
-  "mod_menu.original": "original",
+  "mod_menu.original": "Original Project",
+  "mod_menu.discord": "Discord",
   "mod_menu.donate": "Donate",
   "mod_menu.flattr": "Flattr",
   "mod_menu.github_releases": "GitHub Releases",

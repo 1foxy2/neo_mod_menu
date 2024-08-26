@@ -16,7 +16,7 @@
   
   "mod_menu.search": "Søk etter modder",
   "mod_menu.searchTerms.library": "api bibliotek",
-  "mod_menu.searchTerms.patchwork": "patchwork forge fml",
+  "mod_menu.searchTerms.sinytra": "sinytra fabric",
   "mod_menu.searchTerms.modpack": "modpack pack",
   "mod_menu.searchTerms.deprecated": "deprecated outdated old",
   "mod_menu.searchTerms.clientside": "clientside gameside",
@@ -36,7 +36,7 @@
   "mod_menu.badge.library": "Bibliotek",
   "mod_menu.badge.clientsideOnly": "Klient",
   "mod_menu.badge.deprecated": "Foreldet",
-  "mod_menu.badge.forge": "Forge",
+  "mod_menu.badge.fabric": "Fabric",
   "mod_menu.badge.modpack": "Modpakke",
   "mod_menu.badge.minecraft": "Minecraft",
   

@@ -136,10 +136,10 @@ public interface Mod {
 				"deprecated"
 		),
 
-		PATCHWORK_FORGE(
-			"mod_menu.badge.forge",
-			0xff1f2d42,
-			0xff101721,
+		SINYTRA_FABRIC(
+			"mod_menu.badge.fabric",
+			0xffc7b48b,
+				0xff786d58,
 			null
 		),
 
