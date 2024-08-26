@@ -7,6 +7,7 @@ import com.terraformersmc.mod_menu.gui.widget.DescriptionListWidget;
 import com.terraformersmc.mod_menu.gui.widget.ModListWidget;
 import com.terraformersmc.mod_menu.gui.widget.entries.ModListEntry;
 import com.terraformersmc.mod_menu.util.DrawingUtil;
+import com.terraformersmc.mod_menu.util.ModMenuScreenTexts;
 import com.terraformersmc.mod_menu.util.TranslationUtil;
 import com.terraformersmc.mod_menu.util.mod.Mod;
 import com.terraformersmc.mod_menu.util.mod.ModBadgeRenderer;
@@ -213,8 +214,8 @@ public class ModsScreen extends Screen {
 		if (!ModMenu.getConfig().CONFIG_MODE.get()) {
 			this.addRenderableWidget(filtersButton);
 		}
-		Component showLibrariesText = ModMenu.getLibrariesComponent();
-		Component sortingText = ModMenu.getSortingComponent();
+		Component showLibrariesText = ModMenuScreenTexts.getLibrariesComponent();
+		Component sortingText = ModMenuScreenTexts.getSortingComponent();
 		int showLibrariesWidth = font.width(showLibrariesText) + 20;
 		int sortingWidth = font.width(sortingText) + 20;
 		filtersWidth = showLibrariesWidth + sortingWidth + 2;
@@ -229,7 +230,7 @@ public class ModsScreen extends Screen {
 			public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
 				guiGraphics.pose().translate(0, 0, 1);
 				visible = filterOptionsShown;
-				this.setMessage(ModMenu.getSortingComponent());
+				this.setMessage(ModMenuScreenTexts.getSortingComponent());
 				super.render(guiGraphics, mouseX, mouseY, delta);
 			}
 		});
@@ -242,7 +243,7 @@ public class ModsScreen extends Screen {
 			public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
 				guiGraphics.pose().translate(0, 0, 1);
 				visible = filterOptionsShown;
-				this.setMessage(ModMenu.getLibrariesComponent());
+				this.setMessage(ModMenuScreenTexts.getLibrariesComponent());
 				super.render(guiGraphics, mouseX, mouseY, delta);
 			}
 		});
