@@ -2,7 +2,10 @@ package com.terraformersmc.mod_menu.gui.widget;
 
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.*;
+import com.mojang.blaze3d.vertex.BufferBuilder;
+import com.mojang.blaze3d.vertex.DefaultVertexFormat;
+import com.mojang.blaze3d.vertex.Tesselator;
+import com.mojang.blaze3d.vertex.VertexFormat;
 import com.terraformersmc.mod_menu.ModMenu;
 import com.terraformersmc.mod_menu.gui.ModsScreen;
 import com.terraformersmc.mod_menu.gui.widget.entries.ModListEntry;
@@ -20,6 +23,7 @@ import net.minecraft.client.gui.narration.NarratedElementType;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.ConfirmLinkScreen;
 import net.minecraft.client.gui.screens.CreditsAndAttributionScreen;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.FormattedCharSequence;
@@ -34,33 +38,20 @@ public class DescriptionListWidget extends AbstractSelectionList<DescriptionList
 
 	private static final Component HAS_UPDATE_TEXT = Component.translatable("mod_menu.hasUpdate");
 	private static final Component EXPERIMENTAL_TEXT = Component.translatable("mod_menu.experimental").withStyle(ChatFormatting.GOLD);
-	private static final Component DOWNLOAD_TEXT = Component.translatable("mod_menu.downloadLink")
-		.withStyle(ChatFormatting.BLUE)
-		.withStyle(ChatFormatting.UNDERLINE);
+	private static final Component MODRINTH_TEXT = Component.translatable("mod_menu.modrinth");
 	private static final Component CHILD_HAS_UPDATE_TEXT = Component.translatable("mod_menu.childHasUpdate");
 	private static final Component LINKS_TEXT = Component.translatable("mod_menu.links");
-	private static final Component SOURCE_TEXT = Component.translatable("mod_menu.source")
-		.withStyle(ChatFormatting.BLUE)
-		.withStyle(ChatFormatting.UNDERLINE);
+	private static final Component SOURCE_TEXT = Component.translatable("mod_menu.source").withStyle(ChatFormatting.BLUE).withStyle(ChatFormatting.UNDERLINE);
 	private static final Component LICENSE_TEXT = Component.translatable("mod_menu.license");
-	private static final Component VIEW_CREDITS_TEXT = Component.translatable("mod_menu.viewCredits")
-		.withStyle(ChatFormatting.BLUE)
-		.withStyle(ChatFormatting.UNDERLINE);
+	private static final Component VIEW_CREDITS_TEXT = Component.translatable("mod_menu.viewCredits").withStyle(ChatFormatting.BLUE).withStyle(ChatFormatting.UNDERLINE);
 	private static final Component CREDITS_TEXT = Component.translatable("mod_menu.credits");
 
 	private final ModsScreen parent;
 	private final Font textRenderer;
 	private ModListEntry lastSelected = null;
 
-	public DescriptionListWidget(
-		Minecraft client,
-		int width,
-		int height,
-		int y,
-		int itemHeight,
-		ModsScreen parent
-	) {
-		super(client, width, height, y, y + height, itemHeight);
+	public DescriptionListWidget(Minecraft client, int width, int height, int top, int bottom, int entryHeight, ModsScreen parent) {
+		super(client, width, height, top, bottom, entryHeight);
 		this.parent = parent;
 		this.textRenderer = client.font;
 	}
@@ -77,7 +68,7 @@ public class DescriptionListWidget extends AbstractSelectionList<DescriptionList
 
 	@Override
 	protected int getScrollbarPosition() {
-		return this.width - 6 + this.getLeft();
+		return this.width - 6 + getLeft();
 	}
 
 	@Override
@@ -87,7 +78,7 @@ public class DescriptionListWidget extends AbstractSelectionList<DescriptionList
 	}
 
 	@Override
-	public void renderList(GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
+	public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
 		ModListEntry selectedEntry = parent.getSelectedEntry();
 		if (selectedEntry != lastSelected) {
 			lastSelected = selectedEntry;
@@ -98,9 +89,9 @@ public class DescriptionListWidget extends AbstractSelectionList<DescriptionList
 				int wrapWidth = getRowWidth() - 5;
 
 				Mod mod = lastSelected.getMod();
-				Component description = mod.getFormattedDescription();
-				if (!description.getString().isEmpty()) {
-					for (FormattedCharSequence line : textRenderer.split(description, wrapWidth)) {
+				String description = mod.getTranslatedDescription();
+				if (!description.isEmpty()) {
+					for (FormattedCharSequence line : textRenderer.split(Component.literal(description.replaceAll("\n", "\n\n")), wrapWidth)) {
 						children().add(new DescriptionEntry(line));
 					}
 				}
@@ -124,11 +115,7 @@ public class DescriptionListWidget extends AbstractSelectionList<DescriptionList
 
 					links.forEach((key, value) -> {
 						int indent = 8;
-						for (FormattedCharSequence line : textRenderer.split(Component.translatable(key)
-								.withStyle(ChatFormatting.BLUE)
-								.withStyle(ChatFormatting.UNDERLINE),
-							wrapWidth - 16
-						)) {
+						for (FormattedCharSequence line : textRenderer.split(Component.translatable(key).withStyle(ChatFormatting.BLUE).withStyle(ChatFormatting.UNDERLINE), wrapWidth - 16)) {
 							children().add(new LinkEntry(line, value, indent));
 							indent = 16;
 						}
@@ -178,7 +165,7 @@ public class DescriptionListWidget extends AbstractSelectionList<DescriptionList
 								var roleName = role.getKey();
 
 								for (var line : textRenderer.split(this.creditsRoleText(roleName),
-									wrapWidth - 16
+										wrapWidth - 16
 								)) {
 									children().add(new DescriptionEntry(line, indent));
 									indent = 16;
@@ -204,117 +191,76 @@ public class DescriptionListWidget extends AbstractSelectionList<DescriptionList
 		}
 
 		Tesselator tessellator = Tesselator.getInstance();
-		BufferBuilder bufferBuilder;
-		BufferBuilder.RenderedBuffer builtBuffer;
+		BufferBuilder bufferBuilder = tessellator.getBuilder();
 
-		//		{
-		//			RenderSystem.setShader(GameRenderer::getPositionTexColorProgram);
-		//			RenderSystem.setShaderTexture(0, Screen.OPTIONS_BACKGROUND_TEXTURE);
-		//			RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-		//			bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR);
-		//			bufferBuilder.vertex(this.getX(), this.getBottom(), 0.0D).texture(this.getX() / 32.0F, (this.getBottom() + (int) this.getScrollAmount()) / 32.0F).color(32, 32, 32, 255);
-		//			bufferBuilder.vertex(this.getRight(), this.getBottom(), 0.0D).texture(this.getRight() / 32.0F, (this.getBottom() + (int) this.getScrollAmount()) / 32.0F).color(32, 32, 32, 255);
-		//			bufferBuilder.vertex(this.getRight(), this.getY(), 0.0D).texture(this.getRight() / 32.0F, (this.getY() + (int) this.getScrollAmount()) / 32.0F).color(32, 32, 32, 255);
-		//			bufferBuilder.vertex(this.getX(), this.getY(), 0.0D).texture(this.getX() / 32.0F, (this.getY() + (int) this.getScrollAmount()) / 32.0F).color(32, 32, 32, 255);
-		//			tessellator.draw();
-		//		}
+		{
+			RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
+			RenderSystem.setShaderTexture(0, Screen.BACKGROUND_LOCATION);
+			RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+			bufferBuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
+			bufferBuilder.vertex(this.getLeft(), this.getBottom(), 0.0D).uv(this.getLeft() / 32.0F, (this.getBottom() + (int) this.getScrollAmount()) / 32.0F).color(32, 32, 32, 255).endVertex();
+			bufferBuilder.vertex(this.getRight(), this.getBottom(), 0.0D).uv(this.getRight() / 32.0F, (this.getBottom() + (int) this.getScrollAmount()) / 32.0F).color(32, 32, 32, 255).endVertex();
+			bufferBuilder.vertex(this.getRight(), this.getTop(), 0.0D).uv(this.getRight() / 32.0F, (this.getTop() + (int) this.getScrollAmount()) / 32.0F).color(32, 32, 32, 255).endVertex();
+			bufferBuilder.vertex(this.getLeft(), this.getTop(), 0.0D).uv(this.getLeft() / 32.0F, (this.getTop() + (int) this.getScrollAmount()) / 32.0F).color(32, 32, 32, 255).endVertex();
+			tessellator.end();
+		}
 
 		this.enableScissor(guiGraphics);
-		super.renderList(guiGraphics, mouseX, mouseY, delta);
+		this.renderList(guiGraphics, mouseX, mouseY, delta);
 		guiGraphics.disableScissor();
 
 		RenderSystem.depthFunc(515);
 		RenderSystem.disableDepthTest();
 		RenderSystem.enableBlend();
-		RenderSystem.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA,
-			GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA,
-			GlStateManager.SourceFactor.ZERO,
-			GlStateManager.DestFactor.ONE
-		);
+		RenderSystem.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ZERO, GlStateManager.DestFactor.ONE);
 		RenderSystem.setShader(GameRenderer::getPositionColorShader);
 
-		bufferBuilder = tessellator.getBuilder();
 		bufferBuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
-		bufferBuilder.vertex(this.getLeft(), (this.getTop() + 4), 0.0F).
+		bufferBuilder.vertex(this.getLeft(), (this.getTop() + 4), 0.0D).
 
-			color(0, 0, 0, 0);
+				color(0, 0, 0, 0).
 
-		bufferBuilder.vertex(this.getRight(), (this.getTop() + 4), 0.0F).
+				endVertex();
+		bufferBuilder.vertex(this.getRight(), (this.getTop() + 4), 0.0D).
 
-			color(0, 0, 0, 0);
+				color(0, 0, 0, 0).
 
-		bufferBuilder.vertex(this.getRight(), this.getTop(), 0.0F).
+				endVertex();
+		bufferBuilder.vertex(this.getRight(), this.getTop(), 0.0D).
 
-			color(0, 0, 0, 255);
+				color(0, 0, 0, 255).
 
-		bufferBuilder.vertex(this.getLeft(), this.getTop(), 0.0F).
+				endVertex();
+		bufferBuilder.vertex(this.getLeft(), this.getTop(), 0.0D).
 
-			color(0, 0, 0, 255);
+				color(0, 0, 0, 255).
 
-		bufferBuilder.vertex(this.getLeft(), this.getBottom(), 0.0F).
+				endVertex();
+		bufferBuilder.vertex(this.getLeft(), this.getBottom(), 0.0D).
 
-			color(0, 0, 0, 255);
+				color(0, 0, 0, 255).
 
-		bufferBuilder.vertex(this.getRight(), this.getBottom(), 0.0F).
+				endVertex();
+		bufferBuilder.vertex(this.getRight(), this.getBottom(), 0.0D).
 
-			color(0, 0, 0, 255);
+				color(0, 0, 0, 255).
 
-		bufferBuilder.vertex(this.getRight(), (this.getBottom() - 4), 0.0F).
+				endVertex();
+		bufferBuilder.vertex(this.getRight(), (this.getBottom() - 4), 0.0D).
 
-			color(0, 0, 0, 0);
+				color(0, 0, 0, 0).
 
-		bufferBuilder.vertex(this.getLeft(), (this.getBottom() - 4), 0.0F).
+				endVertex();
+		bufferBuilder.vertex(this.getLeft(), (this.getBottom() - 4), 0.0D).
 
-			color(0, 0, 0, 0);
+				color(0, 0, 0, 0).
 
-		try {
-			builtBuffer = bufferBuilder.end();
-			BufferUploader.drawWithShader(builtBuffer);
-			builtBuffer.release();
-		} catch (Exception e) {
-			// Ignored
-		}
+				endVertex();
+		tessellator.end();
+
 		this.renderScrollBar(bufferBuilder, tessellator);
 
 		RenderSystem.disableBlend();
-	}
-
-	public void renderScrollBar(BufferBuilder bufferBuilder, Tesselator tessellator) {
-		BufferBuilder.RenderedBuffer builtBuffer;
-		int scrollbarStartX = this.getScrollbarPosition();
-		int scrollbarEndX = scrollbarStartX + 6;
-		int maxScroll = this.getMaxScroll();
-		if (maxScroll > 0) {
-			int p = (int) ((float) ((this.getBottom() - this.getTop()) * (this.getBottom() - this.getTop())) / (float) this.getMaxPosition());
-			p = Mth.clamp(p, 32, this.getBottom() - this.getTop() - 8);
-			int q = (int) this.getScrollAmount() * (this.getBottom() - this.getTop() - p) / maxScroll + this.getTop();
-			if (q < this.getTop()) {
-				q = this.getTop();
-			}
-
-			RenderSystem.setShader(GameRenderer::getPositionColorShader);
-			bufferBuilder = tessellator.getBuilder();
-			bufferBuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
-			bufferBuilder.vertex(scrollbarStartX, this.getBottom(), 0.0F).color(0, 0, 0, 255);
-			bufferBuilder.vertex(scrollbarEndX, this.getBottom(), 0.0F).color(0, 0, 0, 255);
-			bufferBuilder.vertex(scrollbarEndX, this.getTop(), 0.0F).color(0, 0, 0, 255);
-			bufferBuilder.vertex(scrollbarStartX, this.getTop(), 0.0F).color(0, 0, 0, 255);
-			bufferBuilder.vertex(scrollbarStartX, q + p, 0.0F).color(128, 128, 128, 255);
-			bufferBuilder.vertex(scrollbarEndX, q + p, 0.0F).color(128, 128, 128, 255);
-			bufferBuilder.vertex(scrollbarEndX, q, 0.0F).color(128, 128, 128, 255);
-			bufferBuilder.vertex(scrollbarStartX, q, 0.0F).color(128, 128, 128, 255);
-			bufferBuilder.vertex(scrollbarStartX, q + p - 1, 0.0F).color(192, 192, 192, 255);
-			bufferBuilder.vertex(scrollbarEndX - 1, q + p - 1, 0.0F).color(192, 192, 192, 255);
-			bufferBuilder.vertex(scrollbarEndX - 1, q, 0.0F).color(192, 192, 192, 255);
-			bufferBuilder.vertex(scrollbarStartX, q, 0.0F).color(192, 192, 192, 255);
-			try {
-				builtBuffer = bufferBuilder.end();
-				BufferUploader.drawWithShader(builtBuffer);
-				builtBuffer.release();
-			} catch (Exception e) {
-				// Ignored
-			}
-		}
 	}
 
 	private Component creditsRoleText(String roleName) {
@@ -327,7 +273,37 @@ public class DescriptionListWidget extends AbstractSelectionList<DescriptionList
 		var fallback = roleName.endsWith("r") ? roleName + "s" : roleName;
 
 		return Component.translatableWithFallback("mod_menu.credits.role." + translationKey, fallback)
-			.append(Component.literal(":"));
+				.append(Component.literal(":"));
+	}
+
+	public void renderScrollBar(BufferBuilder bufferBuilder, Tesselator tessellator) {
+		int scrollbarStartX = this.getScrollbarPosition();
+		int scrollbarEndX = scrollbarStartX + 6;
+		int maxScroll = this.getMaxScroll();
+		if (maxScroll > 0) {
+			int p = (int) ((float) ((this.getBottom() - this.getTop()) * (this.getBottom() - this.getTop())) / (float) this.getMaxPosition());
+			p = Mth.clamp(p, 32, this.getBottom() - this.getTop() - 8);
+			int q = (int) this.getScrollAmount() * (this.getBottom() - this.getTop() - p) / maxScroll + this.getTop();
+			if (q < this.getTop()) {
+				q = this.getTop();
+			}
+
+			RenderSystem.setShader(GameRenderer::getPositionColorShader);
+			bufferBuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
+			bufferBuilder.vertex(scrollbarStartX, this.getBottom(), 0.0D).color(0, 0, 0, 255).endVertex();
+			bufferBuilder.vertex(scrollbarEndX, this.getBottom(), 0.0D).color(0, 0, 0, 255).endVertex();
+			bufferBuilder.vertex(scrollbarEndX, this.getTop(), 0.0D).color(0, 0, 0, 255).endVertex();
+			bufferBuilder.vertex(scrollbarStartX, this.getTop(), 0.0D).color(0, 0, 0, 255).endVertex();
+			bufferBuilder.vertex(scrollbarStartX, q + p, 0.0D).color(128, 128, 128, 255).endVertex();
+			bufferBuilder.vertex(scrollbarEndX, q + p, 0.0D).color(128, 128, 128, 255).endVertex();
+			bufferBuilder.vertex(scrollbarEndX, q, 0.0D).color(128, 128, 128, 255).endVertex();
+			bufferBuilder.vertex(scrollbarStartX, q, 0.0D).color(128, 128, 128, 255).endVertex();
+			bufferBuilder.vertex(scrollbarStartX, q + p - 1, 0.0D).color(192, 192, 192, 255).endVertex();
+			bufferBuilder.vertex(scrollbarEndX - 1, q + p - 1, 0.0D).color(192, 192, 192, 255).endVertex();
+			bufferBuilder.vertex(scrollbarEndX - 1, q, 0.0D).color(192, 192, 192, 255).endVertex();
+			bufferBuilder.vertex(scrollbarStartX, q, 0.0D).color(192, 192, 192, 255).endVertex();
+			tessellator.end();
+		}
 	}
 
 	protected class DescriptionEntry extends ContainerObjectSelectionList.Entry<DescriptionEntry> {
@@ -350,18 +326,7 @@ public class DescriptionListWidget extends AbstractSelectionList<DescriptionList
 		}
 
 		@Override
-		public void render(
-			GuiGraphics guiGraphics,
-			int index,
-			int y,
-			int x,
-			int itemWidth,
-			int itemHeight,
-			int mouseX,
-			int mouseY,
-			boolean isSelected,
-			float delta
-		) {
+		public void render(GuiGraphics guiGraphics, int index, int y, int x, int itemWidth, int itemHeight, int mouseX, int mouseY, boolean isSelected, float delta) {
 			if (updateTextEntry) {
 				UpdateAvailableBadge.renderBadge(guiGraphics, x + indent, y);
 				x += 11;

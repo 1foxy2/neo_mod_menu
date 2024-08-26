@@ -68,7 +68,7 @@ public class ModSearch {
 			.contains(Mod.Badge.DEPRECATED) // Search for deprecated mods
 			|| clientside.contains(query) && mod.getBadges().contains(Mod.Badge.CLIENT) // Search for clientside mods
 			|| configurable.contains(query) && screen.getModHasConfigScreen()
-			.get(modId) // Search for mods that can be configured
+			.getOrDefault(modId, false) // Search for mods that can be configured
 			// Search for mods that have updates
 		) {
 			return 1;

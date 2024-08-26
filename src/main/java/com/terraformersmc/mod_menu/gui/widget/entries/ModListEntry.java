@@ -4,9 +4,9 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.terraformersmc.mod_menu.ModMenu;
 import com.terraformersmc.mod_menu.gui.widget.ModListWidget;
 import com.terraformersmc.mod_menu.util.DrawingUtil;
-import com.terraformersmc.mod_menu.util.ModMenuScreenTexts;
 import com.terraformersmc.mod_menu.util.mod.Mod;
 import com.terraformersmc.mod_menu.util.mod.ModBadgeRenderer;
+import net.minecraft.ChatFormatting;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -22,20 +22,17 @@ import net.minecraft.util.Tuple;
 import java.awt.*;
 
 public class ModListEntry extends ObjectSelectionList.Entry<ModListEntry> {
-	public static final ResourceLocation UNKNOWN_ICON = new ResourceLocation("minecraft", "textures/misc/unknown_pack.png");
-	private static final ResourceLocation MOD_CONFIGURATION_ICON = new ResourceLocation(ModMenu.MOD_ID,
-		"textures/gui/mod_configuration.png"
-	);
-	private static final ResourceLocation ERROR_ICON = new ResourceLocation("minecraft", "world_list/error");
-	private static final ResourceLocation ERROR_HIGHLIGHTED_ICON = new ResourceLocation("minecraft", "world_list/error_highlighted");
+	public static final ResourceLocation UNKNOWN_ICON = new ResourceLocation("textures/misc/unknown_pack.png");
+	private static final ResourceLocation MOD_CONFIGURATION_ICON = new ResourceLocation(ModMenu.MOD_ID, "textures/gui/mod_configuration.png");
+	private static final ResourceLocation ERROR_ICON = new ResourceLocation("minecraft", "textures/gui/world_selection.png");
 
 	protected final Minecraft client;
 	public final Mod mod;
 	protected final ModListWidget list;
 	protected Tuple<ResourceLocation, Dimension> iconLocation;
 	protected Tuple<ResourceLocation, Dimension> smallIconLocation;
-	public static final int FULL_ICON_SIZE = 32;
-	public static final int COMPACT_ICON_SIZE = 19;
+	protected static final int FULL_ICON_SIZE = 32;
+	protected static final int COMPACT_ICON_SIZE = 19;
 	protected long sinceLastClick;
 
 	public ModListEntry(Mod mod, ModListWidget list) {
@@ -50,18 +47,7 @@ public class ModListEntry extends ObjectSelectionList.Entry<ModListEntry> {
 	}
 
 	@Override
-	public void render(
-		GuiGraphics guiGraphics,
-		int index,
-		int y,
-		int x,
-		int rowWidth,
-		int rowHeight,
-		int mouseX,
-		int mouseY,
-		boolean hovered,
-		float delta
-	) {
+	public void render(GuiGraphics guiGraphics, int index, int y, int x, int rowWidth, int rowHeight, int mouseX, int mouseY, boolean hovered, float delta) {
 		x += getXOffset();
 		rowWidth -= getXOffset();
 		int iconSize = ModMenu.getConfig().COMPACT_LIST.get() ? COMPACT_ICON_SIZE : FULL_ICON_SIZE;
@@ -93,7 +79,6 @@ public class ModListEntry extends ObjectSelectionList.Entry<ModListEntry> {
 					this.getSquareIconTexture().getB().width, this.getSquareIconTexture().getB().height);
 		}
 
-
 		RenderSystem.disableBlend();
 		Component name = Component.literal(mod.getTranslatedName());
 		FormattedText trimmedName = name;
@@ -101,85 +86,34 @@ public class ModListEntry extends ObjectSelectionList.Entry<ModListEntry> {
 		Font font = this.client.font;
 		if (font.width(name) > maxNameWidth) {
 			FormattedText ellipsis = FormattedText.of("...");
-			trimmedName = FormattedText.composite(font.substrByWidth(name, maxNameWidth - font.width(ellipsis)),
-				ellipsis
-			);
+			trimmedName = FormattedText.composite(font.substrByWidth(name, maxNameWidth - font.width(ellipsis)), ellipsis);
 		}
-		guiGraphics.drawString(font,
-			Language.getInstance().getVisualOrder(trimmedName),
-			x + iconSize + 3,
-			y + 1,
-			0xFFFFFF,
-			true
-		);
+		guiGraphics.drawString(font, Language.getInstance().getVisualOrder(trimmedName), x + iconSize + 3, y + 1, 0xFFFFFF, false);
 		var updateBadgeXOffset = 0;
 		if (!ModMenu.getConfig().HIDE_BADGES.get()) {
-			new ModBadgeRenderer(x + iconSize + 3 + font.width(name) + 2 + updateBadgeXOffset,
-				y,
-				x + rowWidth,
-				mod,
-				list.getParent()
-			).draw(guiGraphics, mouseX, mouseY);
+			new ModBadgeRenderer(x + iconSize + 3 + font.width(name) + 2 + updateBadgeXOffset, y, x + rowWidth, mod, list.getParent()).draw(guiGraphics, mouseX, mouseY);
 		}
 		if (!ModMenu.getConfig().COMPACT_LIST.get()) {
 			String summary = mod.getSummary();
-			DrawingUtil.drawWrappedString(guiGraphics,
-				summary,
-				(x + iconSize + 3 + 4),
-				(y + client.font.lineHeight + 2),
-				rowWidth - iconSize - 7,
-				2,
-				0x808080
-			);
+			DrawingUtil.drawWrappedString(guiGraphics, summary, (x + iconSize + 3 + 4), (y + client.font.lineHeight + 2), rowWidth - iconSize - 7, 2, 0x808080);
 		} else {
-			DrawingUtil.drawWrappedString(guiGraphics,
-				mod.getPrefixedVersion(),
-				(x + iconSize + 3),
-				(y + client.font.lineHeight + 2),
-				rowWidth - iconSize - 7,
-				2,
-				0x808080
-			);
+			DrawingUtil.drawWrappedString(guiGraphics, mod.getPrefixedVersion(), (x + iconSize + 3), (y + client.font.lineHeight + 2), rowWidth - iconSize - 7, 2, 0x808080);
 		}
 
-		if (!(this instanceof ParentEntry) && ModMenu.getConfig().QUICK_CONFIGURE.get() && (this.list.getParent()
-			.getModHasConfigScreen()
-			.get(modId) || this.list.getParent().modScreenErrors.containsKey(modId))) {
-			final int textureSize = ModMenu.getConfig().COMPACT_LIST.get() ?
-				(int) (256 / (FULL_ICON_SIZE / (double) COMPACT_ICON_SIZE)) :
-				256;
+		if (!(this instanceof ParentEntry) && ModMenu.getConfig().QUICK_CONFIGURE.get() && (this.list.getParent().getModHasConfigScreen().getOrDefault(modId, false) || this.list.getParent().modScreenErrors.containsKey(modId))) {
+			final int textureSize = ModMenu.getConfig().COMPACT_LIST.get() ? (int) (256 / (FULL_ICON_SIZE / (double) COMPACT_ICON_SIZE)) : 256;
 			if (this.client.options.touchscreen().get() || hovered) {
 				guiGraphics.fill(x, y, x + iconSize, y + iconSize, -1601138544);
 				boolean hoveringIcon = mouseX - x < iconSize;
+				int v = hoveringIcon ? iconSize : 0;
 				if (this.list.getParent().modScreenErrors.containsKey(modId)) {
-					guiGraphics.blit(hoveringIcon ? ERROR_HIGHLIGHTED_ICON : ERROR_ICON,
-						x,
-						y,
-						0,
-						0,
-						iconSize,
-						iconSize
-					);
+					guiGraphics.blit(ERROR_ICON, x, y, 96.0F, (float) v, iconSize, iconSize, textureSize, textureSize);
 					if (hoveringIcon) {
 						Throwable e = this.list.getParent().modScreenErrors.get(modId);
-						this.list.getParent()
-							.setTooltipForNextRenderPass(this.client.font.split(
-								ModMenuScreenTexts.configureError(modId, e),
-								175
-							));
+						this.list.getParent().setTooltipForNextRenderPass(this.client.font.split(Component.translatable("mod_menu.configure.error", modId, modId).copy().append("\n\n").append(e.toString()).withStyle(ChatFormatting.RED), 175));
 					}
 				} else {
-					int v = hoveringIcon ? iconSize : 0;
-					guiGraphics.blit(MOD_CONFIGURATION_ICON,
-						x,
-						y,
-						0.0F,
-						(float) v,
-						iconSize,
-						iconSize,
-						textureSize,
-						textureSize
-					);
+					guiGraphics.blit(MOD_CONFIGURATION_ICON, x, y, 0.0F, (float) v, iconSize, iconSize, textureSize, textureSize);
 				}
 			}
 		}
@@ -188,9 +122,7 @@ public class ModListEntry extends ObjectSelectionList.Entry<ModListEntry> {
 	@Override
 	public boolean mouseClicked(double mouseX, double mouseY, int delta) {
 		list.select(this);
-		if (ModMenu.getConfig().QUICK_CONFIGURE.get() && this.list.getParent()
-			.getModHasConfigScreen()
-			.get(this.mod.getId())) {
+		if (ModMenu.getConfig().QUICK_CONFIGURE.get() && this.list.getParent().getModHasConfigScreen().getOrDefault(this.mod.getId(), false)) {
 			int iconSize = ModMenu.getConfig().COMPACT_LIST.get() ? COMPACT_ICON_SIZE : FULL_ICON_SIZE;
 			if (mouseX - list.getRowLeft() <= iconSize) {
 				this.openConfig();
@@ -203,7 +135,9 @@ public class ModListEntry extends ObjectSelectionList.Entry<ModListEntry> {
 	}
 
 	public void openConfig() {
-		Minecraft.getInstance().setScreen(ModMenu.getConfigScreen(mod.getContainer().get(), list.getParent()));
+		mod.getContainer().ifPresent(modContainer ->
+				Minecraft.getInstance().setScreen(ModMenu.getConfigScreen(modContainer, list.getParent())));
+
 	}
 
 	public Mod getMod() {
@@ -214,7 +148,7 @@ public class ModListEntry extends ObjectSelectionList.Entry<ModListEntry> {
 		if (this.iconLocation == null) {
 			this.iconLocation = new Tuple<>(new ResourceLocation(ModMenu.MOD_ID, mod.getId() + "_icon"), new Dimension());
 			Tuple<DynamicTexture, Dimension> icon = mod.getIcon(list.getNeoforgeIconHandler(),
-				64 * this.client.options.guiScale().get(), false);
+					64 * this.client.options.guiScale().get(), false);
 
 
 			if (icon != null) {
@@ -244,7 +178,7 @@ public class ModListEntry extends ObjectSelectionList.Entry<ModListEntry> {
 		if (this.smallIconLocation == null) {
 			this.smallIconLocation = new Tuple<>(new ResourceLocation(ModMenu.MOD_ID, mod.getId() + "_icon_small"), new Dimension());
 			Tuple<DynamicTexture, Dimension> icon = mod.getIcon(list.getNeoforgeIconHandler(),
-				64 * this.client.options.guiScale().get(), true);
+					64 * this.client.options.guiScale().get(), true);
 			if (icon != null) {
 				this.smallIconLocation.setB(new Dimension());
 				this.client.getTextureManager().register(this.smallIconLocation.getA(), icon.getA());
