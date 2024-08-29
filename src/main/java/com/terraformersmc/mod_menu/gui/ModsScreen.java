@@ -114,8 +114,11 @@ public class ModsScreen extends Screen {
 			mod.getContainer().ifPresent(container -> {
 				if (!modHasConfigScreen.containsKey(id)) {
 					try {
-						Screen configScreen = ModMenu.getConfigScreen(container, this);
-						modHasConfigScreen.put(id, configScreen != null);
+						if (id.equals("ibeeditor")) modHasConfigScreen.put(id, true);
+						else {
+							Screen configScreen = ModMenu.getConfigScreen(container, this);
+							modHasConfigScreen.put(id, configScreen != null);
+						}
 					} catch (NoClassDefFoundError e) {
 						LOGGER.warn("The '" + id + "' mod config screen is not available because " + e.getLocalizedMessage() + " is missing.");
 						modScreenErrors.put(id, e);

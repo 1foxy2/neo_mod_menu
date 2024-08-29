@@ -59,7 +59,6 @@ public class ModMenuEventHandler {
 		int modsButtonIndex = -1;
 		final int spacing = 24;
 		int buttonsY = screen.height / 4 + 48;
-		boolean isRealmsButton;
 		for (int i = 0; i < buttons.size(); i++) {
 			Renderable widget = buttons.get(i);
 			if (widget instanceof Button button && !(button instanceof PlainTextButton)) {

@@ -137,7 +137,6 @@ public class ModListEntry extends ObjectSelectionList.Entry<ModListEntry> {
 	public void openConfig() {
 		mod.getContainer().ifPresent(modContainer ->
 				Minecraft.getInstance().setScreen(ModMenu.getConfigScreen(modContainer, list.getParent())));
-
 	}
 
 	public Mod getMod() {

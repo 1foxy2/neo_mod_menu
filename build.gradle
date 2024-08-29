@@ -7,7 +7,7 @@ plugins {
     id 'org.spongepowered.mixin' version '0.7.+'
 }
 
-version = mod_version + "+" + minecraft_version
+version = mod_version
 group = mod_group_id
 
 base {
@@ -88,9 +88,6 @@ sourceSets.main.resources { srcDir 'src/generated/resources' }
 
 repositories {
     mavenLocal()
-    maven {
-        url "https://maven.su5ed.dev/releases"
-    }
     // Put repositories for dependencies here
     // ForgeGradle automatically adds the Forge maven and Maven Central for you
 
