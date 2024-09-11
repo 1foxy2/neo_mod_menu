@@ -1,5 +1,6 @@
 package com.terraformersmc.mod_menu.mixin;
 
+import com.llamalad7.mixinextras.sugar.Local;
 import com.terraformersmc.mod_menu.ModMenu;
 import com.terraformersmc.mod_menu.config.ModMenuConfig;
 import com.terraformersmc.mod_menu.event.ModMenuEventHandler;
@@ -13,12 +14,10 @@ import net.minecraft.client.gui.layouts.LayoutElement;
 import net.minecraft.client.gui.screens.PauseScreen;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
-import net.minecraft.server.ServerLinks;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 import java.util.List;
 
@@ -28,8 +27,8 @@ public abstract class MixinPauseScreen extends Screen {
 		super(title);
 	}
 
-	@Inject(method = "createPauseMenu", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/layouts/GridLayout;visitWidgets(Ljava/util/function/Consumer;)V"), locals = LocalCapture.CAPTURE_FAILEXCEPTION)
-	private void onInitWidgets(CallbackInfo ci, GridLayout gridlayout, GridLayout.RowHelper gridlayout$rowhelper, ServerLinks serverlinks, Component component) {
+	@Inject(method = "createPauseMenu", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/layouts/GridLayout;visitWidgets(Ljava/util/function/Consumer;)V"))
+	private void onInitWidgets(CallbackInfo ci, @Local GridLayout gridlayout) {
 		if (gridlayout != null) {
 			final List<LayoutElement> buttons = ((AccessorGridLayout) gridlayout).getChildren();
 			if (ModMenu.getConfig().MODIFY_GAME_MENU.get()) {

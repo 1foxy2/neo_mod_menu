@@ -18,6 +18,6 @@ public class ModMenuConfigListScreen<T> extends ConfigurationScreen.Configuratio
     @Override
     public void onClose() {
         super.onClose();
-        ModMenu.addLibraryBadge();
+        ModMenu.addBadges();
     }
 }

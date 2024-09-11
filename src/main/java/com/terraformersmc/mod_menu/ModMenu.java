@@ -18,21 +18,29 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.options.OptionsScreen;
 import net.minecraft.client.resources.language.I18n;
-import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.PackType;
+import net.minecraft.server.packs.resources.IoSupplier;
+import net.minecraft.util.GsonHelper;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.ModList;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
+import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.gui.ConfigurationScreen;
 import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 import net.neoforged.neoforge.common.ModConfigSpec;
+import net.neoforged.neoforge.common.NeoForge;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.text.NumberFormat;
 import java.util.*;
 
@@ -87,6 +95,7 @@ public class ModMenu {
 
 	public ModMenu(IEventBus bus, ModContainer container) {
 		bus.addListener(this::onClientSetup);
+		NeoForge.EVENT_BUS.addListener(this::onClientTick);
 
 		container.registerConfig(ModConfig.Type.CLIENT, CONFIG.getValue());
 		container.registerExtensionPoint(IConfigScreenFactory.class, (modContainer, screen) ->
@@ -137,7 +146,13 @@ public class ModMenu {
 	public void onClientSetup(FMLClientSetupEvent event) {
 		ModList.get().getMods().forEach(info -> IConfigScreenFactory.getForMod(info).ifPresent(
 				factory -> configScreenFactories.put(info.getModId(), factory)));
-		addLibraryBadge();
+		createBadges();
+		addBadges();
+	}
+
+	public void onClientTick(ClientTickEvent.Post event) {
+	//	LOGGER.warn(String.valueOf(Minecraft.getInstance().screen));
+
 	}
 
 	public static void clearModCountCache() {
@@ -196,7 +211,21 @@ public class ModMenu {
 		return CONFIG.getLeft();
 	}
 
-	public static void addLibraryBadge() {
+	public static void createBadges() {
+		Map<ResourceLocation, IoSupplier<InputStream>> map = new HashMap<>();
+		Minecraft.getInstance().getResourceManager().listPacks().forEach(packResources ->
+				packResources.listResources(PackType.CLIENT_RESOURCES, MOD_ID, "badge", map::putIfAbsent));
+		map.forEach((key, value) -> {
+            try {
+				LOGGER.warn(GsonHelper.parse(new InputStreamReader(value.get())).get("name").getAsString());
+            } catch (IOException e) {
+                LOGGER.warn("incorrect badge json from {} {}", key, e.getMessage());
+            }
+        });
+		LOGGER.warn(map.toString());
+	}
+
+	public static void addBadges() {
 		Set<Mod> allMods = new HashSet<>();
 		allMods.addAll(ROOT_MODS.values());
 		allMods.addAll(MODS.values());
