@@ -1,3 +1,13 @@
 {
-  "name": "class"
+  "name": "class",
+  "fill_color": [
+    1,
+    1,
+    1
+  ],
+  "outline_color": [
+     1,
+     100,
+     1
+  ]
 }

@@ -1,15 +1,14 @@
 package com.terraformersmc.mod_menu;
 
 import com.google.common.collect.LinkedListMultimap;
-import com.google.gson.FieldNamingPolicy;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import com.google.gson.*;
 import com.terraformersmc.mod_menu.config.ModMenuConfig;
 import com.terraformersmc.mod_menu.config.ModMenuConfigScreen;
 import com.terraformersmc.mod_menu.gui.ModsScreen;
 import com.terraformersmc.mod_menu.util.EnumToLowerCaseJsonConverter;
 import com.terraformersmc.mod_menu.util.ModMenuScreenTexts;
 import com.terraformersmc.mod_menu.util.mod.Mod;
+import com.terraformersmc.mod_menu.util.mod.ModBadge;
 import com.terraformersmc.mod_menu.util.mod.fabric.FabricMod;
 import com.terraformersmc.mod_menu.util.mod.java.JavaDummyMod;
 import com.terraformersmc.mod_menu.util.mod.neoforge.NeoforgeDummyParentMod;
@@ -38,6 +37,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.awt.*;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -51,6 +51,14 @@ public class ModMenu {
 	public static final Gson GSON;
 	public static final Gson GSON_MINIFIED;
 	public static final Pair<ModMenuConfig, ModConfigSpec> CONFIG;
+	public static Map<String, ModBadge> defaultBadges = Map.of(
+			"library", new ModBadge("mod_menu.badge.library", 0xff107454, 0xff093929),
+			"client", new ModBadge("mod_menu.badge.clientsideOnly", 0xff2b4b7c, 0xff0e2a55),
+			"deprecated", new ModBadge("mod_menu.badge.deprecated", 0xff841426, 0xff530C17),
+			"sinytra_fabric", new ModBadge("mod_menu.badge.fabric", 0xffc7b48b, 0xff786d58),
+			"modpack", new ModBadge("mod_menu.badge.modpack", 0xff7a2b7c, 0xff510d54),
+			"minecraft", new ModBadge("mod_menu.badge.minecraft", 0xff6f6c6a, 0xff31302f)
+	);
 
 	static {
 		GsonBuilder builder = new GsonBuilder().registerTypeHierarchyAdapter(Enum.class,
@@ -212,16 +220,22 @@ public class ModMenu {
 	}
 
 	public static void createBadges() {
-		Map<ResourceLocation, IoSupplier<InputStream>> map = new HashMap<>();
+		Map<String, ModBadge> map = new HashMap<>();
 		Minecraft.getInstance().getResourceManager().listPacks().forEach(packResources ->
-				packResources.listResources(PackType.CLIENT_RESOURCES, MOD_ID, "badge", map::putIfAbsent));
-		map.forEach((key, value) -> {
-            try {
-				LOGGER.warn(GsonHelper.parse(new InputStreamReader(value.get())).get("name").getAsString());
-            } catch (IOException e) {
-                LOGGER.warn("incorrect badge json from {} {}", key, e.getMessage());
-            }
-        });
+				packResources.listResources(PackType.CLIENT_RESOURCES, MOD_ID, "badge", (key, value) -> {
+					try {
+						JsonObject jsonObject = GsonHelper.parse(new InputStreamReader(value.get()));
+						JsonArray fillColor = jsonObject.getAsJsonArray("fill_color");
+						JsonArray outlineColor = jsonObject.getAsJsonArray("outline_color");
+						ModBadge badge = new ModBadge(jsonObject.get("name").getAsString(),
+								new Color(fillColor.get(0).getAsInt(), fillColor.get(1).getAsInt(), fillColor.get(2).getAsInt()).getRGB(),
+								new Color(outlineColor.get(0).getAsInt(), fillColor.get(1).getAsInt(), fillColor.get(2).getAsInt()).getRGB());
+
+						map.put(key.getPath().replace("badge/", "").replace(".json", ""),
+								badge);
+					} catch (Exception e) {
+						LOGGER.warn("incorrect badge json from {} {}", key, e.getMessage());
+					}}));
 		LOGGER.warn(map.toString());
 	}
 

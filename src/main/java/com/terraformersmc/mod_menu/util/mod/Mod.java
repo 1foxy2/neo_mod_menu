@@ -116,7 +116,7 @@ public interface Mod {
 
 	void reCalculateLibraries();
 
-	enum Badge {
+	/*enum Badge {
 		LIBRARY(
 				"mod_menu.badge.library",
 				0xff107454,
@@ -194,7 +194,7 @@ public interface Mod {
 		static {
 			Arrays.stream(values()).forEach(badge -> KEY_MAP.put(badge.key, badge));
 		}
-	}
+	}*/
 
 	static class ModMenuData {
 		private final Set<Badge> badges;
