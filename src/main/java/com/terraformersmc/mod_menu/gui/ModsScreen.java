@@ -11,6 +11,7 @@ import com.terraformersmc.mod_menu.util.DrawingUtil;
 import com.terraformersmc.mod_menu.util.ModMenuScreenTexts;
 import com.terraformersmc.mod_menu.util.TranslationUtil;
 import com.terraformersmc.mod_menu.util.mod.Mod;
+import com.terraformersmc.mod_menu.util.mod.ModBadge;
 import com.terraformersmc.mod_menu.util.mod.ModBadgeRenderer;
 import net.minecraft.ChatFormatting;
 import net.minecraft.SharedConstants;
@@ -495,14 +496,14 @@ public class ModsScreen extends Screen {
 	private Component computeModCountText(boolean includeLibs) {
 		int[] rootMods = formatModCount(ModMenu.ROOT_MODS.values()
 			.stream()
-			.filter(mod -> !mod.isHidden() && !mod.getBadges().contains(Mod.Badge.LIBRARY))
+			.filter(mod -> !mod.isHidden() && !mod.getBadges().contains(ModBadge.LIBRARY))
 			.map(Mod::getId)
 			.collect(Collectors.toSet()));
 
 		if (includeLibs && ModMenu.getConfig().SHOW_LIBRARIES.get()) {
 			int[] rootLibs = formatModCount(ModMenu.ROOT_MODS.values()
 				.stream()
-				.filter(mod -> !mod.isHidden() && mod.getBadges().contains(Mod.Badge.LIBRARY))
+				.filter(mod -> !mod.isHidden() && mod.getBadges().contains(ModBadge.LIBRARY))
 				.map(Mod::getId)
 				.collect(Collectors.toSet()));
 			return TranslationUtil.translateNumeric("mod_menu.showingModsLibraries", rootMods, rootLibs);
@@ -515,7 +516,7 @@ public class ModsScreen extends Screen {
 		if (ModMenu.getConfig().SHOW_LIBRARIES.get()) {
 			int[] rootLibs = formatModCount(ModMenu.ROOT_MODS.values()
 				.stream()
-				.filter(mod -> !mod.isHidden() && mod.getBadges().contains(Mod.Badge.LIBRARY))
+				.filter(mod -> !mod.isHidden() && mod.getBadges().contains(ModBadge.LIBRARY))
 				.map(Mod::getId)
 				.collect(Collectors.toSet()));
 			return TranslationUtil.translateNumeric("mod_menu.showingLibraries", rootLibs);

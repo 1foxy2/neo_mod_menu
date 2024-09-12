@@ -88,7 +88,7 @@ public interface Mod {
 	 */
 	@NotNull SortedMap<String, Set<String>> getCredits();
 
-	@NotNull Set<Badge> getBadges();
+	@NotNull Set<ModBadge> getBadges();
 
 	@Nullable String getWebsite();
 
@@ -116,99 +116,19 @@ public interface Mod {
 
 	void reCalculateLibraries();
 
-	/*enum Badge {
-		LIBRARY(
-				"mod_menu.badge.library",
-				0xff107454,
-				0xff093929,
-				"library"),
-		CLIENT(
-				"mod_menu.badge.clientsideOnly",
-			0xff2b4b7c,
-			0xff0e2a55,
-			"client"
-		),
-
-		DEPRECATED(
-				"mod_menu.badge.deprecated",
-				0xff841426,
-				0xff530C17,
-				"deprecated"
-		),
-
-		SINYTRA_FABRIC(
-			"mod_menu.badge.fabric",
-			0xffc7b48b,
-				0xff786d58,
-			null
-		),
-
-		MODPACK(
-				"mod_menu.badge.modpack",
-				0xff7a2b7c,
-				0xff510d54,
-				null
-		),
-
-
-		MINECRAFT("mod_menu.badge.minecraft",
-			0xff6f6c6a,
-			0xff31302f,
-			null
-		);
-
-		private final Component component;
-		private final int outlineColor, fillColor;
-		private final String key;
-		private static final Map<String, Badge> KEY_MAP = new HashMap<>();
-
-		Badge(String translationKey, int outlineColor, int fillColor, String key) {
-			this.component = Component.translatable(translationKey);
-			this.outlineColor = outlineColor;
-			this.fillColor = fillColor;
-			this.key = key;
-		}
-
-		public Component getComponent() {
-			return this.component;
-		}
-
-		public int getOutlineColor() {
-			return this.outlineColor;
-		}
-
-		public int getFillColor() {
-			return this.fillColor;
-		}
-
-		public static Set<Badge> convert(Set<String> badgeKeys, String modId) {
-			return badgeKeys.stream().map(key -> {
-				if (!KEY_MAP.containsKey(key)) {
-					ModMenu.LOGGER.warn("Skipping unknown badge key '{}' specified by mod '{}'", key, modId);
-				}
-
-				return KEY_MAP.get(key);
-			}).filter(Objects::nonNull).collect(Collectors.toSet());
-		}
-
-		static {
-			Arrays.stream(values()).forEach(badge -> KEY_MAP.put(badge.key, badge));
-		}
-	}*/
-
 	static class ModMenuData {
-		private final Set<Badge> badges;
+		private final Set<ModBadge> badges;
 		private Optional<String> parent;
 		private @Nullable
 		final DummyParentData dummyParentData;
 
 		public ModMenuData(Set<String> badges, Optional<String> parent, DummyParentData dummyParentData, String id) {
-			this.badges = Badge.convert(badges, id);
+			this.badges = ModBadge.convert(badges, id);
 			this.parent = parent;
 			this.dummyParentData = dummyParentData;
 		}
 
-		public Set<Badge> getBadges() {
+		public Set<ModBadge> getBadges() {
 			return badges;
 		}
 
@@ -220,15 +140,9 @@ public interface Mod {
 			return dummyParentData;
 		}
 
-		public void addClientBadge(boolean add) {
-			if (add) {
-				badges.add(Badge.CLIENT);
-			}
-		}
-
 		public void addLibraryBadge(boolean add) {
 			if (add) {
-				badges.add(Badge.LIBRARY);
+				badges.add(ModBadge.LIBRARY);
 			}
 		}
 
@@ -243,7 +157,7 @@ public interface Mod {
 			private final Optional<String> name;
 			private final Optional<String> description;
 			private final Optional<String> icon;
-			private final Set<Badge> badges;
+			private final Set<ModBadge> badges;
 
 			public DummyParentData(
 					String id,
@@ -256,7 +170,7 @@ public interface Mod {
 				this.name = name;
 				this.description = description;
 				this.icon = icon;
-				this.badges = Badge.convert(badges, id);
+				this.badges = ModBadge.convert(badges, id);
 			}
 
 			public String getId() {
@@ -275,7 +189,7 @@ public interface Mod {
 				return icon;
 			}
 
-			public Set<Badge> getBadges() {
+			public Set<ModBadge> getBadges() {
 				return badges;
 			}
 		}

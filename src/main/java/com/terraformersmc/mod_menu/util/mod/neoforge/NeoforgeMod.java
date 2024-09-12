@@ -5,6 +5,7 @@ import com.google.common.collect.Sets;
 import com.terraformersmc.mod_menu.ModMenu;
 import com.terraformersmc.mod_menu.util.VersionUtil;
 import com.terraformersmc.mod_menu.util.mod.Mod;
+import com.terraformersmc.mod_menu.util.mod.ModBadge;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.util.Tuple;
 import net.neoforged.fml.ModContainer;
@@ -28,7 +29,7 @@ public class NeoforgeMod implements Mod {
 
 	protected final ModMenuData modMenuData;
 
-	protected final Set<Badge> badges;
+	protected final Set<ModBadge> badges;
 
 	protected final Map<String, String> links = new HashMap<>();
 
@@ -112,7 +113,7 @@ public class NeoforgeMod implements Mod {
 		/* Hardcode parents and badges for Fabric API & kotlin api */
 		if (id.startsWith("fabric")) {
 			modMenuData.fillParentIfEmpty("fabric-api");
-			modMenuData.getBadges().add(Badge.LIBRARY);
+			modMenuData.getBadges().add(ModBadge.LIBRARY);
 		}
 
 		/* Hardcode parents and badges for connector-extras */
@@ -121,7 +122,7 @@ public class NeoforgeMod implements Mod {
 				modMenuData.fillParentIfEmpty("connector");
 			}
 
-			modMenuData.getBadges().add(Badge.LIBRARY);
+			modMenuData.getBadges().add(ModBadge.LIBRARY);
 		}
 
 		/* Add additional badges */
@@ -130,10 +131,10 @@ public class NeoforgeMod implements Mod {
 			badges.add(Badge.CLIENT);
 		}*/
 		if ("java".equals(id)) {
-			badges.add(Badge.LIBRARY);
+			badges.add(ModBadge.LIBRARY);
 		}
 		if ("minecraft".equals(getId())) {
-			badges.add(Badge.MINECRAFT);
+			badges.add(ModBadge.DEFAULT_BADGES.get("minecraft"));
 		}
 	}
 
@@ -248,7 +249,7 @@ public class NeoforgeMod implements Mod {
 	}
 
 	@Override
-	public @NotNull Set<Badge> getBadges() {
+	public @NotNull Set<ModBadge> getBadges() {
 		return badges;
 	}
 
@@ -320,11 +321,11 @@ public class NeoforgeMod implements Mod {
 	@Override
 	public void reCalculateLibraries() {
 		boolean isInLibraries = ModMenu.getConfig().LIBRARY_LIST.get().contains(getId());
-		if (!getModMenuData().getBadges().contains(Badge.LIBRARY) && isInLibraries && !wasInLibraries) {
+		if (!getModMenuData().getBadges().contains(ModBadge.LIBRARY) && isInLibraries && !wasInLibraries) {
 			this.modMenuData.addLibraryBadge(true);
 			wasInLibraries = true;
 		} else if (!isInLibraries && wasInLibraries) {
-			this.modMenuData.getBadges().remove(Badge.LIBRARY);
+			this.modMenuData.getBadges().remove(ModBadge.LIBRARY);
 			wasInLibraries = false;
 		}
 	}

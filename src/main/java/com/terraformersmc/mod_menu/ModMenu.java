@@ -19,9 +19,7 @@ import net.minecraft.client.gui.screens.options.OptionsScreen;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
-import net.minecraft.server.packs.resources.IoSupplier;
 import net.minecraft.util.GsonHelper;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
@@ -38,11 +36,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.awt.*;
-import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.text.NumberFormat;
 import java.util.*;
+import java.util.List;
 
 @net.neoforged.fml.common.Mod(ModMenu.MOD_ID)
 public class ModMenu {
@@ -51,14 +48,6 @@ public class ModMenu {
 	public static final Gson GSON;
 	public static final Gson GSON_MINIFIED;
 	public static final Pair<ModMenuConfig, ModConfigSpec> CONFIG;
-	public static Map<String, ModBadge> defaultBadges = Map.of(
-			"library", new ModBadge("mod_menu.badge.library", 0xff107454, 0xff093929),
-			"client", new ModBadge("mod_menu.badge.clientsideOnly", 0xff2b4b7c, 0xff0e2a55),
-			"deprecated", new ModBadge("mod_menu.badge.deprecated", 0xff841426, 0xff530C17),
-			"sinytra_fabric", new ModBadge("mod_menu.badge.fabric", 0xffc7b48b, 0xff786d58),
-			"modpack", new ModBadge("mod_menu.badge.modpack", 0xff7a2b7c, 0xff510d54),
-			"minecraft", new ModBadge("mod_menu.badge.minecraft", 0xff6f6c6a, 0xff31302f)
-	);
 
 	static {
 		GsonBuilder builder = new GsonBuilder().registerTypeHierarchyAdapter(Enum.class,
@@ -179,7 +168,7 @@ public class ModMenu {
 				if (!includeChildren && isChild) {
 					return false;
 				}
-				boolean isLibrary = mod.getBadges().contains(Mod.Badge.LIBRARY);
+				boolean isLibrary = mod.getBadges().contains(ModBadge.LIBRARY);
 				if (!includeLibraries && isLibrary) {
 					return false;
 				}
@@ -220,7 +209,7 @@ public class ModMenu {
 	}
 
 	public static void createBadges() {
-		Map<String, ModBadge> map = new HashMap<>();
+		ModBadge.CUSTOM_BADGES.clear();
 		Minecraft.getInstance().getResourceManager().listPacks().forEach(packResources ->
 				packResources.listResources(PackType.CLIENT_RESOURCES, MOD_ID, "badge", (key, value) -> {
 					try {
@@ -228,15 +217,14 @@ public class ModMenu {
 						JsonArray fillColor = jsonObject.getAsJsonArray("fill_color");
 						JsonArray outlineColor = jsonObject.getAsJsonArray("outline_color");
 						ModBadge badge = new ModBadge(jsonObject.get("name").getAsString(),
-								new Color(fillColor.get(0).getAsInt(), fillColor.get(1).getAsInt(), fillColor.get(2).getAsInt()).getRGB(),
-								new Color(outlineColor.get(0).getAsInt(), fillColor.get(1).getAsInt(), fillColor.get(2).getAsInt()).getRGB());
+								new Color(outlineColor.get(0).getAsInt(), outlineColor.get(1).getAsInt(), outlineColor.get(2).getAsInt()).getRGB(),
+								new Color(fillColor.get(0).getAsInt(), fillColor.get(1).getAsInt(), fillColor.get(2).getAsInt()).getRGB());
 
-						map.put(key.getPath().replace("badge/", "").replace(".json", ""),
+						ModBadge.CUSTOM_BADGES.put(key.getPath().replace("badge/", "").replace(".json", ""),
 								badge);
 					} catch (Exception e) {
 						LOGGER.warn("incorrect badge json from {} {}", key, e.getMessage());
 					}}));
-		LOGGER.warn(map.toString());
 	}
 
 	public static void addBadges() {

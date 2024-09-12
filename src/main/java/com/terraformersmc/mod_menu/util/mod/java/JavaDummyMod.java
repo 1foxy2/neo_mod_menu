@@ -5,6 +5,7 @@ import com.google.common.collect.Sets;
 import com.terraformersmc.mod_menu.ModMenu;
 import com.terraformersmc.mod_menu.util.VersionUtil;
 import com.terraformersmc.mod_menu.util.mod.Mod;
+import com.terraformersmc.mod_menu.util.mod.ModBadge;
 import com.terraformersmc.mod_menu.util.mod.neoforge.NeoforgeIconHandler;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.client.resources.language.I18n;
@@ -43,7 +44,7 @@ public class JavaDummyMod implements Mod {
 
 		this.modMenuData = new ModMenuData(badgeNames, parentId, null, modid);
 
-		modMenuData.getBadges().add(Badge.LIBRARY);
+		modMenuData.getBadges().add(ModBadge.LIBRARY);
 	}
 
 
@@ -122,7 +123,7 @@ public class JavaDummyMod implements Mod {
 	}
 
 	@Override
-	public @NotNull Set<Badge> getBadges() {
+	public @NotNull Set<ModBadge> getBadges() {
 		return modMenuData.getBadges();
 	}
 
