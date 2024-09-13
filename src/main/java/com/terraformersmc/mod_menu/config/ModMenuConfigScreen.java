@@ -111,16 +111,8 @@ public class ModMenuConfigScreen extends ConfigurationScreen.ConfigurationSectio
     @Nullable
     @Override
     protected <T> Element createList(String key, ModConfigSpec.ListValueSpec spec, ModConfigSpec.ConfigValue<List<T>> list) {
-        if (key.equals("library_list"))
-            return new Element(Component.translatable(SECTION, getTranslationComponent(key)), getTooltipComponent(key, null),
-                Button.builder(Component.translatable(SECTION, Component.translatable(translationChecker.check(getTranslationKey(key) + ".button", SECTION_TEXT))),
-                                button -> {
-                        ModMenu.addBadges();
-                    minecraft.setScreen(((ModMenuConfigListScreen) sectionCache.computeIfAbsent(key,
-                                            k -> new ModMenuConfigListScreen<>(Context.list(context, this), key, Component.translatable(CRUMB, this.getTitle(), getTranslationComponent(key)), spec, list))).rebuild());
-                                })
-                        .tooltip(Tooltip.create(getTooltipComponent(key, null))).build(),
-                false);
+        if (key.equals("mod_badges") || key.equals("library_list")) return null;
+
         return super.createList(key, spec, list);
     }
 }

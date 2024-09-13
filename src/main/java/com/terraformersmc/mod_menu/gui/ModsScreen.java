@@ -54,6 +54,9 @@ public class ModsScreen extends Screen {
 	private static final ResourceLocation CONFIGURE_BUTTON_LOCATION = ResourceLocation.fromNamespaceAndPath(ModMenu.MOD_ID,
 		"textures/gui/configure_button.png"
 	);
+	public static final ResourceLocation BADGE_BUTTON_LOCATION = ResourceLocation.fromNamespaceAndPath(ModMenu.MOD_ID,
+			"textures/gui/badge_button.png"
+	);
 
 	private static final Logger LOGGER = LoggerFactory.getLogger("Mod Menu | ModsScreen");
 	private final Screen previousScreen;
@@ -63,7 +66,7 @@ public class ModsScreen extends Screen {
 	private boolean keepFilterOptionsShown = false;
 	private boolean init = false;
 	private boolean filterOptionsShown = false;
-	private static final int RIGHT_PANE_Y = 48;
+	public static final int RIGHT_PANE_Y = 48;
 	private int paneWidth;
 	private int rightPaneX;
 	private int searchBoxX;
@@ -78,6 +81,7 @@ public class ModsScreen extends Screen {
 	private AbstractWidget librariesButton;
 	private ModListWidget modList;
 	private @Nullable AbstractWidget configureButton;
+	private @Nullable AbstractWidget badgeButton;
 	private AbstractWidget websiteButton;
 	private AbstractWidget issuesButton;
 	private DescriptionListWidget descriptionListWidget;
@@ -227,6 +231,16 @@ public class ModsScreen extends Screen {
 				.build();
 		}
 
+		if (!ModMenu.getConfig().HIDE_BADGE_BUTTONS.get()) {
+			this.badgeButton = LegacyTexturedButtonWidget.legacyTexturedBuilder(CommonComponents.EMPTY, button ->
+						this.minecraft.pushGuiLayer(new BadgeScreen(this.selected.mod, paneWidth, searchBoxWidth)))
+					.position(paneWidth / 2 + searchBoxWidth / 2 - 20 / 2 + 26, 22)
+					.size(20, 20)
+					.uv(0, 0, 20)
+					.texture(BADGE_BUTTON_LOCATION, 32, 64)
+					.build();
+		}
+
 		// Website button
 		int urlButtonWidths = this.paneWidth / 2 - 2;
 		int cappedButtonWidth = Math.min(urlButtonWidths, 200);
@@ -303,6 +317,9 @@ public class ModsScreen extends Screen {
 
 		if (this.configureButton != null) {
 			this.addRenderableWidget(this.configureButton);
+		}
+		if (this.badgeButton != null) {
+			this.addRenderableWidget(this.badgeButton);
 		}
 
 		this.addRenderableWidget(this.websiteButton);

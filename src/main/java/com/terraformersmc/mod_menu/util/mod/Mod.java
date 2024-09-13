@@ -15,7 +15,6 @@ import org.jetbrains.annotations.Nullable;
 import java.awt.*;
 import java.util.List;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public interface Mod {
 
@@ -114,7 +113,7 @@ public interface Mod {
 
 	Optional<ModContainer> getContainer();
 
-	void reCalculateLibraries();
+	void reCalculateBadge();
 
 	static class ModMenuData {
 		private final Set<ModBadge> badges;
@@ -122,6 +121,7 @@ public interface Mod {
 		private @Nullable
 		final DummyParentData dummyParentData;
 
+		//TODO: remove badges set from constructor
 		public ModMenuData(Set<String> badges, Optional<String> parent, DummyParentData dummyParentData, String id) {
 			this.badges = ModBadge.convert(badges, id);
 			this.parent = parent;

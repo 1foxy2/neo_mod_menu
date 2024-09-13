@@ -30,6 +30,7 @@ public class NeoforgeMod implements Mod {
 	protected final ModMenuData modMenuData;
 
 	protected final Set<ModBadge> badges;
+	protected final Set<String> badgeNames = new HashSet<>();
 
 	protected final Map<String, String> links = new HashMap<>();
 
@@ -38,7 +39,6 @@ public class NeoforgeMod implements Mod {
 
 	protected boolean defaultIconWarning = true;
 	protected boolean childHasUpdate = false;
-	protected boolean wasInLibraries = false;
 
 	protected String sources;
 	protected String issueTrackerUrl;
@@ -56,7 +56,6 @@ public class NeoforgeMod implements Mod {
 		/* Load modern mod menu custom value data */
 		Optional<String> parentId = Optional.empty();
 		ModMenuData.DummyParentData parentData = null;
-		Set<String> badgeNames = new HashSet<>();
 
 		Optional<ModFileInfo> ownFile = Optional.ofNullable((ModFileInfo) container.getModInfo().getOwningFile());
 		Optional<Map<String, Object>> modMenuValue = ownFile.flatMap(mfi -> mfi.getConfigElement("modproperties", "modmenu"));
@@ -66,19 +65,17 @@ public class NeoforgeMod implements Mod {
 
 			Optional<Map<String, Object>> parentValues = ownFile.flatMap(mfi -> mfi.getConfigElement("modproperties", "modmenu_parent"));
 			if (parentValues.isPresent() && !parentValues.get().isEmpty()) {
+				if (modMenuMap.get("badges") instanceof ArrayList<?> list)
+					badgeNames.addAll((List<String>) list);
+
 				try {
-
-					HashSet<String> badges = new HashSet<>();
-					if (parentValues.get().get("badges") instanceof ArrayList<?> list && !list.isEmpty())
-						badges.addAll((ArrayList<String>) list);
-
 					parentId = Optional.of((String) parentValues.get().get("id"));
 					parentData = new ModMenuData.DummyParentData(
 							parentId.orElseThrow(() -> new RuntimeException("Parent object lacks an id")),
 							Optional.of((String) parentValues.get().get("name")),
 							Optional.of(parentValues.get().get("description") + "\n" + modInfo.getConfig().getConfigElement("credits").orElse("")),
 							Optional.of((String) parentValues.get().get("icon")),
-							badges
+							badgeNames
 					);
 					if (parentId.orElse("").equals(id)) {
 						parentId = Optional.empty();
@@ -89,8 +86,6 @@ public class NeoforgeMod implements Mod {
 					LOGGER.error("Error loading parent data from mod: " + id, t);
 				}
 			}
-
-			if (modMenuMap.get("badges") instanceof ArrayList<?> list) badgeNames.addAll((List<String>) list);
 
 			if (modMenuMap.get("links") instanceof ArrayList<?> list) list.forEach(string -> {
 				String[] strings = string.toString().split("=");
@@ -319,14 +314,11 @@ public class NeoforgeMod implements Mod {
 	}
 
 	@Override
-	public void reCalculateLibraries() {
-		boolean isInLibraries = ModMenu.getConfig().LIBRARY_LIST.get().contains(getId());
-		if (!getModMenuData().getBadges().contains(ModBadge.LIBRARY) && isInLibraries && !wasInLibraries) {
-			this.modMenuData.addLibraryBadge(true);
-			wasInLibraries = true;
-		} else if (!isInLibraries && wasInLibraries) {
-			this.modMenuData.getBadges().remove(ModBadge.LIBRARY);
-			wasInLibraries = false;
+	public void reCalculateBadge() {
+		List<String> badgelist = ModMenu.getConfig().mod_badges.get(this.getId());
+		if (badgelist != null) {
+			badgelist.addAll(badgeNames);
+			this.modMenuData.getBadges().addAll(ModBadge.convert(new HashSet<>(badgelist), this.getId()));
 		}
 	}
 }

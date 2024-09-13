@@ -39,7 +39,6 @@ import java.awt.*;
 import java.io.InputStreamReader;
 import java.text.NumberFormat;
 import java.util.*;
-import java.util.List;
 
 @net.neoforged.fml.common.Mod(ModMenu.MOD_ID)
 public class ModMenu {
@@ -143,6 +142,7 @@ public class ModMenu {
 	public void onClientSetup(FMLClientSetupEvent event) {
 		ModList.get().getMods().forEach(info -> IConfigScreenFactory.getForMod(info).ifPresent(
 				factory -> configScreenFactories.put(info.getModId(), factory)));
+		getConfig().onLoad();
 		createBadges();
 		addBadges();
 	}
@@ -216,12 +216,12 @@ public class ModMenu {
 						JsonObject jsonObject = GsonHelper.parse(new InputStreamReader(value.get()));
 						JsonArray fillColor = jsonObject.getAsJsonArray("fill_color");
 						JsonArray outlineColor = jsonObject.getAsJsonArray("outline_color");
+						String id = key.getPath().replace("badge/", "").replace(".json", "");
 						ModBadge badge = new ModBadge(jsonObject.get("name").getAsString(),
 								new Color(outlineColor.get(0).getAsInt(), outlineColor.get(1).getAsInt(), outlineColor.get(2).getAsInt()).getRGB(),
 								new Color(fillColor.get(0).getAsInt(), fillColor.get(1).getAsInt(), fillColor.get(2).getAsInt()).getRGB());
 
-						ModBadge.CUSTOM_BADGES.put(key.getPath().replace("badge/", "").replace(".json", ""),
-								badge);
+						ModBadge.CUSTOM_BADGES.put(id, badge);
 					} catch (Exception e) {
 						LOGGER.warn("incorrect badge json from {} {}", key, e.getMessage());
 					}}));
@@ -231,6 +231,6 @@ public class ModMenu {
 		Set<Mod> allMods = new HashSet<>();
 		allMods.addAll(ROOT_MODS.values());
 		allMods.addAll(MODS.values());
-		allMods.forEach(Mod::reCalculateLibraries);
+		allMods.forEach(Mod::reCalculateBadge);
 	}
 }

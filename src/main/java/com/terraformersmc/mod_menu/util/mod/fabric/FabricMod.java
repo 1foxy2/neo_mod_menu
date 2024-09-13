@@ -35,6 +35,7 @@ public class FabricMod implements Mod {
 	protected final ModMenuData modMenuData;
 
 	protected final Set<ModBadge> badges;
+	protected final Set<String> badgeNames = new HashSet<>();
 
 	protected final Map<String, String> links = new HashMap<>();
 
@@ -43,8 +44,6 @@ public class FabricMod implements Mod {
 	protected boolean allowsUpdateChecks = true;
 
 	protected boolean childHasUpdate = false;
-
-	protected boolean wasInLibraries = false;
 
 	public FabricMod(String modId) {
 		this.container = FabricLoader.getInstance().getModContainer(modId).get();
@@ -56,7 +55,6 @@ public class FabricMod implements Mod {
 		/* Load modern mod menu custom value data */
 		Optional<String> parentId = Optional.empty();
 		ModMenuData.DummyParentData parentData = null;
-		Set<String> badgeNames = new HashSet<>();
 		CustomValue modMenuValue = metadata.getCustomValue("modmenu");
 		if (modMenuValue != null && modMenuValue.getType() == CustomValue.CvType.OBJECT) {
 			CustomValue.CvObject modMenuObject = modMenuValue.getAsObject();
@@ -275,14 +273,11 @@ public class FabricMod implements Mod {
 	}
 
 	@Override
-	public void reCalculateLibraries() {
-		boolean isInLibraries = ModMenu.getConfig().LIBRARY_LIST.get().contains(getId());
-		if (!getModMenuData().getBadges().contains(ModBadge.LIBRARY) && isInLibraries && !wasInLibraries) {
-			this.modMenuData.addLibraryBadge(true);
-			wasInLibraries = true;
-		} else if (!isInLibraries && wasInLibraries) {
-			this.modMenuData.getBadges().remove(ModBadge.LIBRARY);
-			wasInLibraries = false;
+	public void reCalculateBadge() {
+		List<String> badgelist = ModMenu.getConfig().mod_badges.get(this.getId());
+		if (badgelist != null) {
+			badgelist.addAll(badgeNames);
+			this.modMenuData.getBadges().addAll(ModBadge.convert(new HashSet<>(badgelist), this.getId()));
 		}
 	}
 }

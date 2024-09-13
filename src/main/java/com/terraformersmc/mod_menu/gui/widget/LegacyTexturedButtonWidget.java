@@ -7,14 +7,14 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 
 public class LegacyTexturedButtonWidget extends ImageButton {
-	private final int u;
-	private final int v;
-	private final int hoveredVOffset;
+	protected final int u;
+	protected final int v;
+	protected final int hoveredVOffset;
 
-	private final ResourceLocation texture;
+	protected final ResourceLocation texture;
 
-	private final int textureWidth;
-	private final int textureHeight;
+	protected final int textureWidth;
+	protected final int textureHeight;
 
 	public LegacyTexturedButtonWidget(
 		int x,

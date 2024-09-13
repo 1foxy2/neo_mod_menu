@@ -16,6 +16,11 @@ public class ModMenuConfigListScreen<T> extends ConfigurationScreen.Configuratio
     }
 
     @Override
+    protected void createAddElementButton() {
+        super.createAddElementButton();
+    }
+
+    @Override
     public void onClose() {
         super.onClose();
         ModMenu.addBadges();

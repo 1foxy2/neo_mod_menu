@@ -187,5 +187,9 @@ public class JavaDummyMod implements Mod {
 	}
 
 	@Override
-	public void reCalculateLibraries() {}
+	public void reCalculateBadge() {
+		List<String> badgelist = ModMenu.getConfig().mod_badges.get(this.getId());
+		if (badgelist != null)
+			this.modMenuData.getBadges().addAll(ModBadge.convert(new HashSet<>(badgelist), this.getId()));
+	}
 }

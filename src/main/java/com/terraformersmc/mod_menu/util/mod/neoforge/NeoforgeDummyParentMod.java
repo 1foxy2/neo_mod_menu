@@ -18,7 +18,6 @@ public class NeoforgeDummyParentMod implements Mod {
 	private final String id;
 	private final Mod host;
 	private boolean childHasUpdate;
-	protected boolean wasInLibraries = false;
 
 	public NeoforgeDummyParentMod(Mod host, String id) {
 		this.host = host;
@@ -190,14 +189,10 @@ public class NeoforgeDummyParentMod implements Mod {
 	}
 
 	@Override
-	public void reCalculateLibraries() {
-		boolean isInLibraries = ModMenu.getConfig().LIBRARY_LIST.get().contains(getId());
-		if (!getModMenuData().getBadges().contains(ModBadge.LIBRARY) && isInLibraries && !wasInLibraries) {
-			this.getModMenuData().addLibraryBadge(true);
-			wasInLibraries = true;
-		} else if (!isInLibraries && wasInLibraries) {
-			this.getModMenuData().getBadges().remove(ModBadge.LIBRARY);
-			wasInLibraries = false;
+	public void reCalculateBadge() {
+		List<String> badgelist = ModMenu.getConfig().mod_badges.get(this.getId());
+		if (badgelist != null) {
+			this.getModMenuData().getBadges().addAll(ModBadge.convert(new HashSet<>(badgelist), this.getId()));
 		}
 	}
 }

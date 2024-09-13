@@ -5,10 +5,7 @@ import com.terraformersmc.mod_menu.ModMenu;
 import com.terraformersmc.mod_menu.util.mod.Mod;
 import net.neoforged.neoforge.common.ModConfigSpec;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
 public class ModMenuConfig {
     public final ModConfigSpec.EnumValue<Sorting> SORTING;
@@ -36,12 +33,16 @@ public class ModMenuConfig {
     public final ModConfigSpec.BooleanValue MODIFY_TITLE_SCREEN;
     public final ModConfigSpec.BooleanValue MODIFY_GAME_MENU;
     public final ModConfigSpec.BooleanValue HIDE_CONFIG_BUTTONS;
+    public final ModConfigSpec.BooleanValue HIDE_BADGE_BUTTONS;
     public final ModConfigSpec.BooleanValue CONFIG_MODE;
     public final ModConfigSpec.BooleanValue DISABLE_DRAG_AND_DROP;
     public final ModConfigSpec.ConfigValue<List<? extends String>> HIDDEN_MODS;
     public final ModConfigSpec.ConfigValue<List<? extends String>> HIDDEN_CONFIGS;
     public final ModConfigSpec.ConfigValue<List<? extends String>> LIBRARY_LIST;
+    public final ModConfigSpec.ConfigValue<List<? extends String>> MOD_BADGES;
   //  public static final ModConfigSpec.BooleanValue DISABLE_UPDATE_CHECKER;
+
+    public final Map<String, List<String>> mod_badges = new HashMap<>();
 
     public ModMenuConfig(ModConfigSpec.Builder builder) {
         builder.push("main");
@@ -88,6 +89,8 @@ public class ModMenuConfig {
                 .define("hide_mod_credits", false);
         HIDE_CONFIG_BUTTONS = builder
                 .define("hide_config_buttons", false);
+        HIDE_BADGE_BUTTONS = builder
+                .define("hide_badge_buttons", true);
         HIDDEN_MODS = builder
                 .defineList("hidden_mods", ArrayList::new, String::new, object -> object instanceof String);
         HIDDEN_CONFIGS = builder
@@ -105,11 +108,45 @@ public class ModMenuConfig {
                 .define("count_libraries", true);
         builder.pop();
 
+        MOD_BADGES = builder
+                .defineList("mod_badges", ArrayList::new, String::new, object -> object instanceof String);
+
         //    UPDATE_CHECKER = builder
         //            .define("translate_descriptions", true);
         //    BUTTON_UPDATE_BADGE = builder
         //            .define("button_update_badge", true);
         //  UPDATE_CHANNEL
+    }
+
+    public void onLoad() {
+        this.MOD_BADGES.get().forEach(badge -> {
+            String[] badgeKeyValue = badge.split("=");
+            this.mod_badges.put(badgeKeyValue[0], new ArrayList<>(Arrays.stream(badgeKeyValue[1].split(", ")).toList()) );
+        });
+        if (!this.LIBRARY_LIST.get().isEmpty()) {
+            this.LIBRARY_LIST.get().forEach(string -> {
+                this.mod_badges.putIfAbsent(string, new ArrayList<>());
+                this.mod_badges.get(string).add("library");
+            });
+        }
+    }
+
+    public void save() {
+        List<String> list = new ArrayList<>();
+        this.mod_badges.forEach((key, values) -> {
+
+            StringBuilder string = new StringBuilder();
+            values.removeFirst();
+            for (String value : values) {
+                if (string.isEmpty()) string.append(values.getFirst());
+                else string.append(", ").append(value);
+            }
+
+            list.add(key + "=" + string);
+        });
+
+        this.MOD_BADGES.set(list);
+        ModMenu.CONFIG.getRight().save();
     }
 
     public enum Sorting {

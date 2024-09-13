@@ -28,6 +28,9 @@ public class ModBadge {
         this.outlineColor = outlineColor;
     }
 
+
+
+
     public Component getComponent() {
         return this.component;
     }
