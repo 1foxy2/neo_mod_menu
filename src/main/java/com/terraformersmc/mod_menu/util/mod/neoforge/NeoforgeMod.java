@@ -65,8 +65,10 @@ public class NeoforgeMod implements Mod {
 
 			Optional<Map<String, Object>> parentValues = ownFile.flatMap(mfi -> mfi.getConfigElement("modproperties", "modmenu_parent"));
 			if (parentValues.isPresent() && !parentValues.get().isEmpty()) {
+				Set<String> parentBadges = new HashSet<>();
+
 				if (modMenuMap.get("badges") instanceof ArrayList<?> list)
-					badgeNames.addAll((List<String>) list);
+					parentBadges.addAll((List<String>) list);
 
 				try {
 					parentId = Optional.of((String) parentValues.get().get("id"));
@@ -75,7 +77,7 @@ public class NeoforgeMod implements Mod {
 							Optional.of((String) parentValues.get().get("name")),
 							Optional.of(parentValues.get().get("description") + "\n" + modInfo.getConfig().getConfigElement("credits").orElse("")),
 							Optional.of((String) parentValues.get().get("icon")),
-							badgeNames
+							parentBadges
 					);
 					if (parentId.orElse("").equals(id)) {
 						parentId = Optional.empty();
@@ -86,6 +88,8 @@ public class NeoforgeMod implements Mod {
 					LOGGER.error("Error loading parent data from mod: " + id, t);
 				}
 			}
+
+			if (modMenuMap.get("badges") instanceof ArrayList<?> list) badgeNames.addAll((List<String>) list);
 
 			if (modMenuMap.get("links") instanceof ArrayList<?> list) list.forEach(string -> {
 				String[] strings = string.toString().split("=");
@@ -103,7 +107,7 @@ public class NeoforgeMod implements Mod {
 			authors.add(string);
 		}
 
-		this.modMenuData = new ModMenuData(badgeNames, parentId, parentData, id);
+		this.modMenuData = new ModMenuData(parentId, parentData, id);
 
 		/* Hardcode parents and badges for Fabric API & kotlin api */
 		if (id.startsWith("fabric")) {
@@ -315,10 +319,10 @@ public class NeoforgeMod implements Mod {
 
 	@Override
 	public void reCalculateBadge() {
-		List<String> badgelist = ModMenu.getConfig().mod_badges.get(this.getId());
-		if (badgelist != null) {
-			badgelist.addAll(badgeNames);
-			this.modMenuData.getBadges().addAll(ModBadge.convert(new HashSet<>(badgelist), this.getId()));
-		}
+		Set<String> badgelist = ModMenu.getConfig().mod_badges.get(this.getId());
+		if (badgelist != null)
+			badgeNames.addAll(badgelist);
+
+		this.modMenuData.getBadges().addAll(ModBadge.convert(badgeNames, this.getId()));
 	}
 }

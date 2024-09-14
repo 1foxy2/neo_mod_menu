@@ -190,9 +190,9 @@ public class NeoforgeDummyParentMod implements Mod {
 
 	@Override
 	public void reCalculateBadge() {
-		List<String> badgelist = ModMenu.getConfig().mod_badges.get(this.getId());
+		Set<String> badgelist = ModMenu.getConfig().mod_badges.get(this.getId());
 		if (badgelist != null) {
-			this.getModMenuData().getBadges().addAll(ModBadge.convert(new HashSet<>(badgelist), this.getId()));
+			this.getModMenuData().getBadges().addAll(ModBadge.convert(badgelist, this.getId()));
 		}
 	}
 }

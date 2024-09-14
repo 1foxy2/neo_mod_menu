@@ -42,7 +42,7 @@ public class ModMenuConfig {
     public final ModConfigSpec.ConfigValue<List<? extends String>> MOD_BADGES;
   //  public static final ModConfigSpec.BooleanValue DISABLE_UPDATE_CHECKER;
 
-    public final Map<String, List<String>> mod_badges = new HashMap<>();
+    public final Map<String, Set<String>> mod_badges = new HashMap<>();
 
     public ModMenuConfig(ModConfigSpec.Builder builder) {
         builder.push("main");
@@ -121,25 +121,27 @@ public class ModMenuConfig {
     public void onLoad() {
         this.MOD_BADGES.get().forEach(badge -> {
             String[] badgeKeyValue = badge.split("=");
-            this.mod_badges.put(badgeKeyValue[0], new ArrayList<>(Arrays.stream(badgeKeyValue[1].split(", ")).toList()) );
+            if (badgeKeyValue.length != 1)
+                this.mod_badges.put(badgeKeyValue[0], new HashSet<>(Arrays.stream(badgeKeyValue[1].split(", ")).toList()));
         });
         if (!this.LIBRARY_LIST.get().isEmpty()) {
             this.LIBRARY_LIST.get().forEach(string -> {
-                this.mod_badges.putIfAbsent(string, new ArrayList<>());
+                this.mod_badges.putIfAbsent(string, new HashSet<>());
                 this.mod_badges.get(string).add("library");
             });
+            this.LIBRARY_LIST.set(new ArrayList<>());
         }
     }
 
     public void save() {
         List<String> list = new ArrayList<>();
         this.mod_badges.forEach((key, values) -> {
-
             StringBuilder string = new StringBuilder();
-            values.removeFirst();
             for (String value : values) {
-                if (string.isEmpty()) string.append(values.getFirst());
-                else string.append(", ").append(value);
+                if (!string.isEmpty())
+                    string.append(", ");
+
+                string.append(value);
             }
 
             list.add(key + "=" + string);

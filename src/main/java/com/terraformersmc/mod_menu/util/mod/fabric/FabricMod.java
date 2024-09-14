@@ -90,7 +90,7 @@ public class FabricMod implements Mod {
 			});
 			allowsUpdateChecks = CustomValueUtil.getBoolean("update_checker", modMenuObject).orElse(true);
 		}
-		this.modMenuData = new ModMenuData(badgeNames, parentId, parentData, id);
+		this.modMenuData = new ModMenuData(parentId, parentData, id);
 
 		/* Hardcode parents and badges for Fabric API & Fabric Loader */
 		if (id.startsWith("fabric") && (id.equals("fabricloader") || metadata.getProvides()
@@ -274,10 +274,10 @@ public class FabricMod implements Mod {
 
 	@Override
 	public void reCalculateBadge() {
-		List<String> badgelist = ModMenu.getConfig().mod_badges.get(this.getId());
+		Set<String> badgelist = ModMenu.getConfig().mod_badges.get(this.getId());
 		if (badgelist != null) {
 			badgelist.addAll(badgeNames);
-			this.modMenuData.getBadges().addAll(ModBadge.convert(new HashSet<>(badgelist), this.getId()));
+			this.modMenuData.getBadges().addAll(ModBadge.convert(badgelist, this.getId()));
 		}
 	}
 }

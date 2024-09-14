@@ -37,9 +37,7 @@ public interface Mod {
 	@NotNull
 	default String getSummary() {
 		String string = getTranslatedSummary();
-		return ModMenu.TEXT_PLACEHOLDER_COMPAT ?
-			TextPlaceholderApiCompat.PARSER.parseText(string, ParserContext.of()).getString() :
-			string;
+		return TextPlaceholderApiCompat.PARSER.parseText(string, ParserContext.of()).getString();
 	}
 
 	@NotNull
@@ -66,9 +64,7 @@ public interface Mod {
 
 	default Component getFormattedDescription() {
 		String string = getTranslatedDescription();
-		return ModMenu.TEXT_PLACEHOLDER_COMPAT ?
-			TextPlaceholderApiCompat.PARSER.parseText(string, ParserContext.of()) :
-				Component.literal(string);
+		return TextPlaceholderApiCompat.PARSER.parseText(string, ParserContext.of());
 	}
 
 	@NotNull String getVersion();
@@ -116,14 +112,13 @@ public interface Mod {
 	void reCalculateBadge();
 
 	static class ModMenuData {
-		private final Set<ModBadge> badges;
+		private final Set<ModBadge> badges = new HashSet<>();
 		private Optional<String> parent;
 		private @Nullable
 		final DummyParentData dummyParentData;
 
 		//TODO: remove badges set from constructor
-		public ModMenuData(Set<String> badges, Optional<String> parent, DummyParentData dummyParentData, String id) {
-			this.badges = ModBadge.convert(badges, id);
+		public ModMenuData(Optional<String> parent, DummyParentData dummyParentData, String id) {
 			this.parent = parent;
 			this.dummyParentData = dummyParentData;
 		}

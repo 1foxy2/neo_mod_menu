@@ -29,6 +29,7 @@ public class JavaDummyMod implements Mod {
 	private static final String modid = "java";
 
 	protected final Map<String, String> links = new HashMap<>();
+	protected final Set<String> badgeNames = new HashSet<>();
 
 	protected boolean defaultIconWarning = true;
 
@@ -42,7 +43,7 @@ public class JavaDummyMod implements Mod {
 		Optional<String> parentId = Optional.empty();
 		Set<String> badgeNames = new HashSet<>();
 
-		this.modMenuData = new ModMenuData(badgeNames, parentId, null, modid);
+		this.modMenuData = new ModMenuData(parentId, null, modid);
 
 		modMenuData.getBadges().add(ModBadge.LIBRARY);
 	}
@@ -188,8 +189,10 @@ public class JavaDummyMod implements Mod {
 
 	@Override
 	public void reCalculateBadge() {
-		List<String> badgelist = ModMenu.getConfig().mod_badges.get(this.getId());
-		if (badgelist != null)
-			this.modMenuData.getBadges().addAll(ModBadge.convert(new HashSet<>(badgelist), this.getId()));
+		Set<String> badgelist = ModMenu.getConfig().mod_badges.get(this.getId());
+		if (badgelist != null) {
+			badgelist.addAll(badgeNames);
+			this.modMenuData.getBadges().addAll(ModBadge.convert(badgelist, this.getId()));
+		}
 	}
 }

@@ -68,7 +68,6 @@ public class ModMenu {
 
 	private static int cachedDisplayedModCount = -1;
 	public static final boolean HAS_SINYTRA = ModList.get().isLoaded("connector");
-	public static final boolean TEXT_PLACEHOLDER_COMPAT = ModList.get().isLoaded("placeholder_api");
 
 	public static Screen getConfigScreen(ModContainer c, Screen menuScreen) {
 		configScreenFactories.putIfAbsent("minecraft", (modContainer, screen) -> new OptionsScreen(screen, Minecraft.getInstance().options));
@@ -91,7 +90,6 @@ public class ModMenu {
 
 	public ModMenu(IEventBus bus, ModContainer container) {
 		bus.addListener(this::onClientSetup);
-		NeoForge.EVENT_BUS.addListener(this::onClientTick);
 
 		container.registerConfig(ModConfig.Type.CLIENT, CONFIG.getValue());
 		container.registerExtensionPoint(IConfigScreenFactory.class, (modContainer, screen) ->
@@ -145,11 +143,6 @@ public class ModMenu {
 		getConfig().onLoad();
 		createBadges();
 		addBadges();
-	}
-
-	public void onClientTick(ClientTickEvent.Post event) {
-	//	LOGGER.warn(String.valueOf(Minecraft.getInstance().screen));
-
 	}
 
 	public static void clearModCountCache() {
@@ -231,6 +224,7 @@ public class ModMenu {
 		Set<Mod> allMods = new HashSet<>();
 		allMods.addAll(ROOT_MODS.values());
 		allMods.addAll(MODS.values());
+		allMods.forEach(mod -> LOGGER.warn(mod.getId()));
 		allMods.forEach(Mod::reCalculateBadge);
 	}
 }

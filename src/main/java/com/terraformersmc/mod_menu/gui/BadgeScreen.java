@@ -12,7 +12,7 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Map;
 
 public class BadgeScreen extends Screen {
@@ -57,7 +57,7 @@ public class BadgeScreen extends Screen {
                             } else {
                                 mod.getBadges().add(badge);
                                 if (!ModMenu.getConfig().mod_badges.containsKey(mod.getId()))
-                                    ModMenu.getConfig().mod_badges.put(mod.getId(), new ArrayList<>());
+                                    ModMenu.getConfig().mod_badges.put(mod.getId(), new HashSet<>());
                                 ModMenu.getConfig().mod_badges.get(mod.getId()).add(badgeEntry.getKey());
                             }
                             ((BadgeToogleButton) button).toggle();

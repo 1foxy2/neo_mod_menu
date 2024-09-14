@@ -19,7 +19,7 @@ description='''${mod_description}'''
 config="${mod_id}.mixins.json"
 
 [modproperties.modmenu]
-badges=["client", "badge"]
+badges=["client"]
 links=["mod_menu.original=https://modrinth.com/mod/modmenu"]
 contributors=[
     "shedaniel",
