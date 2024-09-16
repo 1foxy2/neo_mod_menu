@@ -26,11 +26,9 @@ import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.ModList;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
-import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.gui.ConfigurationScreen;
 import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 import net.neoforged.neoforge.common.ModConfigSpec;
-import net.neoforged.neoforge.common.NeoForge;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -111,10 +109,18 @@ public class ModMenu {
 		Map<String, Mod> dummyParents = new HashMap<>();
 
 		// Initialize parent map
+		HashSet<String> modParentSet = new HashSet<>();
 		for (Mod mod : MODS.values()) {
 			String parentId = mod.getParent();
-			if (parentId != null) {
-				Mod parent = MODS.getOrDefault(parentId, dummyParents.get(parentId));
+			if (parentId == null) {
+				ROOT_MODS.put(mod.getId(), mod);
+				continue;
+			}
+
+			Mod parent;
+			modParentSet.clear();
+			while (true) {
+				parent = MODS.getOrDefault(parentId, dummyParents.get(parentId));
 				if (parent == null) {
 					if (mod instanceof NeoforgeMod) {
 						parent = new NeoforgeDummyParentMod(mod, parentId);
@@ -124,17 +130,32 @@ public class ModMenu {
 					}
 					dummyParents.put(parentId, parent);
 				}
-				PARENT_MAP.put(parent, mod);
-			} else {
-				ROOT_MODS.put(mod.getId(), mod);
+
+				parentId = parent != null ? parent.getParent() : null;
+				if (parentId == null) {
+					// It will most likely end here in the first iteration
+					break;
+				}
+
+				if (modParentSet.contains(parentId)) {
+					LOGGER.warn("Mods contain each other as parents: {}", modParentSet);
+					parent = null;
+					break;
+				}
+				modParentSet.add(parentId);
 			}
+
+			if (parent == null) {
+				ROOT_MODS.put(mod.getId(), mod);
+				continue;
+			}
+			PARENT_MAP.put(parent, mod);
 		}
 
 		Mod java = new JavaDummyMod();
 		MODS.put("java", java);
 		ROOT_MODS.put("java", java);
 		MODS.putAll(dummyParents);
-		ROOT_MODS.putAll(dummyParents);
 	}
 
 	public void onClientSetup(FMLClientSetupEvent event) {
