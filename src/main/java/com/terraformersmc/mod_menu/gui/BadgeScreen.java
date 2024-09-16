@@ -2,7 +2,6 @@ package com.terraformersmc.mod_menu.gui;
 
 import com.terraformersmc.mod_menu.ModMenu;
 import com.terraformersmc.mod_menu.gui.widget.BadgeToogleButton;
-import com.terraformersmc.mod_menu.gui.widget.LegacyTexturedButtonWidget;
 import com.terraformersmc.mod_menu.util.DrawingUtil;
 import com.terraformersmc.mod_menu.util.mod.Mod;
 import com.terraformersmc.mod_menu.util.mod.ModBadge;
@@ -36,8 +35,8 @@ public class BadgeScreen extends Screen {
 
     @Override
     protected void init() {
-        this.badgeButton = ImageButton(posX, 22, 20, 20, 0, 0, 20, ModsScreen.BADGE_BUTTON_LOCATION, 32, 64, CommonComponents.EMPTY, button ->
-                        this.onClose());
+        this.badgeButton = new ImageButton(posX, 22, 20, 20, 0, 0, 20, ModsScreen.BADGE_BUTTON_LOCATION, 32, 64, button ->
+                        this.onClose(), CommonComponents.EMPTY);
         this.addRenderableWidget(badgeButton);
 
         int i = 0;

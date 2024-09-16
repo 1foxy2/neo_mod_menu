@@ -10,6 +10,7 @@ import com.terraformersmc.mod_menu.util.DrawingUtil;
 import com.terraformersmc.mod_menu.util.ModMenuScreenTexts;
 import com.terraformersmc.mod_menu.util.TranslationUtil;
 import com.terraformersmc.mod_menu.util.mod.Mod;
+import com.terraformersmc.mod_menu.util.mod.ModBadge;
 import com.terraformersmc.mod_menu.util.mod.ModBadgeRenderer;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.ChatFormatting;

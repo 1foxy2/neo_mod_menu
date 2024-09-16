@@ -29,7 +29,7 @@ public class NeoforgeMod implements Mod {
 
 	protected final ModMenuData modMenuData;
 
-	protected final Set<Badge> badges;
+	protected final Set<ModBadge> badges;
 	protected final Set<String> badgeNames = new HashSet<>();
 
 	protected final Map<String, String> links = new HashMap<>();
