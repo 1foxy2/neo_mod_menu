@@ -4,6 +4,7 @@ import com.google.common.collect.Sets;
 import com.terraformersmc.mod_menu.ModMenu;
 import com.terraformersmc.mod_menu.util.VersionUtil;
 import com.terraformersmc.mod_menu.util.mod.Mod;
+import com.terraformersmc.mod_menu.util.mod.ModBadge;
 import com.terraformersmc.mod_menu.util.mod.neoforge.NeoforgeIconHandler;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
@@ -33,7 +34,8 @@ public class FabricMod implements Mod {
 
 	protected final ModMenuData modMenuData;
 
-	protected final Set<Badge> badges;
+	protected final Set<ModBadge> badges;
+	protected final Set<String> badgeNames = new HashSet<>();
 
 	protected final Map<String, String> links = new HashMap<>();
 
@@ -42,8 +44,6 @@ public class FabricMod implements Mod {
 	protected boolean allowsUpdateChecks = true;
 
 	protected boolean childHasUpdate = false;
-
-	protected boolean wasInLibraries = false;
 
 	public FabricMod(String modId) {
 		this.container = FabricLoader.getInstance().getModContainer(modId).get();
@@ -55,7 +55,6 @@ public class FabricMod implements Mod {
 		/* Load modern mod menu custom value data */
 		Optional<String> parentId = Optional.empty();
 		ModMenuData.DummyParentData parentData = null;
-		Set<String> badgeNames = new HashSet<>();
 		CustomValue modMenuValue = metadata.getCustomValue("modmenu");
 		if (modMenuValue != null && modMenuValue.getType() == CustomValue.CvType.OBJECT) {
 			CustomValue.CvObject modMenuObject = modMenuValue.getAsObject();
@@ -91,29 +90,29 @@ public class FabricMod implements Mod {
 			});
 			allowsUpdateChecks = CustomValueUtil.getBoolean("update_checker", modMenuObject).orElse(true);
 		}
-		this.modMenuData = new ModMenuData(badgeNames, parentId, parentData, id);
+		this.modMenuData = new ModMenuData(parentId, parentData, id);
 
 		/* Hardcode parents and badges for Fabric API & Fabric Loader */
 		if (id.startsWith("fabric") && (id.equals("fabricloader") || metadata.getProvides()
 			.contains("fabricloader") || id.equals("fabric") || id.equals("fabric_api") || metadata.getProvides()
 			.contains("fabric") || metadata.getProvides()
 			.contains("fabric_api") || id.equals("fabric_language_kotlin"))) {
-			modMenuData.getBadges().add(Badge.LIBRARY);
+			modMenuData.getBadges().add(ModBadge.LIBRARY);
 		}
 
 		/* Hardcode parents and badges for Kotlin */
 		if (id.startsWith("org_jetbrains_kotlin")) {
 			modMenuData.fillParentIfEmpty("fabric_language_kotlin");
-			modMenuData.getBadges().add(Badge.LIBRARY);
+			modMenuData.getBadges().add(ModBadge.LIBRARY);
 		}
 
 		/* Add additional badges */
 		this.badges = modMenuData.getBadges();
 		if (this.metadata.getEnvironment() == ModEnvironment.CLIENT) {
-			badges.add(Badge.CLIENT);
+			badges.add(ModBadge.DEFAULT_BADGES.get("client"));
 		}
 
-		badges.add(Badge.SINYTRA_FABRIC);
+		badges.add(ModBadge.DEFAULT_BADGES.get("sinytra_fabric"));
 	}
 
 	public Optional<net.minecraftforge.fml.ModContainer> getContainer() {
@@ -214,7 +213,7 @@ public class FabricMod implements Mod {
 	}
 
 	@Override
-	public @NotNull Set<Badge> getBadges() {
+	public @NotNull Set<ModBadge> getBadges() {
 		return badges;
 	}
 
@@ -274,14 +273,11 @@ public class FabricMod implements Mod {
 	}
 
 	@Override
-	public void reCalculateLibraries() {
-		boolean isInLibraries = ModMenu.getConfig().LIBRARY_LIST.get().contains(getId());
-		if (!getModMenuData().getBadges().contains(Badge.LIBRARY) && isInLibraries && !wasInLibraries) {
-			this.modMenuData.addLibraryBadge(true);
-			wasInLibraries = true;
-		} else if (!isInLibraries && wasInLibraries) {
-			this.modMenuData.getBadges().remove(Badge.LIBRARY);
-			wasInLibraries = false;
+	public void reCalculateBadge() {
+		Set<String> badgelist = ModMenu.getConfig().mod_badges.get(this.getId());
+		if (badgelist != null) {
+			badgelist.addAll(badgeNames);
+			this.modMenuData.getBadges().addAll(ModBadge.convert(badgelist, this.getId()));
 		}
 	}
 }

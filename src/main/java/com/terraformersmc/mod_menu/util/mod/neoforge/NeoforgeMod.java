@@ -5,6 +5,7 @@ import com.google.common.collect.Sets;
 import com.terraformersmc.mod_menu.ModMenu;
 import com.terraformersmc.mod_menu.util.VersionUtil;
 import com.terraformersmc.mod_menu.util.mod.Mod;
+import com.terraformersmc.mod_menu.util.mod.ModBadge;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.util.Tuple;
 import net.minecraftforge.fml.ModContainer;
@@ -29,6 +30,7 @@ public class NeoforgeMod implements Mod {
 	protected final ModMenuData modMenuData;
 
 	protected final Set<Badge> badges;
+	protected final Set<String> badgeNames = new HashSet<>();
 
 	protected final Map<String, String> links = new HashMap<>();
 
@@ -37,7 +39,6 @@ public class NeoforgeMod implements Mod {
 
 	protected boolean defaultIconWarning = true;
 	protected boolean childHasUpdate = false;
-	protected boolean wasInLibraries = false;
 
 	protected String sources;
 	protected String issueTrackerUrl;
@@ -55,7 +56,6 @@ public class NeoforgeMod implements Mod {
 		/* Load modern mod menu custom value data */
 		Optional<String> parentId = Optional.empty();
 		ModMenuData.DummyParentData parentData = null;
-		Set<String> badgeNames = new HashSet<>();
 
 		Optional<ModFileInfo> ownFile = Optional.ofNullable((ModFileInfo) container.getModInfo().getOwningFile());
 		Optional<Map<String, Object>> modMenuValue = ownFile.flatMap(mfi -> mfi.getConfigElement("modproperties", "modmenu"));
@@ -65,19 +65,19 @@ public class NeoforgeMod implements Mod {
 
 			Optional<Map<String, Object>> parentValues = ownFile.flatMap(mfi -> mfi.getConfigElement("modproperties", "modmenu_parent"));
 			if (parentValues.isPresent() && !parentValues.get().isEmpty()) {
+				Set<String> parentBadges = new HashSet<>();
+
+				if (modMenuMap.get("badges") instanceof ArrayList<?> list)
+					parentBadges.addAll((List<String>) list);
+
 				try {
-
-					HashSet<String> badges = new HashSet<>();
-					if (parentValues.get().get("badges") instanceof ArrayList<?> list && !list.isEmpty())
-						badges.addAll((ArrayList<String>) list);
-
 					parentId = Optional.of((String) parentValues.get().get("id"));
 					parentData = new ModMenuData.DummyParentData(
 							parentId.orElseThrow(() -> new RuntimeException("Parent object lacks an id")),
 							Optional.of((String) parentValues.get().get("name")),
 							Optional.of(parentValues.get().get("description") + "\n" + modInfo.getConfig().getConfigElement("credits").orElse("")),
 							Optional.of((String) parentValues.get().get("icon")),
-							badges
+							parentBadges
 					);
 					if (parentId.orElse("").equals(id)) {
 						parentId = Optional.empty();
@@ -107,12 +107,12 @@ public class NeoforgeMod implements Mod {
 			authors.add(string);
 		}
 
-		this.modMenuData = new ModMenuData(badgeNames, parentId, parentData, id);
+		this.modMenuData = new ModMenuData(parentId, parentData, id);
 
 		/* Hardcode parents and badges for Fabric API & kotlin api */
 		if (id.startsWith("fabric")) {
 			modMenuData.fillParentIfEmpty("fabric-api");
-			modMenuData.getBadges().add(Badge.LIBRARY);
+			modMenuData.getBadges().add(ModBadge.LIBRARY);
 		}
 
 		/* Hardcode parents and badges for connector-extras */
@@ -121,7 +121,7 @@ public class NeoforgeMod implements Mod {
 				modMenuData.fillParentIfEmpty("connectormod");
 			}
 
-			modMenuData.getBadges().add(Badge.LIBRARY);
+			modMenuData.getBadges().add(ModBadge.LIBRARY);
 		}
 
 		/* Add additional badges */
@@ -130,10 +130,10 @@ public class NeoforgeMod implements Mod {
 			badges.add(Badge.CLIENT);
 		}*/
 		if ("java".equals(id)) {
-			badges.add(Badge.LIBRARY);
+			badges.add(ModBadge.LIBRARY);
 		}
 		if ("minecraft".equals(getId())) {
-			badges.add(Badge.MINECRAFT);
+			badges.add(ModBadge.DEFAULT_BADGES.get("minecraft"));
 		}
 	}
 
@@ -248,7 +248,7 @@ public class NeoforgeMod implements Mod {
 	}
 
 	@Override
-	public @NotNull Set<Badge> getBadges() {
+	public @NotNull Set<ModBadge> getBadges() {
 		return badges;
 	}
 
@@ -318,14 +318,11 @@ public class NeoforgeMod implements Mod {
 	}
 
 	@Override
-	public void reCalculateLibraries() {
-		boolean isInLibraries = ModMenu.getConfig().LIBRARY_LIST.get().contains(getId());
-		if (!getModMenuData().getBadges().contains(Badge.LIBRARY) && isInLibraries && !wasInLibraries) {
-			this.modMenuData.addLibraryBadge(true);
-			wasInLibraries = true;
-		} else if (!isInLibraries && wasInLibraries) {
-			this.modMenuData.getBadges().remove(Badge.LIBRARY);
-			wasInLibraries = false;
-		}
+	public void reCalculateBadge() {
+		Set<String> badgelist = ModMenu.getConfig().mod_badges.get(this.getId());
+		if (badgelist != null)
+			badgeNames.addAll(badgelist);
+
+		this.modMenuData.getBadges().addAll(ModBadge.convert(badgeNames, this.getId()));
 	}
 }

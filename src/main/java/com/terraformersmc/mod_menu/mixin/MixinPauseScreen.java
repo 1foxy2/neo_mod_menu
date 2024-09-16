@@ -28,7 +28,7 @@ public abstract class MixinPauseScreen extends Screen {
 	}
 
 	@Inject(method = "createPauseMenu", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/layouts/GridLayout;visitWidgets(Ljava/util/function/Consumer;)V"), locals = LocalCapture.CAPTURE_FAILEXCEPTION)
-	private void onInitWidgets(CallbackInfo ci, GridLayout gridlayout, GridLayout.RowHelper $$1, Component $$2) {
+	private void onInitWidgets(CallbackInfo ci, GridLayout gridlayout) {
 		if (gridlayout != null) {
 			final List<LayoutElement> buttons = ((AccessorGridLayout) gridlayout).getChildren();
 			if (ModMenu.getConfig().MODIFY_GAME_MENU.get()) {

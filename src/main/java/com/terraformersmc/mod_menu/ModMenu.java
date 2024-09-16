@@ -1,14 +1,13 @@
 package com.terraformersmc.mod_menu;
 
 import com.google.common.collect.LinkedListMultimap;
-import com.google.gson.FieldNamingPolicy;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import com.google.gson.*;
 import com.terraformersmc.mod_menu.config.ModMenuConfig;
 import com.terraformersmc.mod_menu.gui.ModsScreen;
 import com.terraformersmc.mod_menu.util.EnumToLowerCaseJsonConverter;
 import com.terraformersmc.mod_menu.util.ModMenuScreenTexts;
 import com.terraformersmc.mod_menu.util.mod.Mod;
+import com.terraformersmc.mod_menu.util.mod.ModBadge;
 import com.terraformersmc.mod_menu.util.mod.fabric.FabricMod;
 import com.terraformersmc.mod_menu.util.mod.java.JavaDummyMod;
 import com.terraformersmc.mod_menu.util.mod.neoforge.NeoforgeDummyParentMod;
@@ -19,6 +18,8 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.server.packs.PackType;
+import net.minecraft.util.GsonHelper;
 import net.minecraftforge.client.ConfigScreenHandler;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -32,6 +33,8 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.awt.*;
+import java.io.InputStreamReader;
 import java.text.NumberFormat;
 import java.util.*;
 import java.util.function.BiFunction;
@@ -64,7 +67,6 @@ public class ModMenu {
 
 	private static int cachedDisplayedModCount = -1;
 	public static final boolean HAS_SINYTRA = ModList.get().isLoaded("connectormod");
-	public static final boolean TEXT_PLACEHOLDER_COMPAT = ModList.get().isLoaded("placeholder_api");
 
 	public static Screen getConfigScreen(ModContainer c, Screen menuScreen) {
 		configScreenFactories.putIfAbsent("minecraft", (minecraft, screen) -> new OptionsScreen(screen, Minecraft.getInstance().options));
@@ -109,10 +111,18 @@ public class ModMenu {
 		Map<String, Mod> dummyParents = new HashMap<>();
 
 		// Initialize parent map
+		HashSet<String> modParentSet = new HashSet<>();
 		for (Mod mod : MODS.values()) {
 			String parentId = mod.getParent();
-			if (parentId != null) {
-				Mod parent = MODS.getOrDefault(parentId, dummyParents.get(parentId));
+			if (parentId == null) {
+				ROOT_MODS.put(mod.getId(), mod);
+				continue;
+			}
+
+			Mod parent;
+			modParentSet.clear();
+			while (true) {
+				parent = MODS.getOrDefault(parentId, dummyParents.get(parentId));
 				if (parent == null) {
 					if (mod instanceof NeoforgeMod) {
 						parent = new NeoforgeDummyParentMod(mod, parentId);
@@ -122,23 +132,40 @@ public class ModMenu {
 					}
 					dummyParents.put(parentId, parent);
 				}
-				PARENT_MAP.put(parent, mod);
-			} else {
-				ROOT_MODS.put(mod.getId(), mod);
+
+				parentId = parent != null ? parent.getParent() : null;
+				if (parentId == null) {
+					// It will most likely end here in the first iteration
+					break;
+				}
+
+				if (modParentSet.contains(parentId)) {
+					LOGGER.warn("Mods contain each other as parents: {}", modParentSet);
+					parent = null;
+					break;
+				}
+				modParentSet.add(parentId);
 			}
+
+			if (parent == null) {
+				ROOT_MODS.put(mod.getId(), mod);
+				continue;
+			}
+			PARENT_MAP.put(parent, mod);
 		}
 
 		Mod java = new JavaDummyMod();
 		MODS.put("java", java);
 		ROOT_MODS.put("java", java);
 		MODS.putAll(dummyParents);
-		ROOT_MODS.putAll(dummyParents);
 	}
 
 	public void onClientSetup(FMLClientSetupEvent event) {
 		ModList.get().getMods().forEach(info -> ConfigScreenHandler.getScreenFactoryFor(info).ifPresent(
 				factory -> configScreenFactories.put(info.getModId(), factory)));
-		addLibraryBadge();
+		getConfig().onLoad();
+		createBadges();
+		addBadges();
 	}
 
 	public static void clearModCountCache() {
@@ -157,7 +184,7 @@ public class ModMenu {
 				if (!includeChildren && isChild) {
 					return false;
 				}
-				boolean isLibrary = mod.getBadges().contains(Mod.Badge.LIBRARY);
+				boolean isLibrary = mod.getBadges().contains(ModBadge.LIBRARY);
 				if (!includeLibraries && isLibrary) {
 					return false;
 				}
@@ -197,10 +224,29 @@ public class ModMenu {
 		return CONFIG.getLeft();
 	}
 
-	public static void addLibraryBadge() {
+	public static void createBadges() {
+		ModBadge.CUSTOM_BADGES.clear();
+		Minecraft.getInstance().getResourceManager().listPacks().forEach(packResources ->
+				packResources.listResources(PackType.CLIENT_RESOURCES, MOD_ID, "badge", (key, value) -> {
+					try {
+						JsonObject jsonObject = GsonHelper.parse(new InputStreamReader(value.get()));
+						JsonArray fillColor = jsonObject.getAsJsonArray("fill_color");
+						JsonArray outlineColor = jsonObject.getAsJsonArray("outline_color");
+						String id = key.getPath().replace("badge/", "").replace(".json", "");
+						ModBadge badge = new ModBadge(jsonObject.get("name").getAsString(),
+								new Color(outlineColor.get(0).getAsInt(), outlineColor.get(1).getAsInt(), outlineColor.get(2).getAsInt()).getRGB(),
+								new Color(fillColor.get(0).getAsInt(), fillColor.get(1).getAsInt(), fillColor.get(2).getAsInt()).getRGB());
+
+						ModBadge.CUSTOM_BADGES.put(id, badge);
+					} catch (Exception e) {
+						LOGGER.warn("incorrect badge json from {} {}", key, e.getMessage());
+					}}));
+	}
+
+	public static void addBadges() {
 		Set<Mod> allMods = new HashSet<>();
 		allMods.addAll(ROOT_MODS.values());
 		allMods.addAll(MODS.values());
-		allMods.forEach(Mod::reCalculateLibraries);
+		allMods.forEach(Mod::reCalculateBadge);
 	}
 }

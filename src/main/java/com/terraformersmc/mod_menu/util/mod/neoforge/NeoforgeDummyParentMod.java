@@ -2,6 +2,7 @@ package com.terraformersmc.mod_menu.util.mod.neoforge;
 
 import com.terraformersmc.mod_menu.ModMenu;
 import com.terraformersmc.mod_menu.util.mod.Mod;
+import com.terraformersmc.mod_menu.util.mod.ModBadge;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.util.Tuple;
 import net.minecraftforge.fml.ModContainer;
@@ -105,24 +106,24 @@ public class NeoforgeDummyParentMod implements Mod {
 	}
 
 	@Override
-	public @NotNull Set<Badge> getBadges() {
+	public @NotNull Set<ModBadge> getBadges() {
 		NeoforgeMod.ModMenuData.DummyParentData parentData = host.getModMenuData().getDummyParentData();
 		if (parentData != null) {
 			return parentData.getBadges();
 		}
-		var badges = new HashSet<Badge>();
+		var badges = new HashSet<ModBadge>();
 		if (id.equals("fabric-api")) {
-			badges.add(Badge.LIBRARY);
+			badges.add(ModBadge.LIBRARY);
 		}
 
 		boolean modpackChildren = true;
 		for (Mod mod : ModMenu.PARENT_MAP.get(this)) {
-			if (!mod.getBadges().contains(Badge.MODPACK)) {
+			if (!mod.getBadges().contains(ModBadge.DEFAULT_BADGES.get("modpack"))) {
 				modpackChildren = false;
 			}
 		}
 		if (modpackChildren) {
-			badges.add(Badge.MODPACK);
+			badges.add(ModBadge.DEFAULT_BADGES.get("modpack"));
 		}
 
 		return badges;
@@ -189,14 +190,10 @@ public class NeoforgeDummyParentMod implements Mod {
 	}
 
 	@Override
-	public void reCalculateLibraries() {
-		boolean isInLibraries = ModMenu.getConfig().LIBRARY_LIST.get().contains(getId());
-		if (!getModMenuData().getBadges().contains(Badge.LIBRARY) && isInLibraries && !wasInLibraries) {
-			this.getModMenuData().addLibraryBadge(true);
-			wasInLibraries = true;
-		} else if (!isInLibraries && wasInLibraries) {
-			this.getModMenuData().getBadges().remove(Badge.LIBRARY);
-			wasInLibraries = false;
+	public void reCalculateBadge() {
+		Set<String> badgelist = ModMenu.getConfig().mod_badges.get(this.getId());
+		if (badgelist != null) {
+			this.getModMenuData().getBadges().addAll(ModBadge.convert(badgelist, this.getId()));
 		}
 	}
 }

@@ -26,11 +26,11 @@ public class ModBadgeRenderer {
 	public void draw(GuiGraphics guiGraphics, int mouseX, int mouseY) {
 		this.badgeX = startX;
 		this.badgeY = startY;
-		Set<Mod.Badge> badges = mod.getBadges();
+		Set<ModBadge> badges = mod.getBadges();
 		badges.forEach(badge -> drawBadge(guiGraphics, badge, mouseX, mouseY));
 	}
 
-	public void drawBadge(GuiGraphics guiGraphics, Mod.Badge badge, int mouseX, int mouseY) {
+	public void drawBadge(GuiGraphics guiGraphics, ModBadge badge, int mouseX, int mouseY) {
 		this.drawBadge(guiGraphics,
 			badge.getComponent().getVisualOrderText(),
 			badge.getOutlineColor(),

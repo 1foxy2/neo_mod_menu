@@ -12,6 +12,7 @@ import com.terraformersmc.mod_menu.gui.widget.entries.IndependentEntry;
 import com.terraformersmc.mod_menu.gui.widget.entries.ModListEntry;
 import com.terraformersmc.mod_menu.gui.widget.entries.ParentEntry;
 import com.terraformersmc.mod_menu.util.mod.Mod;
+import com.terraformersmc.mod_menu.util.mod.ModBadge;
 import com.terraformersmc.mod_menu.util.mod.ModSearch;
 import com.terraformersmc.mod_menu.util.mod.neoforge.NeoforgeIconHandler;
 import net.minecraft.client.Minecraft;
@@ -120,7 +121,7 @@ public class ModListWidget extends ObjectSelectionList<ModListEntry> implements 
 		List<Mod> children = ModMenu.PARENT_MAP.get(parent);
 		boolean hideLibraries = !ModMenu.getConfig().SHOW_LIBRARIES.get();
 
-		return !children.stream().allMatch(child -> child.isHidden() || hideLibraries && child.getBadges().contains(Mod.Badge.LIBRARY));
+		return !children.stream().allMatch(child -> child.isHidden() || hideLibraries && child.getBadges().contains(ModBadge.LIBRARY));
 	}
 
 	private void filter(String searchTerm, boolean refresh, boolean search) {
@@ -155,7 +156,7 @@ public class ModListWidget extends ObjectSelectionList<ModListEntry> implements 
 			String modId = mod.getId();
 
 			//Hide parent lib mods when the config is set to hide
-			if (mod.getBadges().contains(Mod.Badge.LIBRARY) && !ModMenu.getConfig().SHOW_LIBRARIES.get()) {
+			if (mod.getBadges().contains(ModBadge.LIBRARY) && !ModMenu.getConfig().SHOW_LIBRARIES.get()) {
 				continue;
 			}
 

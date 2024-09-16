@@ -45,7 +45,7 @@ public class ModSearch {
 		String hasUpdate = I18n.get("mod_menu.searchTerms.hasUpdate");
 
 		// Libraries are currently hidden, ignore them entirely
-		if (mod.isHidden() || !ModMenu.getConfig().SHOW_LIBRARIES.get() && mod.getBadges().contains(Mod.Badge.LIBRARY)) {
+		if (mod.isHidden() || !ModMenu.getConfig().SHOW_LIBRARIES.get() && mod.getBadges().contains(ModBadge.LIBRARY)) {
 			return 0;
 		}
 
@@ -60,13 +60,13 @@ public class ModSearch {
 		if (modDescription.toLowerCase(Locale.ROOT).contains(query) // Search default mod description
 			|| modSummary.toLowerCase(Locale.ROOT).contains(query) // Search mod summary
 			|| authorMatches(mod, query) // Search via author
-			|| library.contains(query) && mod.getBadges().contains(Mod.Badge.LIBRARY) // Search for lib mods
+			|| library.contains(query) && mod.getBadges().contains(ModBadge.LIBRARY) // Search for lib mods
 			|| sinytra.contains(query) && mod.getBadges()
-			.contains(Mod.Badge.SINYTRA_FABRIC) // Search for sinytra mods
-			|| modpack.contains(query) && mod.getBadges().contains(Mod.Badge.MODPACK) // Search for modpack mods
+			.contains(ModBadge.DEFAULT_BADGES.get("sinytra_fabric")) // Search for sinytra mods
+			|| modpack.contains(query) && mod.getBadges().contains(ModBadge.DEFAULT_BADGES.get("modpack")) // Search for modpack mods
 			|| deprecated.contains(query) && mod.getBadges()
-			.contains(Mod.Badge.DEPRECATED) // Search for deprecated mods
-			|| clientside.contains(query) && mod.getBadges().contains(Mod.Badge.CLIENT) // Search for clientside mods
+			.contains(ModBadge.DEFAULT_BADGES.get("deprecated")) // Search for deprecated mods
+			|| clientside.contains(query) && mod.getBadges().contains(ModBadge.DEFAULT_BADGES.get("client")) // Search for clientside mods
 			|| configurable.contains(query) && screen.getModHasConfigScreen()
 			.getOrDefault(modId, false) // Search for mods that can be configured
 			// Search for mods that have updates

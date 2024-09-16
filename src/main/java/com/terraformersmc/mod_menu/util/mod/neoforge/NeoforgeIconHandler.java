@@ -4,6 +4,7 @@ import com.mojang.blaze3d.platform.NativeImage;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.util.Tuple;
 import net.minecraftforge.fml.ModContainer;
+import net.minecraftforge.fml.loading.FMLPaths;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,7 +24,9 @@ public class NeoforgeIconHandler implements Closeable {
 
 	public Tuple<DynamicTexture, Dimension> createIcon(ModContainer iconSource, String iconPath) {
 		try {
-			Path path = iconSource.getModInfo().getOwningFile().getFile().findResource(iconPath);
+			Path path = FMLPaths.GAMEDIR.get().resolve("modicons/" + iconSource.getModId() + (iconPath.endsWith("_small.png") ? "_small.png" : ".png"));
+			if (!path.toFile().exists())
+				path = iconSource.getModInfo().getOwningFile().getFile().findResource(iconPath);
 			Tuple<DynamicTexture, Dimension> cachedIcon = getCachedModIcon(path);
 			if (cachedIcon != null) {
 				return cachedIcon;

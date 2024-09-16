@@ -49,7 +49,7 @@ import java.util.stream.Collectors;
 public class ModsScreen extends Screen {
 	private static final ResourceLocation FILTERS_BUTTON_LOCATION = new ResourceLocation(ModMenu.MOD_ID, "textures/gui/filters_button.png");
 	private static final ResourceLocation CONFIGURE_BUTTON_LOCATION = new ResourceLocation(ModMenu.MOD_ID, "textures/gui/configure_button.png");
-
+	public static final ResourceLocation BADGE_BUTTON_LOCATION = new ResourceLocation(ModMenu.MOD_ID, "textures/gui/badge_button.png");
 	private static final Component TOGGLE_FILTER_OPTIONS = Component.translatable("mod_menu.toggleFilterOptions");
 	private static final Component CONFIGURE = Component.translatable("mod_menu.configure");
 	private static final Logger LOGGER = LoggerFactory.getLogger("Mod Menu | ModsScreen");
@@ -194,6 +194,13 @@ public class ModsScreen extends Screen {
 				super.render(guiGraphics, mouseX, mouseY, delta);
 			}
 		};
+
+		Button badgeButton = null;
+		if (!ModMenu.getConfig().HIDE_BADGE_BUTTONS.get()) {
+			badgeButton = new ImageButton(paneWidth / 2 + searchBoxWidth / 2 - 20 / 2 + 26, 22, 20, 20, 0, 0, 20, BADGE_BUTTON_LOCATION, 32, 64, button ->
+							this.minecraft.pushGuiLayer(new BadgeScreen(this.selected.mod, paneWidth, searchBoxWidth)), CommonComponents.EMPTY);
+		}
+
 		Button issuesButton = new Button(rightPaneX + urlButtonWidths + 4 + (urlButtonWidths / 2) - (cappedButtonWidth / 2), RIGHT_PANE_Y + 36, Math.min(urlButtonWidths, 200), 20,
 				Component.translatable("mod_menu.issues"), button -> {
 			final Mod mod = Objects.requireNonNull(selected).getMod();
@@ -254,6 +261,10 @@ public class ModsScreen extends Screen {
 		if (!ModMenu.getConfig().HIDE_CONFIG_BUTTONS.get()) {
 			this.addRenderableWidget(configureButton);
 		}
+		if (badgeButton != null) {
+			this.addRenderableWidget(badgeButton);
+		}
+
 		this.addRenderableWidget(websiteButton);
 		this.addRenderableWidget(issuesButton);
 		this.addWidget(this.descriptionListWidget);
@@ -376,10 +387,10 @@ public class ModsScreen extends Screen {
 	}
 
 	private Component computeModCountText(boolean includeLibs) {
-		int[] rootMods = formatModCount(ModMenu.ROOT_MODS.values().stream().filter(mod -> !mod.isHidden() && !mod.getBadges().contains(Mod.Badge.LIBRARY)).map(Mod::getId).collect(Collectors.toSet()));
+		int[] rootMods = formatModCount(ModMenu.ROOT_MODS.values().stream().filter(mod -> !mod.isHidden() && !mod.getBadges().contains(ModBadge.LIBRARY)).map(Mod::getId).collect(Collectors.toSet()));
 
 		if (includeLibs && ModMenu.getConfig().SHOW_LIBRARIES.get()) {
-			int[] rootLibs = formatModCount(ModMenu.ROOT_MODS.values().stream().filter(mod -> !mod.isHidden() && mod.getBadges().contains(Mod.Badge.LIBRARY)).map(Mod::getId).collect(Collectors.toSet()));
+			int[] rootLibs = formatModCount(ModMenu.ROOT_MODS.values().stream().filter(mod -> !mod.isHidden() && mod.getBadges().contains(ModBadge.LIBRARY)).map(Mod::getId).collect(Collectors.toSet()));
 			return TranslationUtil.translateNumeric("mod_menu.showingModsLibraries", rootMods, rootLibs);
 		} else {
 			return TranslationUtil.translateNumeric("mod_menu.showingMods", rootMods);
@@ -388,7 +399,7 @@ public class ModsScreen extends Screen {
 
 	private Component computeLibraryCountText() {
 		if (ModMenu.getConfig().SHOW_LIBRARIES.get()) {
-			int[] rootLibs = formatModCount(ModMenu.ROOT_MODS.values().stream().filter(mod -> !mod.isHidden() && mod.getBadges().contains(Mod.Badge.LIBRARY)).map(Mod::getId).collect(Collectors.toSet()));
+			int[] rootLibs = formatModCount(ModMenu.ROOT_MODS.values().stream().filter(mod -> !mod.isHidden() && mod.getBadges().contains(ModBadge.LIBRARY)).map(Mod::getId).collect(Collectors.toSet()));
 			return TranslationUtil.translateNumeric("mod_menu.showingLibraries", rootLibs);
 		} else {
 			return Component.literal(null);

@@ -5,6 +5,7 @@ import com.google.common.collect.Sets;
 import com.terraformersmc.mod_menu.ModMenu;
 import com.terraformersmc.mod_menu.util.VersionUtil;
 import com.terraformersmc.mod_menu.util.mod.Mod;
+import com.terraformersmc.mod_menu.util.mod.ModBadge;
 import com.terraformersmc.mod_menu.util.mod.neoforge.NeoforgeIconHandler;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.client.resources.language.I18n;
@@ -28,6 +29,7 @@ public class JavaDummyMod implements Mod {
 	private static final String modid = "java";
 
 	protected final Map<String, String> links = new HashMap<>();
+	protected final Set<String> badgeNames = new HashSet<>();
 
 	protected boolean defaultIconWarning = true;
 
@@ -41,9 +43,9 @@ public class JavaDummyMod implements Mod {
 		Optional<String> parentId = Optional.empty();
 		Set<String> badgeNames = new HashSet<>();
 
-		this.modMenuData = new ModMenuData(badgeNames, parentId, null, modid);
+		this.modMenuData = new ModMenuData(parentId, null, modid);
 
-		modMenuData.getBadges().add(Badge.LIBRARY);
+		modMenuData.getBadges().add(ModBadge.LIBRARY);
 	}
 
 
@@ -122,7 +124,7 @@ public class JavaDummyMod implements Mod {
 	}
 
 	@Override
-	public @NotNull Set<Badge> getBadges() {
+	public @NotNull Set<ModBadge> getBadges() {
 		return modMenuData.getBadges();
 	}
 
@@ -186,5 +188,11 @@ public class JavaDummyMod implements Mod {
 	}
 
 	@Override
-	public void reCalculateLibraries() {}
+	public void reCalculateBadge() {
+		Set<String> badgelist = ModMenu.getConfig().mod_badges.get(this.getId());
+		if (badgelist != null) {
+			badgelist.addAll(badgeNames);
+			this.modMenuData.getBadges().addAll(ModBadge.convert(badgelist, this.getId()));
+		}
+	}
 }
