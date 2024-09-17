@@ -209,6 +209,12 @@ public class ModListEntry extends ObjectSelectionList.Entry<ModListEntry> {
 	}
 
 	public Tuple<ResourceLocation, Dimension> getIconTexture() {
+		if (ModMenu.shouldResetCache) {
+			this.smallIconLocation = null;
+			this.iconLocation = null;
+			ModMenu.shouldResetCache = false;
+		}
+
 		if (this.iconLocation == null) {
 			this.iconLocation = new Tuple<>(ResourceLocation.fromNamespaceAndPath(ModMenu.MOD_ID, mod.getId() + "_icon"), new Dimension());
 			Tuple<DynamicTexture, Dimension> icon = mod.getIcon(list.getNeoforgeIconHandler(),

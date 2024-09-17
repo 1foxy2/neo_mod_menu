@@ -59,8 +59,12 @@ public class JavaDummyMod implements Mod {
 
 	@Override
 	public @NotNull Tuple<DynamicTexture, Dimension> getIcon(NeoforgeIconHandler iconHandler, int i, boolean isSmall) {
-
 		String iconSourceId = ModMenu.MOD_ID;
+
+		String iconResourceId = iconSourceId  + (isSmall ? "_small" : "");
+		if (NeoforgeIconHandler.modResourceIconCache.containsKey(iconResourceId))
+			return NeoforgeIconHandler.modResourceIconCache.get(iconResourceId);
+
 		String iconPath = "assets/" + ModMenu.MOD_ID + "/java_icon.png";
 
 		final String finalIconSourceId = iconSourceId;

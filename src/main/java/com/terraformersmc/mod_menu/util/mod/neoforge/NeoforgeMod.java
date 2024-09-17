@@ -153,6 +153,11 @@ public class NeoforgeMod implements Mod {
 	@Override
 	public @NotNull Tuple<DynamicTexture, Dimension> getIcon(NeoforgeIconHandler iconHandler, int i, boolean isSmall) {
 		String iconSourceId = getId();
+
+	    String iconResourceId = iconSourceId  + (isSmall ? "_small" : "");
+		if (NeoforgeIconHandler.modResourceIconCache.containsKey(iconResourceId))
+			return NeoforgeIconHandler.modResourceIconCache.get(iconResourceId);
+
 		String iconPath = modInfo.getLogoFile().orElse("assets/" + getId() + "/icon.png");
 
 		if (isSmall) iconPath = iconPath.replace(".png", "_small.png");

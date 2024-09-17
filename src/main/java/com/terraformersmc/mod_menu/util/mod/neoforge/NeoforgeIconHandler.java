@@ -4,7 +4,6 @@ import com.mojang.blaze3d.platform.NativeImage;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.util.Tuple;
 import net.neoforged.fml.ModContainer;
-import net.neoforged.fml.loading.FMLPaths;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,12 +20,11 @@ public class NeoforgeIconHandler implements Closeable {
 	private static final Logger LOGGER = LoggerFactory.getLogger("Mod Menu | NeoforgeIconHandler");
 
 	private final Map<Path, Tuple<DynamicTexture, Dimension>> modIconCache = new HashMap<>();
+	public static final Map<String, Tuple<DynamicTexture, Dimension>> modResourceIconCache = new HashMap<>();
 
 	public Tuple<DynamicTexture, Dimension> createIcon(ModContainer iconSource, String iconPath) {
 		try {
-			Path path = FMLPaths.GAMEDIR.get().resolve("modicons/" + iconSource.getModId() + (iconPath.endsWith("_small.png") ? "_small.png" : ".png"));
-			if (!path.toFile().exists())
-				path = iconSource.getModInfo().getOwningFile().getFile().findResource(iconPath);
+			Path path = iconSource.getModInfo().getOwningFile().getFile().findResource(iconPath);
 			Tuple<DynamicTexture, Dimension> cachedIcon = getCachedModIcon(path);
 			if (cachedIcon != null) {
 				return cachedIcon;

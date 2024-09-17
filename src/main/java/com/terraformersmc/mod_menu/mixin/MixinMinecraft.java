@@ -13,6 +13,6 @@ import java.util.concurrent.CompletableFuture;
 public class MixinMinecraft {
     @Inject(method = "reloadResourcePacks(ZLnet/minecraft/client/Minecraft$GameLoadCookie;)Ljava/util/concurrent/CompletableFuture;", at = @At("RETURN"))
     private void addBadges(boolean error, Minecraft.GameLoadCookie gameLoadCookie, CallbackInfoReturnable<CompletableFuture<Void>> cir) {
-        ModMenu.createBadges();
+        ModMenu.createBadgesAndIcons();
     }
 }
