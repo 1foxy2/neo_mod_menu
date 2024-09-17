@@ -3,6 +3,7 @@ package com.terraformersmc.mod_menu.config;
 import com.google.gson.annotations.SerializedName;
 import com.terraformersmc.mod_menu.ModMenu;
 import com.terraformersmc.mod_menu.util.mod.Mod;
+import com.terraformersmc.mod_menu.util.mod.neoforge.NeoforgeDummyParentMod;
 import net.neoforged.neoforge.common.ModConfigSpec;
 
 import java.util.*;
@@ -40,6 +41,7 @@ public class ModMenuConfig {
     public final ModConfigSpec.ConfigValue<List<? extends String>> HIDDEN_CONFIGS;
     public final ModConfigSpec.ConfigValue<List<? extends String>> LIBRARY_LIST;
     public final ModConfigSpec.ConfigValue<List<? extends String>> MOD_BADGES;
+    public final ModConfigSpec.ConfigValue<List<? extends String>> MOD_PARENTS;
   //  public static final ModConfigSpec.BooleanValue DISABLE_UPDATE_CHECKER;
 
     public final Map<String, Set<String>> mod_badges = new HashMap<>();
@@ -110,6 +112,8 @@ public class ModMenuConfig {
 
         MOD_BADGES = builder
                 .defineList("mod_badges", ArrayList::new, String::new, object -> object instanceof String);
+        MOD_PARENTS = builder
+                .defineList("mod_parents", ArrayList::new, String::new, object -> object instanceof String);
 
         //    UPDATE_CHECKER = builder
         //            .define("translate_descriptions", true);
@@ -132,6 +136,55 @@ public class ModMenuConfig {
             });
             this.LIBRARY_LIST.set(new ArrayList<>());
         }
+        Map<String, Mod> dummyParents = new HashMap<>();
+
+        // Initialize parent map
+        HashSet<String> modParentSet = new HashSet<>();
+        this.MOD_PARENTS.get().forEach(parentToMods -> {
+            if (parentToMods.isEmpty())
+                return;
+
+            String[] parentToMod = parentToMods.split("=");
+            List<String> modIds = Arrays.stream(parentToMod[1].split(", ")).toList();
+            for (String id : modIds) {
+                Mod mod = ModMenu.MODS.get(id);
+
+                if (mod == null)
+                    continue;
+
+                String parentId = parentToMod[0];
+
+                Mod parent;
+                modParentSet.clear();
+                while (true) {
+                    parent = ModMenu.MODS.getOrDefault(parentId, dummyParents.get(parentId));
+                    if (parent == null) {
+                        parent = new NeoforgeDummyParentMod(mod, parentId);
+                        dummyParents.put(parentId, parent);
+                    }
+
+                    parentId = parent != null ? parent.getParent() : null;
+                    if (parentId == null) {
+                        // It will most likely end here in the first iteration
+                        break;
+                    }
+
+                    if (modParentSet.contains(parentId)) {
+                        ModMenu.LOGGER.warn("Mods contain each other as parents: {}", modParentSet);
+                        parent = null;
+                        break;
+                    }
+                    modParentSet.add(parentId);
+                }
+
+                if (parent == null) {
+                    continue;
+                }
+                ModMenu.ROOT_MODS.remove(mod.getId(), mod);
+                ModMenu.PARENT_MAP.put(parent, mod);
+            }
+        });
+        ModMenu.MODS.putAll(dummyParents);
     }
 
     public void save() {

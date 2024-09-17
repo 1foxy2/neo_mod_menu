@@ -140,6 +140,8 @@
   "mod_menu.configuration.count_libraries": "Libraries",
   "mod_menu.configuration.count_libraries.true": "Counted",
   "mod_menu.configuration.count_libraries.false": "Not Counted",
+  "mod_menu.configuration.mod_parents": "Mod's parents",
+  "mod_menu.configuration.mod_parents.tooltip": "needs restart",
   "mod_menu.configuration.count_hidden_mods": "Hidden Mods",
   "mod_menu.configuration.count_hidden_mods.true": "Counted",
   "mod_menu.configuration.count_hidden_mods.false": "Not Counted",

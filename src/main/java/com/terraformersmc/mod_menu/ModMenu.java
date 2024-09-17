@@ -129,9 +129,7 @@ public class ModMenu {
 			while (true) {
 				parent = MODS.getOrDefault(parentId, dummyParents.get(parentId));
 				if (parent == null) {
-					if (mod instanceof NeoforgeMod || mod instanceof FabricMod) {
-						parent = new NeoforgeDummyParentMod(mod, parentId);
-					}
+					parent = new NeoforgeDummyParentMod(mod, parentId);
 					dummyParents.put(parentId, parent);
 				}
 
