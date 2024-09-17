@@ -18,8 +18,8 @@ public class NeoforgeDummyParentMod implements Mod {
 	private final String id;
 	private final Mod host;
 	private boolean childHasUpdate;
-	private final Set<String> badgeNames = new HashSet<>();
-	private final Set<ModBadge> badges = new HashSet<>();
+	private final Set<String> badgeNames = new LinkedHashSet<>();
+	private final Set<ModBadge> badges = new LinkedHashSet<>();
 
 	public NeoforgeDummyParentMod(Mod host, String id) {
 		this.host = host;

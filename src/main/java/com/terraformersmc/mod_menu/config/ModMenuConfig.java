@@ -122,12 +122,12 @@ public class ModMenuConfig {
         this.MOD_BADGES.get().forEach(badge -> {
             String[] badgeKeyValue = badge.split("=");
             if (badgeKeyValue.length != 1)
-                this.mod_badges.put(badgeKeyValue[0], new HashSet<>(Arrays.stream(badgeKeyValue[1].split(", ")).toList()));
-            else this.mod_badges.put(badgeKeyValue[0], new HashSet<>());
+                this.mod_badges.put(badgeKeyValue[0], new LinkedHashSet<>(Arrays.stream(badgeKeyValue[1].split(", ")).toList()));
+            else this.mod_badges.put(badgeKeyValue[0], new LinkedHashSet<>());
         });
         if (!this.LIBRARY_LIST.get().isEmpty()) {
             this.LIBRARY_LIST.get().forEach(string -> {
-                this.mod_badges.putIfAbsent(string, new HashSet<>());
+                this.mod_badges.putIfAbsent(string, new LinkedHashSet<>());
                 this.mod_badges.get(string).add("library");
             });
             this.LIBRARY_LIST.set(new ArrayList<>());

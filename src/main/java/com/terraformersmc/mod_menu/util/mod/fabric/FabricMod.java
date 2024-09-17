@@ -35,7 +35,7 @@ public class FabricMod implements Mod {
 	protected final ModMenuData modMenuData;
 
 	protected final Set<ModBadge> badges;
-	protected final Set<String> badgeNames = new HashSet<>();
+	protected final Set<String> badgeNames = new LinkedHashSet<>();
 
 	protected final Map<String, String> links = new HashMap<>();
 
@@ -104,6 +104,7 @@ public class FabricMod implements Mod {
 
 		/* Add additional badges */
 		this.badges = modMenuData.getBadges();
+
 		if (this.metadata.getEnvironment() == ModEnvironment.CLIENT) {
 			badgeNames.add("client");
 		}

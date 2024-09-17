@@ -29,7 +29,7 @@ public class JavaDummyMod implements Mod {
 	private static final String modid = "java";
 
 	protected final Map<String, String> links = new HashMap<>();
-	protected final Set<String> badgeNames = new HashSet<>();
+	protected final Set<String> badgeNames = new LinkedHashSet<>();
 
 	protected boolean defaultIconWarning = true;
 

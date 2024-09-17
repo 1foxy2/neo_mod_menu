@@ -30,7 +30,7 @@ public class NeoforgeMod implements Mod {
 	protected final ModMenuData modMenuData;
 
 	protected final Set<ModBadge> badges;
-	protected final Set<String> badgeNames = new HashSet<>();
+	protected final Set<String> badgeNames = new LinkedHashSet<>();
 
 	protected final Map<String, String> links = new HashMap<>();
 
@@ -65,9 +65,9 @@ public class NeoforgeMod implements Mod {
 
 			Optional<Map<String, Object>> parentValues = ownFile.flatMap(mfi -> mfi.getConfigElement("modproperties", "modmenu_parent"));
 			if (parentValues.isPresent() && !parentValues.get().isEmpty()) {
-				Set<String> parentBadges = new HashSet<>();
+				Set<String> parentBadges = new LinkedHashSet<>();
 
-				if (modMenuMap.get("badges") instanceof ArrayList<?> list)
+				if (parentValues.get().get("badges") instanceof ArrayList<?> list)
 					parentBadges.addAll((List<String>) list);
 
 				try {

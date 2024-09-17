@@ -112,7 +112,7 @@ public interface Mod {
 	void reCalculateBadge();
 
 	static class ModMenuData {
-		private final Set<ModBadge> badges = new HashSet<>();
+		private final Set<ModBadge> badges = new LinkedHashSet<>();
 		private Optional<String> parent;
 		private @Nullable
 		final DummyParentData dummyParentData;
