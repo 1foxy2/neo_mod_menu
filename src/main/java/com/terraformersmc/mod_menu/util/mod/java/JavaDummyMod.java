@@ -41,11 +41,9 @@ public class JavaDummyMod implements Mod {
 		allowsUpdateChecks = false;
 
 		Optional<String> parentId = Optional.empty();
-		Set<String> badgeNames = new HashSet<>();
+		badgeNames.add("library");
 
 		this.modMenuData = new ModMenuData(parentId, null, modid);
-
-		modMenuData.getBadges().add(ModBadge.LIBRARY);
 	}
 
 
@@ -189,9 +187,11 @@ public class JavaDummyMod implements Mod {
 
 	@Override
 	public void reCalculateBadge() {
+		if (!ModMenu.getConfig().mod_badges.containsKey(getId())) {
+			ModMenu.getConfig().mod_badges.put(getId(), badgeNames);
+		}
 		Set<String> badgelist = ModMenu.getConfig().mod_badges.get(this.getId());
 		if (badgelist != null) {
-			badgelist.addAll(badgeNames);
 			this.modMenuData.getBadges().addAll(ModBadge.convert(badgelist, this.getId()));
 		}
 	}

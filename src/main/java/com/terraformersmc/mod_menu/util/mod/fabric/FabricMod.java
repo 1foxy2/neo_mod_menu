@@ -92,27 +92,23 @@ public class FabricMod implements Mod {
 		}
 		this.modMenuData = new ModMenuData(parentId, parentData, id);
 
-		/* Hardcode parents and badges for Fabric API & Fabric Loader */
-		if (id.startsWith("fabric") && (id.equals("fabricloader") || metadata.getProvides()
-			.contains("fabricloader") || id.equals("fabric") || id.equals("fabric_api") || metadata.getProvides()
-			.contains("fabric") || metadata.getProvides()
-			.contains("fabric_api") || id.equals("fabric_language_kotlin"))) {
-			modMenuData.getBadges().add(ModBadge.LIBRARY);
+		/* Hardcode parents and badges for Kotlin */
+		if (getId().equals("fabric_language_kotlin")) {
+			badgeNames.add("library");
 		}
 
-		/* Hardcode parents and badges for Kotlin */
-		if (id.startsWith("org_jetbrains_kotlin")) {
+		if (getId().startsWith("org_jetbrains_kotlin")) {
 			modMenuData.fillParentIfEmpty("fabric_language_kotlin");
-			modMenuData.getBadges().add(ModBadge.LIBRARY);
+			badgeNames.add("library");
 		}
 
 		/* Add additional badges */
 		this.badges = modMenuData.getBadges();
 		if (this.metadata.getEnvironment() == ModEnvironment.CLIENT) {
-			badges.add(ModBadge.DEFAULT_BADGES.get("client"));
+			badgeNames.add("client");
 		}
 
-		badges.add(ModBadge.DEFAULT_BADGES.get("sinytra_fabric"));
+		badgeNames.add("sinytra_fabric");
 	}
 
 	public Optional<net.neoforged.fml.ModContainer> getContainer() {
@@ -274,10 +270,11 @@ public class FabricMod implements Mod {
 
 	@Override
 	public void reCalculateBadge() {
-		Set<String> badgelist = ModMenu.getConfig().mod_badges.get(this.getId());
-		if (badgelist != null) {
-			badgelist.addAll(badgeNames);
-			this.modMenuData.getBadges().addAll(ModBadge.convert(badgelist, this.getId()));
+		if (!ModMenu.getConfig().mod_badges.containsKey(getId())) {
+			ModMenu.getConfig().mod_badges.put(getId(), badgeNames);
 		}
+
+		Set<String> badgelist = ModMenu.getConfig().mod_badges.get(this.getId());
+		this.modMenuData.getBadges().addAll(ModBadge.convert(badgelist, this.getId()));
 	}
 }

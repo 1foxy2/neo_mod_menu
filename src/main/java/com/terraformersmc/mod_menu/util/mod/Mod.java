@@ -117,7 +117,6 @@ public interface Mod {
 		private @Nullable
 		final DummyParentData dummyParentData;
 
-		//TODO: remove badges set from constructor
 		public ModMenuData(Optional<String> parent, DummyParentData dummyParentData, String id) {
 			this.parent = parent;
 			this.dummyParentData = dummyParentData;
@@ -133,12 +132,6 @@ public interface Mod {
 
 		public @Nullable DummyParentData getDummyParentData() {
 			return dummyParentData;
-		}
-
-		public void addLibraryBadge(boolean add) {
-			if (add) {
-				badges.add(ModBadge.LIBRARY);
-			}
 		}
 
 		public void fillParentIfEmpty(String parent) {

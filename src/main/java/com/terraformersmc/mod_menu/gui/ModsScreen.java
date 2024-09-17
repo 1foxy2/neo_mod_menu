@@ -66,7 +66,7 @@ public class ModsScreen extends Screen {
 	private boolean keepFilterOptionsShown = false;
 	private boolean init = false;
 	private boolean filterOptionsShown = false;
-	public static final int RIGHT_PANE_Y = 48;
+	protected static final int RIGHT_PANE_Y = 48;
 	private int paneWidth;
 	private int rightPaneX;
 	private int searchBoxX;

@@ -122,10 +122,7 @@ public class ModMenu {
 			while (true) {
 				parent = MODS.getOrDefault(parentId, dummyParents.get(parentId));
 				if (parent == null) {
-					if (mod instanceof NeoforgeMod) {
-						parent = new NeoforgeDummyParentMod(mod, parentId);
-					}
-					if (mod instanceof FabricMod) {
+					if (mod instanceof NeoforgeMod || mod instanceof FabricMod) {
 						parent = new NeoforgeDummyParentMod(mod, parentId);
 					}
 					dummyParents.put(parentId, parent);
@@ -245,7 +242,6 @@ public class ModMenu {
 		Set<Mod> allMods = new HashSet<>();
 		allMods.addAll(ROOT_MODS.values());
 		allMods.addAll(MODS.values());
-		allMods.forEach(mod -> LOGGER.warn(mod.getId()));
 		allMods.forEach(Mod::reCalculateBadge);
 	}
 }

@@ -123,6 +123,7 @@ public class ModMenuConfig {
             String[] badgeKeyValue = badge.split("=");
             if (badgeKeyValue.length != 1)
                 this.mod_badges.put(badgeKeyValue[0], new HashSet<>(Arrays.stream(badgeKeyValue[1].split(", ")).toList()));
+            else this.mod_badges.put(badgeKeyValue[0], new HashSet<>());
         });
         if (!this.LIBRARY_LIST.get().isEmpty()) {
             this.LIBRARY_LIST.get().forEach(string -> {
