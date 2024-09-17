@@ -51,6 +51,11 @@ public class NeoforgeDummyParentMod implements Mod {
 	@Override
 	public @NotNull Tuple<DynamicTexture, Dimension> getIcon(NeoforgeIconHandler iconHandler, int i, boolean isSmall) {
 		String iconSourceId = host.getId();
+
+		String iconResourceId = id  + (isSmall ? "_small" : "");
+		if (NeoforgeIconHandler.modResourceIconCache.containsKey(iconResourceId))
+			return NeoforgeIconHandler.modResourceIconCache.get(iconResourceId);
+
 		NeoforgeMod.ModMenuData.DummyParentData parentData = host.getModMenuData().getDummyParentData();
 		String iconPath = null;
 		if (parentData != null) {
