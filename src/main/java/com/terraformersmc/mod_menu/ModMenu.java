@@ -226,6 +226,7 @@ public class ModMenu {
 
 	public static void createBadgesAndIcons() {
 		ModBadge.CUSTOM_BADGES.clear();
+		NeoforgeIconHandler.modResourceIconCache.clear();
 		Stream<PackResources> resourcePacks = Minecraft.getInstance().getResourceManager().listPacks();
 		resourcePacks.forEach(packResources -> {
 			packResources.listResources(PackType.CLIENT_RESOURCES, MOD_ID, "badge", (key, value) -> {
