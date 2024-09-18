@@ -135,56 +135,56 @@ public class ModMenuConfig {
                 this.mod_badges.get(string).add("library");
             });
             this.LIBRARY_LIST.set(new ArrayList<>());
-            Map<String, Mod> dummyParents = new HashMap<>();
-
-            // Initialize parent map
-            HashSet<String> modParentSet = new HashSet<>();
-            this.MOD_PARENTS.get().forEach(parentToMods -> {
-                if (parentToMods.isEmpty())
-                    return;
-
-                String[] parentToMod = parentToMods.split("=");
-                List<String> modIds = Arrays.stream(parentToMod[1].split(", ")).toList();
-                for (String id : modIds) {
-                    Mod mod = ModMenu.MODS.get(id);
-
-                    if (mod == null)
-                        continue;
-
-                    String parentId = parentToMod[0];
-
-                    Mod parent;
-                    modParentSet.clear();
-                    while (true) {
-                        parent = ModMenu.MODS.getOrDefault(parentId, dummyParents.get(parentId));
-                        if (parent == null) {
-                            parent = new NeoforgeDummyParentMod(mod, parentId);
-                            dummyParents.put(parentId, parent);
-                        }
-
-                        parentId = parent != null ? parent.getParent() : null;
-                        if (parentId == null) {
-                            // It will most likely end here in the first iteration
-                            break;
-                        }
-
-                        if (modParentSet.contains(parentId)) {
-                            ModMenu.LOGGER.warn("Mods contain each other as parents: {}", modParentSet);
-                            parent = null;
-                            break;
-                        }
-                        modParentSet.add(parentId);
-                    }
-
-                    if (parent == null) {
-                        continue;
-                    }
-                    ModMenu.ROOT_MODS.remove(mod.getId(), mod);
-                    ModMenu.PARENT_MAP.put(parent, mod);
-                }
-            });
-            ModMenu.MODS.putAll(dummyParents);
         }
+        Map<String, Mod> dummyParents = new HashMap<>();
+
+        // Initialize parent map
+        HashSet<String> modParentSet = new HashSet<>();
+        this.MOD_PARENTS.get().forEach(parentToMods -> {
+            if (parentToMods.isEmpty())
+                return;
+
+            String[] parentToMod = parentToMods.split("=");
+            List<String> modIds = Arrays.stream(parentToMod[1].split(", ")).toList();
+            for (String id : modIds) {
+                Mod mod = ModMenu.MODS.get(id);
+
+                if (mod == null)
+                    continue;
+
+                String parentId = parentToMod[0];
+
+                Mod parent;
+                modParentSet.clear();
+                while (true) {
+                    parent = ModMenu.MODS.getOrDefault(parentId, dummyParents.get(parentId));
+                    if (parent == null) {
+                        parent = new NeoforgeDummyParentMod(mod, parentId);
+                        dummyParents.put(parentId, parent);
+                    }
+
+                    parentId = parent != null ? parent.getParent() : null;
+                    if (parentId == null) {
+                        // It will most likely end here in the first iteration
+                        break;
+                    }
+
+                    if (modParentSet.contains(parentId)) {
+                        ModMenu.LOGGER.warn("Mods contain each other as parents: {}", modParentSet);
+                        parent = null;
+                        break;
+                    }
+                    modParentSet.add(parentId);
+                }
+
+                if (parent == null) {
+                    continue;
+                }
+                ModMenu.ROOT_MODS.remove(mod.getId(), mod);
+                ModMenu.PARENT_MAP.put(parent, mod);
+            }
+        });
+        ModMenu.MODS.putAll(dummyParents);
     }
 
     public void save() {
@@ -204,7 +204,6 @@ public class ModMenuConfig {
         this.MOD_BADGES.set(list);
         ModMenu.CONFIG.getRight().save();
     }
-
 
     public enum Sorting {
         ASCENDING(Comparator.comparing(mod -> mod.getTranslatedName()

@@ -92,13 +92,13 @@ public class FabricMod implements Mod {
 		}
 		this.modMenuData = new ModMenuData(parentId, parentData, id);
 
-		/* Hardcode parents and badges for Fabric API & Fabric Loader */
-		if (id.equals("fabric_language_kotlin")) {
+		/* Hardcode parents and badges for Kotlin */
+		if (getId().equals("fabric_language_kotlin")) {
 			badgeNames.add("library");
 		}
 
 		/* Hardcode parents and badges for Kotlin */
-		if (id.startsWith("org_jetbrains_kotlin")) {
+		if (getId().startsWith("org_jetbrains_kotlin")) {
 			modMenuData.fillParentIfEmpty("fabric_language_kotlin");
 			badgeNames.add("library");
 		}
@@ -282,6 +282,5 @@ public class FabricMod implements Mod {
 
 		Set<String> badgelist = ModMenu.getConfig().mod_badges.get(this.getId());
 		this.modMenuData.getBadges().addAll(ModBadge.convert(badgelist, this.getId()));
-
 	}
 }
