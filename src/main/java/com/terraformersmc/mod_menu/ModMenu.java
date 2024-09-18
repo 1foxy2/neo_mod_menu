@@ -2,6 +2,7 @@ package com.terraformersmc.mod_menu;
 
 import com.google.common.collect.LinkedListMultimap;
 import com.google.gson.*;
+import com.mojang.blaze3d.platform.NativeImage;
 import com.terraformersmc.mod_menu.config.ModMenuConfig;
 import com.terraformersmc.mod_menu.gui.ModsScreen;
 import com.terraformersmc.mod_menu.util.EnumToLowerCaseJsonConverter;
@@ -11,15 +12,19 @@ import com.terraformersmc.mod_menu.util.mod.ModBadge;
 import com.terraformersmc.mod_menu.util.mod.fabric.FabricMod;
 import com.terraformersmc.mod_menu.util.mod.java.JavaDummyMod;
 import com.terraformersmc.mod_menu.util.mod.neoforge.NeoforgeDummyParentMod;
+import com.terraformersmc.mod_menu.util.mod.neoforge.NeoforgeIconHandler;
 import com.terraformersmc.mod_menu.util.mod.neoforge.NeoforgeMod;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.OptionsScreen;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.server.packs.PackResources;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.util.GsonHelper;
+import net.minecraft.util.Tuple;
 import net.minecraftforge.client.ConfigScreenHandler;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -38,6 +43,7 @@ import java.io.InputStreamReader;
 import java.text.NumberFormat;
 import java.util.*;
 import java.util.function.BiFunction;
+import java.util.stream.Stream;
 
 @net.minecraftforge.fml.common.Mod(ModMenu.MOD_ID)
 public class ModMenu {
@@ -46,6 +52,7 @@ public class ModMenu {
 	public static final Gson GSON;
 	public static final Gson GSON_MINIFIED;
 	public static final Pair<ModMenuConfig, ForgeConfigSpec> CONFIG;
+	public static boolean shouldResetCache = false;
 
 	static {
 		GsonBuilder builder = new GsonBuilder().registerTypeHierarchyAdapter(Enum.class,
@@ -124,12 +131,7 @@ public class ModMenu {
 			while (true) {
 				parent = MODS.getOrDefault(parentId, dummyParents.get(parentId));
 				if (parent == null) {
-					if (mod instanceof NeoforgeMod) {
-						parent = new NeoforgeDummyParentMod(mod, parentId);
-					}
-					if (mod instanceof FabricMod) {
-						parent = new NeoforgeDummyParentMod(mod, parentId);
-					}
+					parent = new NeoforgeDummyParentMod(mod, parentId);
 					dummyParents.put(parentId, parent);
 				}
 
@@ -164,7 +166,7 @@ public class ModMenu {
 		ModList.get().getMods().forEach(info -> ConfigScreenHandler.getScreenFactoryFor(info).ifPresent(
 				factory -> configScreenFactories.put(info.getModId(), factory)));
 		getConfig().onLoad();
-		createBadges();
+		createBadgesAndIcons();
 		addBadges();
 	}
 
@@ -224,23 +226,39 @@ public class ModMenu {
 		return CONFIG.getLeft();
 	}
 
-	public static void createBadges() {
+	public static void createBadgesAndIcons() {
 		ModBadge.CUSTOM_BADGES.clear();
-		Minecraft.getInstance().getResourceManager().listPacks().forEach(packResources ->
-				packResources.listResources(PackType.CLIENT_RESOURCES, MOD_ID, "badge", (key, value) -> {
-					try {
-						JsonObject jsonObject = GsonHelper.parse(new InputStreamReader(value.get()));
-						JsonArray fillColor = jsonObject.getAsJsonArray("fill_color");
-						JsonArray outlineColor = jsonObject.getAsJsonArray("outline_color");
-						String id = key.getPath().replace("badge/", "").replace(".json", "");
-						ModBadge badge = new ModBadge(jsonObject.get("name").getAsString(),
-								new Color(outlineColor.get(0).getAsInt(), outlineColor.get(1).getAsInt(), outlineColor.get(2).getAsInt()).getRGB(),
-								new Color(fillColor.get(0).getAsInt(), fillColor.get(1).getAsInt(), fillColor.get(2).getAsInt()).getRGB());
+		NeoforgeIconHandler.modResourceIconCache.clear();
+		Stream<PackResources> resourcePacks = Minecraft.getInstance().getResourceManager().listPacks();
+		resourcePacks.forEach(packResources -> {
+			packResources.listResources(PackType.CLIENT_RESOURCES, MOD_ID, "badge", (key, value) -> {
+				try {
+					JsonObject jsonObject = GsonHelper.parse(new InputStreamReader(value.get()));
+					JsonArray fillColor = jsonObject.getAsJsonArray("fill_color");
+					JsonArray outlineColor = jsonObject.getAsJsonArray("outline_color");
+					String id = key.getPath().replace("badge/", "").replace(".json", "");
+					ModBadge badge = new ModBadge(jsonObject.get("name").getAsString(),
+							new Color(outlineColor.get(0).getAsInt(), outlineColor.get(1).getAsInt(), outlineColor.get(2).getAsInt()).getRGB(),
+							new Color(fillColor.get(0).getAsInt(), fillColor.get(1).getAsInt(), fillColor.get(2).getAsInt()).getRGB());
 
-						ModBadge.CUSTOM_BADGES.put(id, badge);
-					} catch (Exception e) {
-						LOGGER.warn("incorrect badge json from {} {}", key, e.getMessage());
-					}}));
+					ModBadge.CUSTOM_BADGES.put(id, badge);
+				} catch (Exception e) {
+					LOGGER.warn("incorrect badge json from {} {}", key, e.getMessage());
+				}
+			});
+			packResources.listResources(PackType.CLIENT_RESOURCES, MOD_ID, "modicon", (key, value) -> {
+				try {
+					NativeImage image = NativeImage.read(value.get());
+					Tuple<DynamicTexture, Dimension> tex = new Tuple<>(new DynamicTexture(image),
+							new Dimension(image.getWidth(), image.getHeight()));
+					String id = key.getPath().replace("modicon/", "").replace(".png", "");
+					NeoforgeIconHandler.modResourceIconCache.put(id, tex);
+				} catch (Exception e) {
+					LOGGER.warn(e.getMessage());
+				}
+			});
+		});
+		ModMenu.shouldResetCache = true;
 	}
 
 	public static void addBadges() {

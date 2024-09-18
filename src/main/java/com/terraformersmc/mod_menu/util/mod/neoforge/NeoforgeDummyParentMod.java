@@ -18,11 +18,17 @@ public class NeoforgeDummyParentMod implements Mod {
 	private final String id;
 	private final Mod host;
 	private boolean childHasUpdate;
-	protected boolean wasInLibraries = false;
+	private final Set<String> badgeNames = new LinkedHashSet<>();
+	private final Set<ModBadge> badges = new LinkedHashSet<>();
 
 	public NeoforgeDummyParentMod(Mod host, String id) {
 		this.host = host;
 		this.id = id;
+
+		NeoforgeMod.ModMenuData.DummyParentData parentData = host.getModMenuData().getDummyParentData();
+		if (parentData != null) {
+			badgeNames.addAll(parentData.getBadges());
+		}
 	}
 
 	@Override
@@ -45,6 +51,11 @@ public class NeoforgeDummyParentMod implements Mod {
 	@Override
 	public @NotNull Tuple<DynamicTexture, Dimension> getIcon(NeoforgeIconHandler iconHandler, int i, boolean isSmall) {
 		String iconSourceId = host.getId();
+
+		String iconResourceId = id  + (isSmall ? "_small" : "");
+		if (NeoforgeIconHandler.modResourceIconCache.containsKey(iconResourceId))
+			return NeoforgeIconHandler.modResourceIconCache.get(iconResourceId);
+
 		NeoforgeMod.ModMenuData.DummyParentData parentData = host.getModMenuData().getDummyParentData();
 		String iconPath = null;
 		if (parentData != null) {
@@ -107,25 +118,6 @@ public class NeoforgeDummyParentMod implements Mod {
 
 	@Override
 	public @NotNull Set<ModBadge> getBadges() {
-		NeoforgeMod.ModMenuData.DummyParentData parentData = host.getModMenuData().getDummyParentData();
-		if (parentData != null) {
-			return parentData.getBadges();
-		}
-		var badges = new HashSet<ModBadge>();
-		if (id.equals("fabric-api")) {
-			badges.add(ModBadge.LIBRARY);
-		}
-
-		boolean modpackChildren = true;
-		for (Mod mod : ModMenu.PARENT_MAP.get(this)) {
-			if (!mod.getBadges().contains(ModBadge.DEFAULT_BADGES.get("modpack"))) {
-				modpackChildren = false;
-			}
-		}
-		if (modpackChildren) {
-			badges.add(ModBadge.DEFAULT_BADGES.get("modpack"));
-		}
-
 		return badges;
 	}
 
@@ -191,9 +183,14 @@ public class NeoforgeDummyParentMod implements Mod {
 
 	@Override
 	public void reCalculateBadge() {
-		Set<String> badgelist = ModMenu.getConfig().mod_badges.get(this.getId());
-		if (badgelist != null) {
-			this.getModMenuData().getBadges().addAll(ModBadge.convert(badgelist, this.getId()));
+		if (!ModMenu.getConfig().mod_badges.containsKey(getId())) {
+			if (id.equals("fabric-api")) {
+				badgeNames.add("library");
+			}
+			ModMenu.getConfig().mod_badges.put(getId(), badgeNames);
 		}
+		Set<String> badgelist = ModMenu.getConfig().mod_badges.get(this.getId());
+
+		this.badges.addAll(ModBadge.convert(badgelist, this.getId()));
 	}
 }

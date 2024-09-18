@@ -112,7 +112,7 @@ public interface Mod {
 	void reCalculateBadge();
 
 	static class ModMenuData {
-		private final Set<ModBadge> badges = new HashSet<>();
+		private final Set<ModBadge> badges = new LinkedHashSet<>();
 		private Optional<String> parent;
 		private @Nullable
 		final DummyParentData dummyParentData;
@@ -145,7 +145,7 @@ public interface Mod {
 			private final Optional<String> name;
 			private final Optional<String> description;
 			private final Optional<String> icon;
-			private final Set<ModBadge> badges;
+			private final Set<String> badges;
 
 			public DummyParentData(
 					String id,
@@ -158,7 +158,7 @@ public interface Mod {
 				this.name = name;
 				this.description = description;
 				this.icon = icon;
-				this.badges = ModBadge.convert(badges, id);
+				this.badges = badges;
 			}
 
 			public String getId() {
@@ -177,7 +177,7 @@ public interface Mod {
 				return icon;
 			}
 
-			public Set<ModBadge> getBadges() {
+			public Set<String> getBadges() {
 				return badges;
 			}
 		}

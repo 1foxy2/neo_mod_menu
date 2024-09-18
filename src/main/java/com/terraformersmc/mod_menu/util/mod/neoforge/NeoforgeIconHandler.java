@@ -21,12 +21,11 @@ public class NeoforgeIconHandler implements Closeable {
 	private static final Logger LOGGER = LoggerFactory.getLogger("Mod Menu | NeoforgeIconHandler");
 
 	private final Map<Path, Tuple<DynamicTexture, Dimension>> modIconCache = new HashMap<>();
+	public static final Map<String, Tuple<DynamicTexture, Dimension>> modResourceIconCache = new HashMap<>();
 
 	public Tuple<DynamicTexture, Dimension> createIcon(ModContainer iconSource, String iconPath) {
 		try {
-			Path path = FMLPaths.GAMEDIR.get().resolve("modicons/" + iconSource.getModId() + (iconPath.endsWith("_small.png") ? "_small.png" : ".png"));
-			if (!path.toFile().exists())
-				path = iconSource.getModInfo().getOwningFile().getFile().findResource(iconPath);
+			Path path = iconSource.getModInfo().getOwningFile().getFile().findResource(iconPath);
 			Tuple<DynamicTexture, Dimension> cachedIcon = getCachedModIcon(path);
 			if (cachedIcon != null) {
 				return cachedIcon;

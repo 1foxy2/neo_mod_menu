@@ -12,7 +12,6 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.HashSet;
 import java.util.Map;
 
 public class BadgeScreen extends Screen {
@@ -45,14 +44,11 @@ public class BadgeScreen extends Screen {
             for (Map.Entry<String, ModBadge> badgeEntry : badgeMap.entrySet()) {
                 ModBadge badge = badgeEntry.getValue();
                 this.addRenderableWidget(BadgeToogleButton.badgeButtonBuilder(CommonComponents.EMPTY, button -> {
-                    ModMenu.LOGGER.warn(String.valueOf(ModMenu.getConfig().mod_badges));
                             if (mod.getBadges().contains(badge)) {
                                 mod.getBadges().remove(badge);
                                 ModMenu.getConfig().mod_badges.get(mod.getId()).remove(badgeEntry.getKey());
                             } else {
                                 mod.getBadges().add(badge);
-                                if (!ModMenu.getConfig().mod_badges.containsKey(mod.getId()))
-                                    ModMenu.getConfig().mod_badges.put(mod.getId(), new HashSet<>());
                                 ModMenu.getConfig().mod_badges.get(mod.getId()).add(badgeEntry.getKey());
                             }
                             ((BadgeToogleButton) button).toggle();

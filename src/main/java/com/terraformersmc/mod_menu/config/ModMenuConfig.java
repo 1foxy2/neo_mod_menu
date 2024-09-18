@@ -3,6 +3,7 @@ package com.terraformersmc.mod_menu.config;
 import com.google.gson.annotations.SerializedName;
 import com.terraformersmc.mod_menu.ModMenu;
 import com.terraformersmc.mod_menu.util.mod.Mod;
+import com.terraformersmc.mod_menu.util.mod.neoforge.NeoforgeDummyParentMod;
 import net.minecraftforge.common.ForgeConfigSpec;
 
 import java.util.*;
@@ -40,6 +41,7 @@ public class ModMenuConfig {
     public final ForgeConfigSpec.ConfigValue<List<? extends String>> HIDDEN_CONFIGS;
     public final ForgeConfigSpec.ConfigValue<List<? extends String>> LIBRARY_LIST;
     public final ForgeConfigSpec.ConfigValue<List<? extends String>> MOD_BADGES;
+    public final ForgeConfigSpec.ConfigValue<List<? extends String>> MOD_PARENTS;
   //  public static final ForgeConfigSpec.BooleanValue DISABLE_UPDATE_CHECKER;
 
     public final Map<String, Set<String>> mod_badges = new HashMap<>();
@@ -110,6 +112,8 @@ public class ModMenuConfig {
 
         MOD_BADGES = builder
                 .defineList("mod_badges", ArrayList::new, object -> object instanceof String);
+        MOD_PARENTS = builder
+                .defineList("mod_parents", ArrayList::new, object -> object instanceof String);
 
         //    UPDATE_CHECKER = builder
         //            .define("translate_descriptions", true);
@@ -122,14 +126,64 @@ public class ModMenuConfig {
         this.MOD_BADGES.get().forEach(badge -> {
             String[] badgeKeyValue = badge.split("=");
             if (badgeKeyValue.length != 1)
-                this.mod_badges.put(badgeKeyValue[0], new HashSet<>(Arrays.stream(badgeKeyValue[1].split(", ")).toList()));
+                this.mod_badges.put(badgeKeyValue[0], new LinkedHashSet<>(Arrays.stream(badgeKeyValue[1].split(", ")).toList()));
+            else this.mod_badges.put(badgeKeyValue[0], new LinkedHashSet<>());
         });
         if (!this.LIBRARY_LIST.get().isEmpty()) {
             this.LIBRARY_LIST.get().forEach(string -> {
-                this.mod_badges.putIfAbsent(string, new HashSet<>());
+                this.mod_badges.putIfAbsent(string, new LinkedHashSet<>());
                 this.mod_badges.get(string).add("library");
             });
             this.LIBRARY_LIST.set(new ArrayList<>());
+            Map<String, Mod> dummyParents = new HashMap<>();
+
+            // Initialize parent map
+            HashSet<String> modParentSet = new HashSet<>();
+            this.MOD_PARENTS.get().forEach(parentToMods -> {
+                if (parentToMods.isEmpty())
+                    return;
+
+                String[] parentToMod = parentToMods.split("=");
+                List<String> modIds = Arrays.stream(parentToMod[1].split(", ")).toList();
+                for (String id : modIds) {
+                    Mod mod = ModMenu.MODS.get(id);
+
+                    if (mod == null)
+                        continue;
+
+                    String parentId = parentToMod[0];
+
+                    Mod parent;
+                    modParentSet.clear();
+                    while (true) {
+                        parent = ModMenu.MODS.getOrDefault(parentId, dummyParents.get(parentId));
+                        if (parent == null) {
+                            parent = new NeoforgeDummyParentMod(mod, parentId);
+                            dummyParents.put(parentId, parent);
+                        }
+
+                        parentId = parent != null ? parent.getParent() : null;
+                        if (parentId == null) {
+                            // It will most likely end here in the first iteration
+                            break;
+                        }
+
+                        if (modParentSet.contains(parentId)) {
+                            ModMenu.LOGGER.warn("Mods contain each other as parents: {}", modParentSet);
+                            parent = null;
+                            break;
+                        }
+                        modParentSet.add(parentId);
+                    }
+
+                    if (parent == null) {
+                        continue;
+                    }
+                    ModMenu.ROOT_MODS.remove(mod.getId(), mod);
+                    ModMenu.PARENT_MAP.put(parent, mod);
+                }
+            });
+            ModMenu.MODS.putAll(dummyParents);
         }
     }
 

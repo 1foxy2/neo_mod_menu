@@ -28,9 +28,6 @@ public class ModBadge {
         this.outlineColor = outlineColor;
     }
 
-
-
-
     public Component getComponent() {
         return this.component;
     }
@@ -54,6 +51,6 @@ public class ModBadge {
 
             ModMenu.LOGGER.warn("Skipping unknown badge key '{}' specified by mod '{}'", key, modId);
             return null;
-        }).filter(Objects::nonNull).collect(Collectors.toSet());
+        }).filter(Objects::nonNull).collect(Collectors.toCollection(LinkedHashSet::new));
     }
 }
