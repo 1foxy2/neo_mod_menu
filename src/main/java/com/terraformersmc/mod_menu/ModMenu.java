@@ -104,13 +104,18 @@ public class ModMenu {
 		for (ModContainer modContainer : ModList.get().getSortedMods()) {
 			Mod mod;
 
-			if (HAS_SINYTRA && ModsScreen.isFabricMod(modContainer.getModInfo().getOwningFile().getFile().getFilePath())) {
-				mod = new FabricMod(modContainer.getModId());
-			} else {
-				mod = new NeoforgeMod(modContainer);
+			try {
+				if (HAS_SINYTRA && ModsScreen.isFabricMod(modContainer.getModInfo().getOwningFile().getFile().getFilePath())) {
+					mod = new FabricMod(modContainer.getModId());
+				} else {
+					mod = new NeoforgeMod(modContainer);
+				}
+
+				MODS.put(mod.getId(), mod);
+			} catch (UnsupportedOperationException e) {
+				LOGGER.warn(e.getMessage() + " from " + modContainer.getModId());
 			}
 
-			MODS.put(mod.getId(), mod);
 		}
 
 		Map<String, Mod> dummyParents = new HashMap<>();

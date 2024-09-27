@@ -192,6 +192,5 @@ public class NeoforgeDummyParentMod implements Mod {
 		Set<String> badgelist = ModMenu.getConfig().mod_badges.get(this.getId());
 
 		this.badges.addAll(ModBadge.convert(badgelist, this.getId()));
-
 	}
 }

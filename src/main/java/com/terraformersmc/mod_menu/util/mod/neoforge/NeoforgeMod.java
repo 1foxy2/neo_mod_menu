@@ -111,13 +111,13 @@ public class NeoforgeMod implements Mod {
 		this.modMenuData = new ModMenuData(parentId, parentData, id);
 
 		/* Hardcode parents and badges for Fabric API & kotlin api */
-		if (getId().startsWith("fabric")) {
+		if (id.startsWith("fabric")) {
 			modMenuData.fillParentIfEmpty("fabric-api");
 			badgeNames.add("library");
 		}
 
 		/* Hardcode parents and badges for connector-extras */
-		if (getId().startsWith("connectorextras") || getId().startsWith("modmenu")) {
+		if (id.startsWith("connectorextras") || id.startsWith("modmenu")) {
 			if (ModList.get().isLoaded("connector")) {
 				modMenuData.fillParentIfEmpty("connector");
 			}

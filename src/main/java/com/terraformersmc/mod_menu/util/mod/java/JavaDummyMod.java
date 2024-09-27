@@ -194,9 +194,8 @@ public class JavaDummyMod implements Mod {
 		if (!ModMenu.getConfig().mod_badges.containsKey(getId())) {
 			ModMenu.getConfig().mod_badges.put(getId(), badgeNames);
 		}
+
 		Set<String> badgelist = ModMenu.getConfig().mod_badges.get(this.getId());
-		if (badgelist != null) {
-			this.modMenuData.getBadges().addAll(ModBadge.convert(badgelist, this.getId()));
-		}
+		this.modMenuData.getBadges().addAll(ModBadge.convert(badgelist, this.getId()));
 	}
 }

@@ -38,7 +38,8 @@ public abstract class MixinBrandingControl {
                 }
                 I18n.get("menu.modded");
                 String[] neoForge = brandings.get(0).split(" ");
-                lineConsumer.accept(0, neoForge[0] + " " + neoForge[1] + I18n.get(replacementKey, count));
+                String second = neoForge.length == 1 ? "" : neoForge[1];
+                lineConsumer.accept(0, neoForge[0] + " " + second + I18n.get(replacementKey, count));
                 lineConsumer.accept(1, brandings.get(1));
             } else lineConsumer.accept(0, brandings.get(1));
             ci.cancel();

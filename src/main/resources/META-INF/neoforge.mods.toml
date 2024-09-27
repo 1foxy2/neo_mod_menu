@@ -94,21 +94,21 @@ sources="https://github.com/1foxy2/neo_mod_menu"
     type="required" #mandatory
     versionRange="${neo_version_range}" #mandatory
     ordering="NONE"
-    side="BOTH"
+    side="CLIENT"
 
 [[dependencies.${mod_id}]]
     modId="minecraft"
     type="required"
     versionRange="${minecraft_version_range}"
     ordering="NONE"
-    side="BOTH"
+    side="CLIENT"
 
 [[dependencies.${mod_id}]]
     modId="connector"
     type="optional"
     versionRange="[1,)"
     ordering="AFTER"
-    side="BOTH"
+    side="CLIENT"
 
 # Features are specific properties of the game environment, that you may want to declare you require. This example declares
 # that your mod requires GL version 3.2 or higher. Other features will be added. They are side aware so declaring this won't
