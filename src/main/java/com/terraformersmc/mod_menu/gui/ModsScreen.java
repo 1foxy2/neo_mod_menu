@@ -676,10 +676,10 @@ public class ModsScreen extends Screen {
 	public static boolean isFabricMod(Path mod) {
 		try (JarFile jarFile = new JarFile(mod.toFile())) {
 			return jarFile.getEntry("fabric.mod.json") != null;
-		} catch (IOException e) {
+		} catch (IOException | UnsupportedOperationException e) {
 			return false;
 		}
-	}
+    }
 
 	private static boolean isMod(Path mod) {
 		return isFabricMod(mod) || isNeoforgeMod(mod);
@@ -688,10 +688,10 @@ public class ModsScreen extends Screen {
 	private static boolean isNeoforgeMod(Path mod) {
 		try (JarFile jarFile = new JarFile(mod.toFile())) {
 			return jarFile.getEntry("META-INF/neoforge.mods.toml") != null;
-		} catch (IOException e) {
+		} catch (IOException | UnsupportedOperationException e) {
 			return false;
 		}
-	}
+    }
 
 	public Map<String, Boolean> getModHasConfigScreen() {
 		return this.modHasConfigScreen;
