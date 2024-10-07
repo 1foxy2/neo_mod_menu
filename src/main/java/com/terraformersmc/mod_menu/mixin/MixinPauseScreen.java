@@ -44,7 +44,8 @@ public abstract class MixinPauseScreen extends Screen {
 				for (int i = 0; i < buttons.size(); i++) {
 					LayoutElement widget = buttons.get(i);
 
-					if (ModMenuEventHandler.buttonHasText(widget, "menu.returnToMenu"))
+					if (ModMenuEventHandler.buttonHasText(widget, "menu.returnToMenu")
+							|| ModMenuEventHandler.buttonHasText(widget, "menu.disconnect"))
 						hadExitButton = true;
 
 					if (hasModsButton)
