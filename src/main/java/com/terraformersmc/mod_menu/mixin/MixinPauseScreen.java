@@ -43,7 +43,8 @@ public abstract class MixinPauseScreen extends Screen {
 				for (int i = 0; i < buttons.size(); i++) {
 					LayoutElement widget = buttons.get(i);
 
-					if (ModMenuEventHandler.buttonHasText(widget, "menu.returnToMenu"))
+					if (ModMenuEventHandler.buttonHasText(widget, "menu.returnToMenu")
+							|| ModMenuEventHandler.buttonHasText(widget, "menu.disconnect"))
 						hadExitButton = true;
 
 					ModMenuEventHandler.shiftButtons(widget, hadExitButton, spacing + (hadExitButton ? 12 : -12));
@@ -114,8 +115,8 @@ public abstract class MixinPauseScreen extends Screen {
 						));
 					}
 				}
+				buttons.removeIf(button -> ModMenuEventHandler.buttonHasText(button, "fml.menu.mods"));
 			}
-			buttons.removeIf(button -> ModMenuEventHandler.buttonHasText(button, "fml.menu.mods"));
 		}
 	}
 }
