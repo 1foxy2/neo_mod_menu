@@ -61,13 +61,15 @@ public class FabricMod implements Mod {
 			CustomValue parentCv = modMenuObject.get("parent");
 			if (parentCv != null) {
 				if (parentCv.getType() == CustomValue.CvType.STRING) {
-					parentId = Optional.of(parentCv.getAsString());
+					parentId = Optional.of(parentCv.getAsString().replace("-", "_"));
 				} else if (parentCv.getType() == CustomValue.CvType.OBJECT) {
 					try {
 						CustomValue.CvObject parentObj = parentCv.getAsObject();
-						parentId = CustomValueUtil.getString("id", parentObj);
+						parentId = Optional.of(CustomValueUtil.getString("id", parentObj)
+								.orElseThrow(() -> new RuntimeException("Parent object lacks an id"))
+								.replace("-", "_"));
 						parentData = new ModMenuData.DummyParentData(
-							parentId.orElseThrow(() -> new RuntimeException("Parent object lacks an id")),
+							parentId.get(),
 							CustomValueUtil.getString("name", parentObj),
 							CustomValueUtil.getString("description", parentObj),
 							CustomValueUtil.getString("icon", parentObj),
