@@ -143,8 +143,7 @@ public class ModListEntry extends ObjectSelectionList.Entry<ModListEntry> {
 		}
 
 		if (!(this instanceof ParentEntry) && ModMenu.getConfig().QUICK_CONFIGURE.get() && (this.list.getParent()
-			.getModHasConfigScreen()
-			.get(modId) || this.list.getParent().modScreenErrors.containsKey(modId))) {
+				.getModHasConfigScreen(mod.getContainer()) || this.list.getParent().modScreenErrors.containsKey(modId))) {
 			final int textureSize = ModMenu.getConfig().COMPACT_LIST.get() ?
 				(int) (256 / (FULL_ICON_SIZE / (double) COMPACT_ICON_SIZE)) :
 				256;
@@ -186,9 +185,7 @@ public class ModListEntry extends ObjectSelectionList.Entry<ModListEntry> {
 	@Override
 	public boolean mouseClicked(double mouseX, double mouseY, int delta) {
 		list.select(this);
-		if (ModMenu.getConfig().QUICK_CONFIGURE.get() && this.list.getParent()
-			.getModHasConfigScreen()
-			.get(this.mod.getId())) {
+		if (ModMenu.getConfig().QUICK_CONFIGURE.get() && this.list.getParent().getModHasConfigScreen(this.mod.getContainer())) {
 			int iconSize = ModMenu.getConfig().COMPACT_LIST.get() ? COMPACT_ICON_SIZE : FULL_ICON_SIZE;
 			if (mouseX - list.getRowLeft() <= iconSize) {
 				this.openConfig();
@@ -201,7 +198,9 @@ public class ModListEntry extends ObjectSelectionList.Entry<ModListEntry> {
 	}
 
 	public void openConfig() {
-		Minecraft.getInstance().setScreen(ModMenu.getConfigScreen(mod.getContainer().get(), list.getParent()));
+		mod.getContainer().ifPresent(container ->
+				this.list.getParent().safelyOpenConfigScreen(container));
+
 	}
 
 	public Mod getMod() {

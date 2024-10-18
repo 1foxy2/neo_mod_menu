@@ -74,6 +74,10 @@ public class ModMenu {
 	private static int cachedDisplayedModCount = -1;
 	public static final boolean HAS_SINYTRA = ModList.get().isLoaded("connector");
 
+	public static boolean hasConfigScreen(ModContainer container) {
+		return IConfigScreenFactory.getForMod(container.getModInfo()).isPresent();
+	}
+
 	public static Screen getConfigScreen(ModContainer c, Screen menuScreen) {
 		configScreenFactories.putIfAbsent("minecraft", (modContainer, screen) -> new OptionsScreen(screen, Minecraft.getInstance().options));
 
