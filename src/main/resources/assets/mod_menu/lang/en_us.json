@@ -195,5 +195,7 @@
   "mod_menu.configuration.disable_drag_and_drop": "Disable Drag And Drop",
   "mod_menu.configuration.modify_game_menu": "Modify Game Menu",
   "mod_menu.configuration.modify_title_screen": "Modify Title Screen",
-  "mod_menu.configuration.library_list": "List of libraries"
+  "mod_menu.configuration.library_list": "List of libraries",
+  "mod_menu.configuration.disable_default_badges": "Disable default badges",
+  "mod_menu.configuration.disable_default_badges.tooltip": "Prevents mods from adding their default badges in case you want to disable it"
 }

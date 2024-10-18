@@ -257,6 +257,12 @@ public class NeoforgeMod implements Mod {
 	}
 
 	@Override
+	@NotNull
+	public Set<String> getBadgeNames() {
+		return badgeNames;
+	}
+
+	@Override
 	public @Nullable String getWebsite() {
 		if ("minecraft".equals(getId())) {
 			return "https://www.minecraft.net/";
@@ -319,15 +325,5 @@ public class NeoforgeMod implements Mod {
 	@Override
 	public boolean isHidden() {
 		return ModMenu.getConfig().HIDDEN_MODS.get().contains(this.getId());
-	}
-
-	@Override
-	public void reCalculateBadge() {
-		if (!ModMenu.getConfig().mod_badges.containsKey(getId())) {
-			ModMenu.getConfig().mod_badges.put(getId(), badgeNames);
-		}
-
-		Set<String> badgelist = ModMenu.getConfig().mod_badges.get(this.getId());
-		this.modMenuData.getBadges().addAll(ModBadge.convert(badgelist, this.getId()));
 	}
 }
