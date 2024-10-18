@@ -67,6 +67,17 @@ public interface Mod {
 		return TextPlaceholderApiCompat.PARSER.parseText(string, ParserContext.of());
 	}
 
+	default void reCalculateBadge() {
+		ModMenu.getConfig().mod_badges.putIfAbsent(getId(), new LinkedHashSet<>());
+
+		if (!ModMenu.getConfig().DISABLE_DEFAULT_BADGES.get().contains(getId())) {
+			ModMenu.getConfig().mod_badges.get(getId()).addAll(getBadgeNames());
+		}
+
+		Set<String> badgelist = ModMenu.getConfig().mod_badges.get(this.getId());
+		this.getBadges().addAll(ModBadge.convert(badgelist, this.getId()));
+	}
+
 	@NotNull String getVersion();
 
 	@NotNull String getPrefixedVersion();
@@ -84,6 +95,8 @@ public interface Mod {
 	@NotNull SortedMap<String, Set<String>> getCredits();
 
 	@NotNull Set<ModBadge> getBadges();
+
+	@NotNull Set<String> getBadgeNames();
 
 	@Nullable String getWebsite();
 
@@ -108,8 +121,6 @@ public interface Mod {
 	ModMenuData getModMenuData();
 
 	Optional<ModContainer> getContainer();
-
-	void reCalculateBadge();
 
 	static class ModMenuData {
 		private final Set<ModBadge> badges = new LinkedHashSet<>();

@@ -42,6 +42,7 @@ public class ModMenuConfig {
     public final ForgeConfigSpec.ConfigValue<List<? extends String>> LIBRARY_LIST;
     public final ForgeConfigSpec.ConfigValue<List<? extends String>> MOD_BADGES;
     public final ForgeConfigSpec.ConfigValue<List<? extends String>> MOD_PARENTS;
+    public final ForgeConfigSpec.ConfigValue<List<? extends String>> DISABLE_DEFAULT_BADGES;
   //  public static final ForgeConfigSpec.BooleanValue DISABLE_UPDATE_CHECKER;
 
     public final Map<String, Set<String>> mod_badges = new HashMap<>();
@@ -99,6 +100,8 @@ public class ModMenuConfig {
                 .defineList("hidden_configs", ArrayList::new, object -> object instanceof String);
         LIBRARY_LIST = builder
                 .defineList("library_list", ArrayList::new, object -> object instanceof String);
+        DISABLE_DEFAULT_BADGES = builder
+                .defineList("disable_default_badges", ArrayList::new, object -> object instanceof String);
         builder.pop();
 
         builder.push("count");

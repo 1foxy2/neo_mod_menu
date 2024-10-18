@@ -73,7 +73,7 @@ public class ModsScreen extends Screen {
 	private int searchRowWidth;
 	public final Set<String> showModChildren = new HashSet<>();
 
-	public final Map<String, Boolean> modHasConfigScreen = new HashMap<>();
+	public final Map<ModContainer, Boolean> modHasConfigScreen = new HashMap<>();
 	public final Map<String, Throwable> modScreenErrors = new HashMap<>();
 
 	public ModsScreen(Screen previousScreen) {
@@ -110,29 +110,6 @@ public class ModsScreen extends Screen {
 		this.searchBox = new EditBox(this.font, searchBoxX, 22, searchBoxWidth, 20, this.searchBox, Component.translatable("mod_menu.search"));
 		this.searchBox.setResponder((string_1) -> this.modList.filter(string_1, false));
 
-		for (Mod mod : ModMenu.MODS.values()) {
-			String id = mod.getId();
-			mod.getContainer().ifPresent(container -> {
-				if (!modHasConfigScreen.containsKey(id)) {
-					try {
-						if (id.equals("ibeeditor")) modHasConfigScreen.put(id, true);
-						else {
-							Screen configScreen = ModMenu.getConfigScreen(container, this);
-							modHasConfigScreen.put(id, configScreen != null);
-						}
-					} catch (NoClassDefFoundError e) {
-						LOGGER.warn("The '" + id + "' mod config screen is not available because " + e.getLocalizedMessage() + " is missing.");
-						modScreenErrors.put(id, e);
-						modHasConfigScreen.put(id, false);
-					} catch (Throwable e) {
-						LOGGER.error("Error from mod '" + id + "'", e);
-						modScreenErrors.put(id, e);
-						modHasConfigScreen.put(id, false);
-					}
-				}
-			});
-		}
-
 		this.modList = new ModListWidget(this.minecraft, paneWidth, this.height, paneY, this.height - 36, ModMenu.getConfig().COMPACT_LIST.get() ? 23 : 36, this.searchBox.getValue(), this.modList, this);
 		this.modList.setLeftPos(0);
 		modList.reloadFilters();
@@ -140,15 +117,12 @@ public class ModsScreen extends Screen {
 		this.descriptionListWidget = new DescriptionListWidget(this.minecraft, paneWidth, this.height, RIGHT_PANE_Y + 60, this.height - 36, font.lineHeight + 1, this);
 		this.descriptionListWidget.setLeftPos(rightPaneX);
 		Button configureButton = new ImageButton(width - 24, RIGHT_PANE_Y, 20, 20, 0, 0, 20, CONFIGURE_BUTTON_LOCATION, 32, 64, button -> {
-			final Optional<ModContainer> container = Objects.requireNonNull(selected).getMod().getContainer();
-			container.ifPresent(modContainer -> {
-				if (modHasConfigScreen.get(modContainer.getModId())) {
-					Screen configScreen = ModMenu.getConfigScreen(modContainer, this);
-					minecraft.setScreen(configScreen);
-				} else {
-					button.active = false;
-				}
-			});
+			final Mod mod = Objects.requireNonNull(selected).getMod();
+			if (getModHasConfigScreen(mod.getContainer())) {
+				this.safelyOpenConfigScreen(mod.getContainer().get());
+			} else {
+				button.active = false;
+			}
 		}) {
 			@Override
 			public void render(GuiGraphics DrawContext, int mouseX, int mouseY, float delta) {
@@ -488,7 +462,10 @@ public class ModsScreen extends Screen {
 				}
 
 				if (allSuccessful) {
-					SystemToast.add(minecraft.getToasts(), SystemToast.SystemToastIds.TUTORIAL_HINT, Component.translatable("mod_menu.dropSuccessful.line1"), Component.translatable("mod_menu.dropSuccessful.line2"));
+					SystemToast.add(minecraft.getToasts(),
+							SystemToast.SystemToastIds.TUTORIAL_HINT,
+							Component.translatable("mod_menu.dropSuccessful.line1"),
+							Component.translatable("mod_menu.dropSuccessful.line2"));
 				}
 			}
 			this.minecraft.setScreen(this);
@@ -515,7 +492,32 @@ public class ModsScreen extends Screen {
 		}
 	}
 
-	public Map<String, Boolean> getModHasConfigScreen() {
-		return modHasConfigScreen;
+	public boolean getModHasConfigScreen(Optional<ModContainer> optionalModContainer) {
+		if (optionalModContainer.isEmpty()) return false;
+
+		ModContainer container = optionalModContainer.get();
+
+		if (this.modScreenErrors.containsKey(container.getModId())) {
+			return false;
+		} else {
+			return this.modHasConfigScreen.computeIfAbsent(container, ModMenu::hasConfigScreen);
+		}
+	}
+
+	public void safelyOpenConfigScreen(ModContainer modId) {
+		try {
+			Screen screen = ModMenu.getConfigScreen(modId, this);
+			if (screen != null) {
+				this.minecraft.setScreen(screen);
+			}
+		} catch (java.lang.NoClassDefFoundError e) {
+			LOGGER.warn(
+					"The '" + modId + "' mod config screen is not available because " + e.getLocalizedMessage() +
+							" is missing.");
+			modScreenErrors.put(modId.getModId(), e);
+		} catch (Throwable e ) {
+			LOGGER.error("Error from mod '" + modId + "'", e);
+			modScreenErrors.put(modId.getModId(), e);
+		}
 	}
 }

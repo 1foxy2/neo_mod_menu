@@ -27,6 +27,9 @@ public class NeoforgeDummyParentMod implements Mod {
 
 		NeoforgeMod.ModMenuData.DummyParentData parentData = host.getModMenuData().getDummyParentData();
 		if (parentData != null) {
+			if (id.equals("fabric-api")) {
+				badgeNames.add("library");
+			}
 			badgeNames.addAll(parentData.getBadges());
 		}
 	}
@@ -122,6 +125,12 @@ public class NeoforgeDummyParentMod implements Mod {
 	}
 
 	@Override
+	@NotNull
+	public Set<String> getBadgeNames() {
+		return badgeNames;
+	}
+
+	@Override
 	public @Nullable String getWebsite() {
 		return null;
 	}
@@ -179,18 +188,5 @@ public class NeoforgeDummyParentMod implements Mod {
 	@Override
 	public Optional<ModContainer> getContainer() {
 		return Optional.empty();
-	}
-
-	@Override
-	public void reCalculateBadge() {
-		if (!ModMenu.getConfig().mod_badges.containsKey(getId())) {
-			if (id.equals("fabric-api")) {
-				badgeNames.add("library");
-			}
-			ModMenu.getConfig().mod_badges.put(getId(), badgeNames);
-		}
-		Set<String> badgelist = ModMenu.getConfig().mod_badges.get(this.getId());
-
-		this.badges.addAll(ModBadge.convert(badgelist, this.getId()));
 	}
 }
