@@ -188,6 +188,7 @@
   "mod_menu.configuration.count": "Count",
   "mod_menu.configuration.main": "Main",
   "mod_menu.configuration.hide": "Hide",
+  "mod_menu.configuration.disable_default_badges_section": "Disable Default Badges",
 
   "mod_menu.configuration.hidden_mods": "Hidden mods",
   "mod_menu.configuration.hidden_configs": "Hidden configs",
@@ -196,6 +197,10 @@
   "mod_menu.configuration.modify_game_menu": "Modify Game Menu",
   "mod_menu.configuration.modify_title_screen": "Modify Title Screen",
   "mod_menu.configuration.library_list": "List of libraries",
-  "mod_menu.configuration.disable_default_badges": "Disable default badges",
-  "mod_menu.configuration.disable_default_badges.tooltip": "Prevents mods from adding their default badges in case you want to disable it"
+  "mod_menu.configuration.disable_default_badges": "For Specific Mods",
+  "mod_menu.configuration.disable_default_badges.tooltip": "Prevents specified mods from adding their default badges in case you want to disable it.",
+  "mod_menu.configuration.disable_default_badges_all": "For All Mods",
+  "mod_menu.configuration.disable_default_badges_all.true": "On",
+  "mod_menu.configuration.disable_default_badges_all.false": "Off",
+  "mod_menu.configuration.disable_default_badges_all.tooltip": "Prevents all mods from adding their default badges in case you want to disable it."
 }

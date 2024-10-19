@@ -548,23 +548,23 @@ public class ModsScreen extends Screen {
 	public void updateSelectedEntry(ModListEntry entry) {
 		if (entry != null) {
 			this.selected = entry;
-			String modid = selected.getMod().getId();
+			String modId = selected.getMod().getId();
 
 			if (this.configureButton != null) {
 
 				this.configureButton.active = getModHasConfigScreen(selected.mod.getContainer());
 				this.configureButton.visible =
-					selected != null && getModHasConfigScreen(selected.mod.getContainer()) || modScreenErrors.containsKey(modid);
+					selected != null && getModHasConfigScreen(selected.mod.getContainer()) || modScreenErrors.containsKey(modId);
 
-				if (modScreenErrors.containsKey(modid)) {
-					Throwable e = modScreenErrors.get(modid);
-					this.configureButton.setTooltip(Tooltip.create(ModMenuScreenTexts.configureError(modid, e)));
+				if (modScreenErrors.containsKey(modId)) {
+					Throwable e = modScreenErrors.get(modId);
+					this.configureButton.setTooltip(Tooltip.create(ModMenuScreenTexts.configureError(modId, e)));
 				} else {
 					this.configureButton.setTooltip(Tooltip.create(ModMenuScreenTexts.CONFIGURE));
 				}
 			}
 
-			var isMinecraft = modid.equals("minecraft");
+			var isMinecraft = modId.equals("minecraft");
 
 			if (isMinecraft) {
 				this.websiteButton.setMessage(SEND_FEEDBACK_TEXT);
@@ -681,6 +681,7 @@ public class ModsScreen extends Screen {
 			return this.modHasConfigScreen.computeIfAbsent(container, ModMenu::hasConfigScreen);
 		}
 	}
+
 	public void safelyOpenConfigScreen(ModContainer modId) {
 		try {
 			Screen screen = ModMenu.getConfigScreen(modId, this);
