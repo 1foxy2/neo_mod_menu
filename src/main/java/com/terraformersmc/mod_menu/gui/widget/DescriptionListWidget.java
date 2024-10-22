@@ -20,6 +20,7 @@ import net.minecraft.client.gui.narration.NarratedElementType;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.ConfirmLinkScreen;
 import net.minecraft.client.gui.screens.CreditsAndAttributionScreen;
+import net.minecraft.client.renderer.CoreShaders;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.FormattedCharSequence;
@@ -231,7 +232,8 @@ public class DescriptionListWidget extends AbstractSelectionList<DescriptionList
 			GlStateManager.SourceFactor.ZERO,
 			GlStateManager.DestFactor.ONE
 		);
-		RenderSystem.setShader(GameRenderer::getPositionColorShader);
+		//RenderSystem.setShader(GameRenderer::getPositionColorShader);
+		RenderSystem.setShader(CoreShaders.POSITION_COLOR);
 
 		bufferBuilder = tessellator.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
 		bufferBuilder.addVertex(this.getX(), (this.getY() + 4), 0.0F).
@@ -291,7 +293,6 @@ public class DescriptionListWidget extends AbstractSelectionList<DescriptionList
 				q = this.getY();
 			}
 
-			RenderSystem.setShader(GameRenderer::getPositionColorShader);
 			bufferBuilder = tessellator.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
 			bufferBuilder.addVertex(scrollbarStartX, this.getBottom(), 0.0F).setColor(0, 0, 0, 255);
 			bufferBuilder.addVertex(scrollbarEndX, this.getBottom(), 0.0F).setColor(0, 0, 0, 255);

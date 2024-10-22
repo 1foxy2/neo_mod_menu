@@ -1,14 +1,14 @@
 package eu.pb4.placeholders.impl.color;
 
 import eu.pb4.placeholders.impl.GeneralUtils;
-import net.minecraft.util.FastColor;
+import net.minecraft.util.ARGB;
 import net.minecraft.util.Mth;
 
 // https://bottosson.github.io/posts/oklab/
 public record OkLab(float l, float a, float b) {
     public static OkLab fromRgb(int rgb) {
-        return fromLinearSRGB(FastColor.ARGB32.red(rgb) / 255f, FastColor.ARGB32.green(rgb) / 255f,
-                FastColor.ARGB32.blue(rgb) / 255f);
+        return fromLinearSRGB(ARGB.red(rgb) / 255f, ARGB.green(rgb) / 255f,
+                ARGB.blue(rgb) / 255f);
     }
 
 

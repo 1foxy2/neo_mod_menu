@@ -12,6 +12,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.ObjectSelectionList;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.locale.Language;
 import net.minecraft.network.chat.Component;
@@ -73,19 +74,19 @@ public class ModListEntry extends ObjectSelectionList.Entry<ModListEntry> {
 		RenderSystem.enableBlend();
 
 		if (this.getIconTexture().getB().height == this.getIconTexture().getB().width) {
-			guiGraphics.blit(
+			guiGraphics.blit(RenderType::guiTextured,
 					this.getIconTexture().getA(),
 					x, y, 0.0f, 0.0f,
 					iconSize, iconSize,
 					iconSize, iconSize);
 		} else if (this.getSquareIconTexture().getB().height == this.getSquareIconTexture().getB().width) {
-			guiGraphics.blit(
+			guiGraphics.blit(RenderType::guiTextured,
 					this.getSquareIconTexture().getA(),
 					x, y, 0.0f, 0.0f,
 					iconSize, iconSize,
 					iconSize, iconSize);
 		} else {
-			guiGraphics.blit(this.getSquareIconTexture().getA(),
+			guiGraphics.blit(RenderType::guiTextured, this.getSquareIconTexture().getA(),
 					(int) (x + (iconSize - this.getSquareIconTexture().getB().width) / 2f),
 					(int) (y + (iconSize - this.getSquareIconTexture().getB().height) / 2f),
 					0.0f, 0.0f,
@@ -151,7 +152,7 @@ public class ModListEntry extends ObjectSelectionList.Entry<ModListEntry> {
 				guiGraphics.fill(x, y, x + iconSize, y + iconSize, -1601138544);
 				boolean hoveringIcon = mouseX - x < iconSize;
 				if (this.list.getParent().modScreenErrors.containsKey(modId)) {
-					guiGraphics.blitSprite(hoveringIcon ? ERROR_HIGHLIGHTED_ICON : ERROR_ICON,
+					guiGraphics.blitSprite(RenderType::guiTextured, hoveringIcon ? ERROR_HIGHLIGHTED_ICON : ERROR_ICON,
 						x,
 						y,
 						iconSize,
@@ -167,7 +168,7 @@ public class ModListEntry extends ObjectSelectionList.Entry<ModListEntry> {
 					}
 				} else {
 					int v = hoveringIcon ? iconSize : 0;
-					guiGraphics.blit(MOD_CONFIGURATION_ICON,
+					guiGraphics.blit(RenderType::guiTextured, MOD_CONFIGURATION_ICON,
 						x,
 						y,
 						0.0F,

@@ -14,6 +14,7 @@ import eu.pb4.placeholders.impl.GeneralUtils;
 import eu.pb4.placeholders.impl.StringArgOps;
 import net.minecraft.ChatFormatting;
 import net.minecraft.Util;
+import net.minecraft.commands.arguments.selector.SelectorPattern;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.TagParser;
@@ -329,7 +330,7 @@ public final class BuiltinTags {
                                                         new HoverEvent.ItemStackInfo(ItemStack.parseOptional(RegistryAccess.EMPTY, TagParser.parseTag(value)))
                                                 );
                                             } catch (Throwable e) {
-                                                var stack = BuiltInRegistries.ITEM.get(ResourceLocation.tryParse(data.get("item", value))).getDefaultInstance();
+                                                var stack = BuiltInRegistries.ITEM.getValue(ResourceLocation.tryParse(data.get("item", value))).getDefaultInstance();
 
                                                 var count = data.getNext("count");
                                                 if (count != null) {
@@ -522,10 +523,14 @@ public final class BuiltinTags {
                             "special",
                             false,
                             (nodes, data, parser) -> {
-                                var sel = data.getNext("pattern", "@p");
+                                var sel = data.getNext("selector", "@p");
                                 var arg = data.getNext("separator");
 
-                                return new SelectorNode(sel, arg != null ? Optional.of(TextNode.of(arg)) : Optional.empty());
+                                Optional<SelectorPattern> selector = SelectorPattern.parse(sel).result();
+                                if (selector.isEmpty()) {
+                                    return TextNode.empty();
+                                }
+                                return new SelectorNode(selector.get(), arg != null ? Optional.of(TextNode.of(arg)) : Optional.empty());
                             }
                     )
             );

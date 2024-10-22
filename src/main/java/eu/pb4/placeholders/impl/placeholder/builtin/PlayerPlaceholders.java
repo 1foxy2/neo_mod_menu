@@ -197,7 +197,7 @@ public class PlayerPlaceholders {
                     if (args.length == 1) {
                         var identifier = ResourceLocation.tryParse(args[0]);
                         if (identifier != null) {
-                            var stat = Stats.CUSTOM.get(BuiltInRegistries.CUSTOM_STAT.get(identifier));
+                            var stat = Stats.CUSTOM.get(BuiltInRegistries.CUSTOM_STAT.getValue(identifier));
                             int x = ctx.player().getStats().getValue(stat);
                             return PlaceholderResult.value(stat.format(x));
                         }
@@ -205,7 +205,7 @@ public class PlayerPlaceholders {
                         var type = ResourceLocation.tryParse(args[0]);
                         var id = ResourceLocation.tryParse(args[1]);
                         if (type != null) {
-                            var statType = (StatType<Object>) BuiltInRegistries.STAT_TYPE.get(type);
+                            var statType = (StatType<Object>) BuiltInRegistries.STAT_TYPE.getValue(type);
 
                             if (statType != null) {
                                 var key = statType.getRegistry().get(id);
@@ -234,7 +234,7 @@ public class PlayerPlaceholders {
                     if (args.length == 1) {
                         var identifier = ResourceLocation.tryParse(args[0]);
                         if (identifier != null) {
-                            var stat = Stats.CUSTOM.get(BuiltInRegistries.CUSTOM_STAT.get(identifier));
+                            var stat = Stats.CUSTOM.get(BuiltInRegistries.CUSTOM_STAT.getValue(identifier));
                             int x = ctx.player().getStats().getValue(stat);
                             return PlaceholderResult.value(String.valueOf(x));
                         }
@@ -242,7 +242,7 @@ public class PlayerPlaceholders {
                         var type = ResourceLocation.tryParse(args[0]);
                         var id = ResourceLocation.tryParse(args[1]);
                         if (type != null) {
-                            var statType = (StatType<Object>) BuiltInRegistries.STAT_TYPE.get(type);
+                            var statType = (StatType<Object>) BuiltInRegistries.STAT_TYPE.getValue(type);
 
                             if (statType != null) {
                                 var key = statType.getRegistry().get(id);

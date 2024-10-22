@@ -15,6 +15,7 @@ import com.terraformersmc.mod_menu.util.mod.neoforge.NeoforgeIconHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.ObjectSelectionList;
+import net.minecraft.client.renderer.CoreShaders;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
@@ -226,7 +227,7 @@ public class ModListWidget extends ObjectSelectionList<ModListEntry> implements 
 					entryLeft = getRowLeft() - 2 + entry.getXOffset();
 					int selectionRight = this.getRowLeft() + rowWidth + 2;
 					float float_2 = this.isFocused() ? 1.0F : 0.5F;
-					RenderSystem.setShader(GameRenderer::getPositionShader);
+					RenderSystem.setShader(CoreShaders.POSITION);
 					RenderSystem.setShaderColor(float_2, float_2, float_2, 1.0F);
 					Matrix4f matrix = guiGraphics.pose().last().pose();
 					MeshData builtBuffer;
@@ -242,7 +243,7 @@ public class ModListWidget extends ObjectSelectionList<ModListEntry> implements 
 					} catch (Exception e) {
 						// Ignored
 					}
-					RenderSystem.setShader(GameRenderer::getPositionShader);
+					RenderSystem.setShader(CoreShaders.POSITION);
 					RenderSystem.setShaderColor(0.0F, 0.0F, 0.0F, 1.0F);
 					buffer = tessellator.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION);
 					buffer.addVertex(matrix, entryLeft + 1, entryTop + entryHeight + 1, 0.0F);

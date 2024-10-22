@@ -8,6 +8,7 @@ import com.terraformersmc.mod_menu.util.mod.ModSearch;
 import net.minecraft.Util;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import org.lwjgl.glfw.GLFW;
@@ -101,7 +102,7 @@ public class ParentEntry extends ModListEntry {
 			int xOffset = list.getParent().showModChildren.contains(getMod().getId()) ? iconSize : 0;
 			int yOffset = hoveringIcon ? iconSize : 0;
 			RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-			guiGraphics.blit(PARENT_MOD_TEXTURE,
+			guiGraphics.blit(RenderType::guiTextured, PARENT_MOD_TEXTURE,
 				x,
 				y,
 				xOffset,

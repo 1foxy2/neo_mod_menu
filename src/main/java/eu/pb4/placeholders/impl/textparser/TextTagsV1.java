@@ -7,6 +7,7 @@ import eu.pb4.placeholders.api.node.parent.*;
 import eu.pb4.placeholders.api.parsers.TextParserV1;
 import eu.pb4.placeholders.impl.GeneralUtils;
 import net.minecraft.ChatFormatting;
+import net.minecraft.commands.arguments.selector.SelectorPattern;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.TagParser;
@@ -327,7 +328,7 @@ public final class TextTagsV1 {
                                             } catch (Throwable e) {
                                                 lines = lines[1].split(":", 2);
                                                 if (lines.length > 0) {
-                                                    var stack = BuiltInRegistries.ITEM.get(ResourceLocation.tryParse(lines[0])).getDefaultInstance();
+                                                    var stack = BuiltInRegistries.ITEM.getValue(ResourceLocation.tryParse(lines[0])).getDefaultInstance();
 
                                                     if (lines.length > 1) {
                                                         stack.setCount(Integer.parseInt(lines[1]));
@@ -537,10 +538,16 @@ public final class TextTagsV1 {
                             "special",
                             false, (tag, data, input, handlers, endAt) -> {
                                 String[] lines = data.split(":");
+                                String pattern = restoreOriginalEscaping(cleanArgument(lines[0]));
+                                Optional<SelectorPattern> optional = SelectorPattern.parse(pattern).result();
+                                if (optional.isEmpty()) {
+                                    return TextParserV1.TagNodeValue.EMPTY;
+                                }
                                 if (lines.length == 2) {
-                                    return new TextParserV1.TagNodeValue(new SelectorNode(restoreOriginalEscaping(cleanArgument(lines[0])), Optional.of(TextNode.asSingle(recursiveParsing(restoreOriginalEscaping(cleanArgument(lines[1])), handlers, null).nodes()))), 0);
+                                    return new TextParserV1.TagNodeValue(new SelectorNode(optional.get(),
+                                            Optional.of(TextNode.asSingle(recursiveParsing(restoreOriginalEscaping(cleanArgument(lines[1])), handlers, null).nodes()))), 0);
                                 } else if (lines.length == 1) {
-                                    return new TextParserV1.TagNodeValue(new SelectorNode(restoreOriginalEscaping(cleanArgument(lines[0])), Optional.empty()), 0);
+                                    return new TextParserV1.TagNodeValue(new SelectorNode(optional.get(), Optional.empty()), 0);
                                 }
                                 return TextParserV1.TagNodeValue.EMPTY;
                             }

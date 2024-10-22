@@ -3,6 +3,7 @@ package com.terraformersmc.mod_menu.gui.widget;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.Util;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
 
 public class UpdateAvailableBadge {
@@ -14,6 +15,6 @@ public class UpdateAvailableBadge {
 		if ((Util.getMillis() / 800L & 1L) == 1L) {
 			animOffset = 8;
 		}
-		guiGraphics.blitSprite(UPDATE_ICON, x, y, 8, 8);
+		guiGraphics.blitSprite(RenderType::guiTextured, UPDATE_ICON, x, y, 8, 8);
 	}
 }

@@ -122,7 +122,8 @@ public record PlaceholderContext(MinecraftServer server,
         if (entity instanceof ServerPlayer player) {
             return of(player, view);
         } else {
-            return new PlaceholderContext(entity.getServer(), entity::createCommandSourceStack, (ServerLevel) entity.level(), null, entity, null, view);
+            var world = (ServerLevel) entity.level();
+            return new PlaceholderContext(entity.getServer(), () -> entity.createCommandSourceStackForNameResolution(world), world, null, entity, null, view);
         }
     }
 

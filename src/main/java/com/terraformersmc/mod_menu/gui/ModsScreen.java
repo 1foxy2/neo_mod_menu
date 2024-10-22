@@ -25,6 +25,7 @@ import net.minecraft.client.gui.components.toasts.SystemToast;
 import net.minecraft.client.gui.screens.ConfirmLinkScreen;
 import net.minecraft.client.gui.screens.ConfirmScreen;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.locale.Language;
 import net.minecraft.network.chat.CommonComponents;
@@ -415,7 +416,7 @@ public class ModsScreen extends Screen {
 
 			int imageOffset = iconProperties.getB().width;
 			int imageHeight = iconProperties.getB().height;
-			guiGraphics.blit(iconProperties.getA(), x, RIGHT_PANE_Y, 0.0F, 0.0F,
+			guiGraphics.blit(RenderType::guiTextured, iconProperties.getA(), x, RIGHT_PANE_Y, 0.0F, 0.0F,
 					imageOffset, imageHeight,
 					imageOffset, imageHeight);
 
@@ -639,7 +640,7 @@ public class ModsScreen extends Screen {
 				}
 
 				if (allSuccessful) {
-					SystemToast.add(minecraft.getToasts(),
+					SystemToast.add(minecraft.getToastManager(),
 						SystemToast.SystemToastId.PERIODIC_NOTIFICATION,
 						ModMenuScreenTexts.DROP_SUCCESSFUL_LINE_1,
 						ModMenuScreenTexts.DROP_SUCCESSFUL_LINE_2

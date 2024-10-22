@@ -3,6 +3,7 @@ package com.terraformersmc.mod_menu.gui.widget;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.ImageButton;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 
@@ -52,7 +53,7 @@ public class LegacyTexturedButtonWidget extends ImageButton {
 			v += this.hoveredVOffset;
 		}
 
-		guiGraphics.blit(this.texture,
+		guiGraphics.blit(RenderType::guiTextured, this.texture,
 			this.getX(),
 			this.getY(),
 			this.u,
