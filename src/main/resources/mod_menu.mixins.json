@@ -7,12 +7,10 @@
     "AccessorGridLayout",
     "MixinMinecraft",
     "MixinPauseScreen",
-    "MixinTitleScreen"
+    "MixinTitleScreen",
+    "MixinBrandingControl"
   ],
   "injectors": {
     "defaultRequire": 1
-  },
-  "mixins": [
-    "MixinBrandingControl"
-  ]
+  }
 }
