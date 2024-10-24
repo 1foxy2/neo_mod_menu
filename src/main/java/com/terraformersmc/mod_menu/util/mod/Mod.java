@@ -71,10 +71,13 @@ public interface Mod {
 	default void reCalculateBadge() {
 		ModMenu.getConfig().mod_badges.putIfAbsent(getId(), new LinkedHashSet<>());
 
-		if (!ModMenu.getConfig().DISABLE_DEFAULT_BADGES_ALL.get() &&
-				!ModMenu.getConfig().DISABLE_DEFAULT_BADGES.get().contains(getId())) {
-			ModMenu.getConfig().mod_badges.get(getId()).addAll(getBadgeNames());
-		}
+		Set<String> defaultBadges = new LinkedHashSet<>(getBadgeNames());
+
+		Set<String> disabledBadges = ModMenu.getConfig().disabled_mod_badges.get(getId());
+		if (disabledBadges != null)
+			defaultBadges.removeAll(disabledBadges);
+
+		ModMenu.getConfig().mod_badges.get(getId()).addAll(defaultBadges);
 
 		Set<String> badgelist = ModMenu.getConfig().mod_badges.get(this.getId());
 		this.getBadges().addAll(ModBadge.convert(badgelist, this.getId()));

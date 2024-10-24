@@ -39,14 +39,12 @@ public class ModMenuConfig {
     public final ModConfigSpec.BooleanValue DISABLE_DRAG_AND_DROP;
     public final ModConfigSpec.ConfigValue<List<? extends String>> HIDDEN_MODS;
     public final ModConfigSpec.ConfigValue<List<? extends String>> HIDDEN_CONFIGS;
-    public final ModConfigSpec.ConfigValue<List<? extends String>> LIBRARY_LIST;
     public final ModConfigSpec.ConfigValue<List<? extends String>> MOD_BADGES;
     public final ModConfigSpec.ConfigValue<List<? extends String>> MOD_PARENTS;
-    public final ModConfigSpec.ConfigValue<List<? extends String>> DISABLE_DEFAULT_BADGES;
-    public final ModConfigSpec.BooleanValue DISABLE_DEFAULT_BADGES_ALL;
   //  public static final ModConfigSpec.BooleanValue DISABLE_UPDATE_CHECKER;
 
     public final Map<String, Set<String>> mod_badges = new HashMap<>();
+    public final Map<String, Set<String>> disabled_mod_badges = new HashMap<>();
 
     public ModMenuConfig(ModConfigSpec.Builder builder) {
         builder.push("main");
@@ -99,14 +97,6 @@ public class ModMenuConfig {
                 .defineList("hidden_mods", ArrayList::new, String::new, object -> object instanceof String);
         HIDDEN_CONFIGS = builder
                 .defineList("hidden_configs", ArrayList::new, String::new, object -> object instanceof String);
-        LIBRARY_LIST = builder
-                .defineList("library_list", ArrayList::new, String::new, object -> object instanceof String);
-        builder.push("disable_default_badges_section");
-        DISABLE_DEFAULT_BADGES_ALL = builder
-                .define("disable_default_badges_all", false);
-        DISABLE_DEFAULT_BADGES = builder
-                .defineList("disable_default_badges", ArrayList::new, String::new, object -> object instanceof String);
-        builder.pop();
         builder.pop();
 
         builder.push("count");
@@ -133,17 +123,21 @@ public class ModMenuConfig {
     public void onLoad() {
         this.MOD_BADGES.get().forEach(badge -> {
             String[] badgeKeyValue = badge.split("=");
-            if (badgeKeyValue.length != 1)
-                this.mod_badges.put(badgeKeyValue[0], new LinkedHashSet<>(Arrays.stream(badgeKeyValue[1].split(", ")).toList()));
-            else this.mod_badges.put(badgeKeyValue[0], new LinkedHashSet<>());
+            if (badgeKeyValue.length != 1) {
+                Set<String> badges = new LinkedHashSet<>();
+                Set<String> disabledBadges = new LinkedHashSet<>();
+                Arrays.stream(badgeKeyValue[1].split(", ")).toList().forEach(badgeId -> {
+                    if (badgeId.startsWith("!"))
+                        disabledBadges.add(badgeId.substring(1));
+                    else
+                        badges.add(badgeId);
+
+                });
+                this.mod_badges.put(badgeKeyValue[0], badges);
+                this.disabled_mod_badges.put(badgeKeyValue[0], disabledBadges);
+            }
         });
-        if (!this.LIBRARY_LIST.get().isEmpty()) {
-            this.LIBRARY_LIST.get().forEach(string -> {
-                this.mod_badges.putIfAbsent(string, new LinkedHashSet<>());
-                this.mod_badges.get(string).add("library");
-            });
-            this.LIBRARY_LIST.set(new ArrayList<>());
-        }
+
         Map<String, Mod> dummyParents = new HashMap<>();
 
         // Initialize parent map
@@ -206,8 +200,19 @@ public class ModMenuConfig {
                 string.append(value);
             }
 
-            list.add(key + "=" + string);
+            Set<String> disabledBadges = disabled_mod_badges.get(key);
+            if (disabledBadges != null)
+                for (String value : disabledBadges) {
+                    if (!string.isEmpty())
+                        string.append(", ");
+
+                    string.append(value);
+                }
+
+            if (!string.isEmpty())
+                list.add(key + "=" + string);
         });
+
 
         this.MOD_BADGES.set(list);
         ModMenu.CONFIG.getRight().save();

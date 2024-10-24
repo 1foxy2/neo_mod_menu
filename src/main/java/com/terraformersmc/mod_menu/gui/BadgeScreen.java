@@ -12,6 +12,7 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.LinkedHashSet;
 import java.util.Map;
 
 public class BadgeScreen extends Screen {
@@ -52,6 +53,10 @@ public class BadgeScreen extends Screen {
                             if (mod.getBadges().contains(badge)) {
                                 mod.getBadges().remove(badge);
                                 ModMenu.getConfig().mod_badges.get(mod.getId()).remove(badgeEntry.getKey());
+                                if (mod.getBadgeNames().contains(badgeEntry.getKey())) {
+                                    ModMenu.getConfig().disabled_mod_badges.putIfAbsent(mod.getId(), new LinkedHashSet<>());
+                                    ModMenu.getConfig().disabled_mod_badges.get(mod.getId()).add("!" + badgeEntry.getKey());
+                                }
                             } else {
                                 mod.getBadges().add(badge);
                                 ModMenu.getConfig().mod_badges.get(mod.getId()).add(badgeEntry.getKey());
