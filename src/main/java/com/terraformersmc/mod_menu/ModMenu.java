@@ -239,14 +239,22 @@ public class ModMenu {
 					JsonObject jsonObject = GsonHelper.parse(new InputStreamReader(value.get()));
 					JsonArray fillColor = jsonObject.getAsJsonArray("fill_color");
 					JsonArray outlineColor = jsonObject.getAsJsonArray("outline_color");
+					JsonArray textColor;
+					try {
+						textColor = jsonObject.getAsJsonArray("text_color");
+					} catch (Exception ignored) {
+						textColor = null;
+					}
+
 					String id = key.getPath().replace("badge/", "").replace(".json", "");
 					ModBadge badge = new ModBadge(jsonObject.get("name").getAsString(),
 							new Color(outlineColor.get(0).getAsInt(), outlineColor.get(1).getAsInt(), outlineColor.get(2).getAsInt()).getRGB(),
-							new Color(fillColor.get(0).getAsInt(), fillColor.get(1).getAsInt(), fillColor.get(2).getAsInt()).getRGB());
+							new Color(fillColor.get(0).getAsInt(), fillColor.get(1).getAsInt(), fillColor.get(2).getAsInt()).getRGB(),
+							textColor == null ? 0 : new Color(textColor.get(0).getAsInt(), textColor.get(1).getAsInt(), textColor.get(2).getAsInt()).getRGB());
 
 					ModBadge.CUSTOM_BADGES.put(id, badge);
 				} catch (Exception e) {
-					LOGGER.warn("incorrect badge json from {} {}", key, e.getMessage());
+					LOGGER.warn("incorrect badge json from {} because {}", key, e.getMessage());
 				}
 			});
 			packResources.listResources(PackType.CLIENT_RESOURCES, MOD_ID, "modicon", (key, value) -> {

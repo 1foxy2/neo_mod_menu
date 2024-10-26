@@ -93,7 +93,7 @@ public class BadgeScreen extends Screen {
                 int badgeWidth = minecraft.font.width(badge.getComponent().getVisualOrderText()) + 6;
                 DrawingUtil.drawBadge(guiGraphics, posX, 43 + 11 * i, badgeWidth,
                         badge.getComponent().getVisualOrderText(),
-                        badge.getOutlineColor(), badge.getFillColor(), 0xCACACA);
+                        badge.getOutlineColor(), badge.getFillColor(), badge.getTextColor());
                 i++;
             }
         }

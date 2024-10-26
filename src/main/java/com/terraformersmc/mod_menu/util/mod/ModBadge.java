@@ -10,6 +10,7 @@ public class ModBadge {
     private final Component component;
     private final int fillColor;
     private final int outlineColor;
+    private final int textColor;
     public static ModBadge LIBRARY = new ModBadge("modmenu.badge.library", 0xff107454, 0xff093929);
     public static Map<String, ModBadge> DEFAULT_BADGES = Map.of(
             "library", LIBRARY,
@@ -24,9 +25,14 @@ public class ModBadge {
     public static List<Map<String, ModBadge>> BADGES = List.of(DEFAULT_BADGES, CUSTOM_BADGES);
 
     public ModBadge(String displayName, int outlineColor, int fillColor) {
+        this(displayName, outlineColor, fillColor, 0);
+    }
+
+    public ModBadge(String displayName, int outlineColor, int fillColor, int textColor) {
         this.component = Component.translatable(displayName);
         this.fillColor = fillColor;
         this.outlineColor = outlineColor;
+        this.textColor = textColor == 0 ? 0xCACACA : textColor;
     }
 
     public Component getComponent() {
@@ -39,6 +45,10 @@ public class ModBadge {
 
     public int getFillColor() {
         return this.fillColor;
+    }
+
+    public int getTextColor() {
+        return this.textColor;
     }
 
     public static Set<ModBadge> convert(Set<String> badgeKeys, String modId) {
