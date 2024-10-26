@@ -1,6 +1,7 @@
 package com.terraformersmc.mod_menu.gui;
 
 import com.terraformersmc.mod_menu.ModMenu;
+import com.terraformersmc.mod_menu.config.ModMenuConfig;
 import com.terraformersmc.mod_menu.gui.widget.BadgeToogleButton;
 import com.terraformersmc.mod_menu.gui.widget.LegacyTexturedButtonWidget;
 import com.terraformersmc.mod_menu.util.DrawingUtil;
@@ -14,6 +15,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Set;
 
 public class BadgeScreen extends Screen {
     private @Nullable AbstractWidget badgeButton;
@@ -50,16 +52,24 @@ public class BadgeScreen extends Screen {
             for (Map.Entry<String, ModBadge> badgeEntry : badgeMap.entrySet()) {
                 ModBadge badge = badgeEntry.getValue();
                 this.addRenderableWidget(BadgeToogleButton.badgeButtonBuilder(CommonComponents.EMPTY, button -> {
+                            ModMenuConfig config = ModMenu.getConfig();
                             if (mod.getBadges().contains(badge)) {
                                 mod.getBadges().remove(badge);
-                                ModMenu.getConfig().mod_badges.get(mod.getId()).remove(badgeEntry.getKey());
+                                config.mod_badges.get(mod.getId()).remove(badgeEntry.getKey());
+
                                 if (mod.getBadgeNames().contains(badgeEntry.getKey())) {
-                                    ModMenu.getConfig().disabled_mod_badges.putIfAbsent(mod.getId(), new LinkedHashSet<>());
-                                    ModMenu.getConfig().disabled_mod_badges.get(mod.getId()).add("!" + badgeEntry.getKey());
+                                    config.disabled_mod_badges.putIfAbsent(mod.getId(), new LinkedHashSet<>());
+                                    config.disabled_mod_badges.get(mod.getId()).add(badgeEntry.getKey());
                                 }
                             } else {
                                 mod.getBadges().add(badge);
-                                ModMenu.getConfig().mod_badges.get(mod.getId()).add(badgeEntry.getKey());
+
+                                Set<String> disabled_badges = config.disabled_mod_badges.get(mod.getId());
+                                if (disabled_badges != null && disabled_badges.contains(badgeEntry.getKey())) {
+                                    disabled_badges.remove(badgeEntry.getKey());
+                                } else
+                                    config.mod_badges.get(mod.getId()).add(badgeEntry.getKey());
+
                             }
                             ((BadgeToogleButton) button).toggle();
                         }, mod.getBadges().contains(badge))

@@ -192,6 +192,10 @@ public class ModMenuConfig {
     public void save() {
         List<String> list = new ArrayList<>();
         this.mod_badges.forEach((key, values) -> {
+            Set<String> disabledBadges = disabled_mod_badges.get(key);
+            if (values.isEmpty() && disabledBadges == null)
+                return;
+
             StringBuilder string = new StringBuilder();
             for (String value : values) {
                 if (!string.isEmpty())
@@ -200,13 +204,12 @@ public class ModMenuConfig {
                 string.append(value);
             }
 
-            Set<String> disabledBadges = disabled_mod_badges.get(key);
             if (disabledBadges != null)
                 for (String value : disabledBadges) {
                     if (!string.isEmpty())
                         string.append(", ");
 
-                    string.append(value);
+                    string.append("!").append(value);
                 }
 
             if (!string.isEmpty())
