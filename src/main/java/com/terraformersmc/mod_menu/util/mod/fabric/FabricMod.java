@@ -87,7 +87,7 @@ public class FabricMod implements Mod {
 			}
 			badgeNames.addAll(CustomValueUtil.getStringSet("badges", modMenuObject).orElse(new HashSet<>()));
 			CustomValueUtil.getStringMap("links", modMenuObject).orElse(new HashMap<>()).forEach((key, vakue) -> {
-				if (key.startsWith("modmenu")) key = key.replace("modmenu", "mod_menu");
+				if (key.startsWith("mod_menu")) key = key.replace("mod_menu", "modmenu");
 				links.put(key, vakue);
 			});
 			allowsUpdateChecks = CustomValueUtil.getBoolean("update_checker", modMenuObject).orElse(true);

@@ -95,7 +95,7 @@ public class ModMenuConfigScreen extends ConfigurationScreen.ConfigurationSectio
         final List<T> list = Arrays.stream(clazz.getEnumConstants()).filter(spec::test).toList();
 
         return new Element(getTranslationComponent(key), getTooltipComponent(key, null),
-                new OptionInstance<>(getTranslationKey(key), getTooltip(key, null), (caption, displayvalue) -> Component.translatable("mod_menu.configuration." + key + "." + displayvalue.name().toLowerCase()),
+                new OptionInstance<>(getTranslationKey(key), getTooltip(key, null), (caption, displayvalue) -> Component.translatable("option.modmenu." + key + "." + displayvalue.name().toLowerCase()),
                         new Custom<>(list), source.get(), newValue -> {
                     // regarding change detection: new value always is different (cycle button)
                     undoManager.add(v -> {
@@ -114,5 +114,10 @@ public class ModMenuConfigScreen extends ConfigurationScreen.ConfigurationSectio
         if (key.equals("mod_badges") || key.equals("library_list")) return null;
 
         return super.createList(key, spec, list);
+    }
+
+    @Override
+    protected String getTranslationKey(String key) {
+        return "option.modmenu." + key;
     }
 }

@@ -212,10 +212,10 @@ public class ModMenu {
 		if (ModMenu.getConfig().MOD_COUNT_LOCATION.get().isOnModsButton() && !isIcon) {
 			String count = ModMenu.getDisplayedModCount();
 			if (isShort) {
-				modsText.append(Component.literal(" ")).append(Component.translatable("mod_menu.loaded.short", count));
+				modsText.append(Component.literal(" ")).append(Component.translatable("modmenu.loaded.short", count));
 			} else {
-				String specificKey = "mod_menu.loaded." + count;
-				String key = I18n.exists(specificKey) ? specificKey : "mod_menu.loaded";
+				String specificKey = "modmenu.loaded." + count;
+				String key = I18n.exists(specificKey) ? specificKey : "modmenu.loaded";
 				if (ModMenu.getConfig().EASTER_EGGS.get() && I18n.exists(specificKey + ".secret")) {
 					key = specificKey + ".secret";
 				}

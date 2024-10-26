@@ -36,13 +36,13 @@ public class ModSearch {
 		String modDescription = mod.getDescription();
 		String modSummary = mod.getSummary();
 
-		String library = I18n.get("mod_menu.searchTerms.library");
-		String sinytra = I18n.get("mod_menu.searchTerms.sinytra");
-		String modpack = I18n.get("mod_menu.searchTerms.modpack");
-		String deprecated = I18n.get("mod_menu.searchTerms.deprecated");
-		String clientside = I18n.get("mod_menu.searchTerms.clientside");
-		String configurable = I18n.get("mod_menu.searchTerms.configurable");
-		String hasUpdate = I18n.get("mod_menu.searchTerms.hasUpdate");
+		String library = I18n.get("modmenu.searchTerms.library");
+		String sinytra = I18n.get("modmenu.searchTerms.sinytra");
+		String modpack = I18n.get("modmenu.searchTerms.modpack");
+		String deprecated = I18n.get("modmenu.searchTerms.deprecated");
+		String clientside = I18n.get("modmenu.searchTerms.clientside");
+		String configurable = I18n.get("modmenu.searchTerms.configurable");
+		String hasUpdate = I18n.get("modmenu.searchTerms.hasUpdate");
 
 		// Libraries are currently hidden, ignore them entirely
 		if (mod.isHidden() || !ModMenu.getConfig().SHOW_LIBRARIES.get() && mod.getBadges().contains(ModBadge.LIBRARY)) {

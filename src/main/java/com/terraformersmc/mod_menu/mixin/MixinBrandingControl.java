@@ -31,8 +31,8 @@ public abstract class MixinBrandingControl {
             final List<String> brandings = getBrandings(includeMC, reverse);
             if (ModMenu.getConfig().MOD_COUNT_LOCATION.get().isOnTitleScreen()) {
                 String count = ModMenu.getDisplayedModCount();
-                String specificKey = "mod_menu.mods." + count;
-                String replacementKey = I18n.exists(specificKey) ? specificKey : "mod_menu.mods.n";
+                String specificKey = "modmenu.mods." + count;
+                String replacementKey = I18n.exists(specificKey) ? specificKey : "modmenu.mods.n";
                 if (ModMenu.getConfig().EASTER_EGGS.get() && I18n.exists(specificKey + ".secret")) {
                     replacementKey = specificKey + ".secret";
                 }

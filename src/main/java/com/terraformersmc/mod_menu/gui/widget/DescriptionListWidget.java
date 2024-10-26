@@ -33,21 +33,21 @@ import java.util.Set;
 
 public class DescriptionListWidget extends AbstractSelectionList<DescriptionListWidget.DescriptionEntry> {
 
-	private static final Component HAS_UPDATE_TEXT = Component.translatable("mod_menu.hasUpdate");
-	private static final Component EXPERIMENTAL_TEXT = Component.translatable("mod_menu.experimental").withStyle(ChatFormatting.GOLD);
-	private static final Component DOWNLOAD_TEXT = Component.translatable("mod_menu.downloadLink")
+	private static final Component HAS_UPDATE_TEXT = Component.translatable("modmenu.hasUpdate");
+	private static final Component EXPERIMENTAL_TEXT = Component.translatable("modmenu.experimental").withStyle(ChatFormatting.GOLD);
+	private static final Component DOWNLOAD_TEXT = Component.translatable("modmenu.downloadLink")
 		.withStyle(ChatFormatting.BLUE)
 		.withStyle(ChatFormatting.UNDERLINE);
-	private static final Component CHILD_HAS_UPDATE_TEXT = Component.translatable("mod_menu.childHasUpdate");
-	private static final Component LINKS_TEXT = Component.translatable("mod_menu.links");
-	private static final Component SOURCE_TEXT = Component.translatable("mod_menu.source")
+	private static final Component CHILD_HAS_UPDATE_TEXT = Component.translatable("modmenu.childHasUpdate");
+	private static final Component LINKS_TEXT = Component.translatable("modmenu.links");
+	private static final Component SOURCE_TEXT = Component.translatable("modmenu.source")
 		.withStyle(ChatFormatting.BLUE)
 		.withStyle(ChatFormatting.UNDERLINE);
-	private static final Component LICENSE_TEXT = Component.translatable("mod_menu.license");
-	private static final Component VIEW_CREDITS_TEXT = Component.translatable("mod_menu.viewCredits")
+	private static final Component LICENSE_TEXT = Component.translatable("modmenu.license");
+	private static final Component VIEW_CREDITS_TEXT = Component.translatable("modmenu.viewCredits")
 		.withStyle(ChatFormatting.BLUE)
 		.withStyle(ChatFormatting.UNDERLINE);
-	private static final Component CREDITS_TEXT = Component.translatable("mod_menu.credits");
+	private static final Component CREDITS_TEXT = Component.translatable("modmenu.credits");
 
 	private final ModsScreen parent;
 	private final Font textRenderer;
@@ -325,7 +325,7 @@ public class DescriptionListWidget extends AbstractSelectionList<DescriptionList
 		// Fixes common role names people use in English (e.g. Author -> Authors)
 		var fallback = roleName.endsWith("r") ? roleName + "s" : roleName;
 
-		return Component.translatableWithFallback("mod_menu.credits.role." + translationKey, fallback)
+		return Component.translatableWithFallback("modmenu.credits.role." + translationKey, fallback)
 			.append(Component.literal(":"));
 	}
 
