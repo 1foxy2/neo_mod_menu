@@ -16,10 +16,11 @@ public class ModBadge {
             "client", new ModBadge("modmenu.badge.clientsideOnly", 0xff2b4b7c, 0xff0e2a55),
             "deprecated", new ModBadge("modmenu.badge.deprecated", 0xff841426, 0xff530C17),
             "sinytra_fabric", new ModBadge("modmenu.badge.fabric", 0xffc7b48b, 0xff786d58),
+            "sinytra_neoforge", new ModBadge("modmenu.badge.neoforge", 0xffff7C26, 0xffd85600),
             "modpack", new ModBadge("modmenu.badge.modpack", 0xff7a2b7c, 0xff510d54),
             "minecraft", new ModBadge("modmenu.badge.minecraft", 0xff6f6c6a, 0xff31302f)
     );
-    public static Map<String, ModBadge> CUSTOM_BADGES = new HashMap<>();
+    public static Map<String, ModBadge> CUSTOM_BADGES = new LinkedHashMap<>();
     public static List<Map<String, ModBadge>> BADGES = List.of(DEFAULT_BADGES, CUSTOM_BADGES);
 
     public ModBadge(String displayName, int outlineColor, int fillColor) {

@@ -131,9 +131,11 @@ public class NeoforgeMod implements Mod {
 			badges.add(Badge.CLIENT);
 		}*/
 
-		if ("minecraft".equals(getId())) {
+		if ("minecraft".equals(getId()))
 			badgeNames.add("minecraft");
-		}
+
+		else if (ModMenu.HAS_SINYTRA)
+			badgeNames.add("sinytra_neoforge");
 	}
 
 	public Optional<ModContainer> getContainer() {
