@@ -20,7 +20,7 @@ config="${mod_id}.mixins.json"
 
 [modproperties.modmenu]
 badges=["client"]
-links=["mod_menu.original=https://modrinth.com/mod/modmenu"]
+links=["modmenu.original=https://modrinth.com/mod/modmenu"]
 contributors=[
     "shedaniel",
     "Draylar",
