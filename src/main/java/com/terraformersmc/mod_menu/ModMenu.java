@@ -26,6 +26,7 @@ import net.minecraft.server.packs.PackResources;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.util.Tuple;
+import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.ModList;
@@ -45,7 +46,7 @@ import java.text.NumberFormat;
 import java.util.*;
 import java.util.stream.Stream;
 
-@net.neoforged.fml.common.Mod(ModMenu.MOD_ID)
+@net.neoforged.fml.common.Mod(value = ModMenu.MOD_ID, dist = Dist.CLIENT)
 public class ModMenu {
 	public static final String MOD_ID = "mod_menu";
 	public static final Logger LOGGER = LoggerFactory.getLogger("Mod Menu");
