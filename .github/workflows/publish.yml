@@ -25,7 +25,9 @@ jobs:
           files: build/libs/*.jar
           github-files: build/libs/*.jar
           version-type: beta
-          game-versions: 1.21.2
+          game-versions: |
+            1.21.2
+            1.21.3
           game-version-filter: releases
           dependencies: |
             better_mods_button(incompatible){modrinth:KUZAAwdD}{curseforge:541584}#(ignore:github)
