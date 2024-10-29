@@ -4,6 +4,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.terraformersmc.modmenu.ModMenu;
 import com.terraformersmc.modmenu.gui.widget.ModListWidget;
 import com.terraformersmc.modmenu.util.mod.Mod;
+import com.terraformersmc.modmenu.util.mod.ModBadge;
 import com.terraformersmc.modmenu.util.mod.ModSearch;
 import net.minecraft.Util;
 import net.minecraft.client.gui.Font;
@@ -47,9 +48,12 @@ public class ParentEntry extends ModListEntry {
 		int childrenBadgeHeight = font.lineHeight;
 		int childrenBadgeWidth = font.lineHeight;
 		int shownChildren = ModSearch.search(list.getParent(), list.getParent().getSearchInput(), getChildren()).size();
-		Component str = shownChildren == children.size() ?
+		int allChildren = children.stream().filter(child -> !child.isHidden() &&
+				(ModMenu.getConfig().SHOW_LIBRARIES.get()
+						|| !child.getBadges().contains(ModBadge.LIBRARY))).toList().size();
+		Component str = shownChildren == allChildren ?
 				Component.literal(String.valueOf(shownChildren)) :
-				Component.literal(shownChildren + "/" + children.size());
+				Component.literal(shownChildren + "/" + allChildren);
 		int childrenWidth = font.width(str) - 1;
 		if (childrenBadgeWidth < childrenWidth + 4) {
 			childrenBadgeWidth = childrenWidth + 4;

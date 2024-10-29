@@ -17,7 +17,9 @@ public class ModSearch {
 
 	public static List<Mod> search(ModsScreen screen, String query, List<Mod> candidates) {
 		if (!validSearchQuery(query)) {
-			return candidates;
+			return candidates.stream().filter(child -> !child.isHidden() &&
+					(ModMenu.getConfig().SHOW_LIBRARIES.get()
+							|| !child.getBadges().contains(ModBadge.LIBRARY))).toList();
 		}
 		return candidates.stream()
 			.map(modContainer -> new Tuple<>(modContainer,
