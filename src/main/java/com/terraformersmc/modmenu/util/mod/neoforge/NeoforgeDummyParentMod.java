@@ -27,10 +27,10 @@ public class NeoforgeDummyParentMod implements Mod {
 
 		NeoforgeMod.ModMenuData.DummyParentData parentData = host.getModMenuData().getDummyParentData();
 		if (parentData != null) {
-			if (id.equals("fabric-api")) {
-				badgeNames.add("library");
-			}
 			badgeNames.addAll(parentData.getBadges());
+		}
+		if (id.equals("fabric-api")) {
+			badgeNames.add("library");
 		}
 	}
 
