@@ -38,6 +38,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
 import java.awt.*;
 import java.io.InputStreamReader;
 import java.text.NumberFormat;
@@ -76,27 +77,31 @@ public class ModMenu {
 	public static final boolean HAS_SINYTRA = ModList.get().isLoaded("connectormod");
 
 	public static boolean hasConfigScreen(ModContainer container) {
-		return ConfigScreenHandler.getScreenFactoryFor(container.getModInfo()).isPresent();
+		return getConfigScreenFactory(container) != null;
 	}
 
-	public static Screen getConfigScreen(ModContainer c, Screen menuScreen) {
-		configScreenFactories.putIfAbsent("minecraft", (minecraft, screen) -> new OptionsScreen(screen, Minecraft.getInstance().options));
+	public static @Nullable Screen getConfigScreen(ModContainer container, Screen parent) {
+		BiFunction<Minecraft, Screen, Screen> factory = getConfigScreenFactory(container);
+		if (factory != null) {
+			return factory.apply(Minecraft.getInstance(), parent);
+		}
+		return null;
+	}
 
-		if (ModMenu.getConfig().HIDDEN_CONFIGS.get().contains(c.getModId()) || "java".equals(c.getModId())) {
+	private static @Nullable BiFunction<Minecraft, Screen, Screen> getConfigScreenFactory(ModContainer container) {
+		if (ModMenu.getConfig().HIDDEN_CONFIGS.get().contains(container.getModId()) || "java".equals(container.getModId())) {
 			return null;
 		}
 
-		BiFunction<Minecraft, Screen, Screen> factory = configScreenFactories.get(c.getModId());
-		if (factory != null) {
-            return factory.apply(Minecraft.getInstance(), menuScreen);
-        }
+		configScreenFactories.putIfAbsent("minecraft", (modContainer, screen) ->
+				new OptionsScreen(screen, Minecraft.getInstance().options));
 
-		Optional<BiFunction<Minecraft, Screen, Screen>> factoryOptional = ConfigScreenHandler.getScreenFactoryFor(c.getModInfo());
+		Optional<BiFunction<Minecraft, Screen, Screen>> factoryOptional = ConfigScreenHandler.getScreenFactoryFor(container.getModInfo());
 
-		factoryOptional.ifPresent(f -> configScreenFactories.put(c.getModId(), f));
+		factoryOptional.ifPresent(f -> configScreenFactories.putIfAbsent(container.getModId(), f));
 
-        return factoryOptional.map(f -> f.apply(Minecraft.getInstance(), menuScreen)).orElse(null);
-    }
+		return configScreenFactories.get(container.getModId());
+	}
 
 	public ModMenu() {
 		IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
