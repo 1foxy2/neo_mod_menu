@@ -32,7 +32,6 @@ import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.ModList;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
-import net.neoforged.neoforge.client.event.RegisterClientReloadListenersEvent;
 import net.neoforged.neoforge.client.gui.ConfigurationScreen;
 import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 import net.neoforged.neoforge.common.ModConfigSpec;
@@ -40,10 +39,14 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
 import java.awt.*;
 import java.io.InputStreamReader;
 import java.text.NumberFormat;
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 @net.neoforged.fml.common.Mod(value = ModMenu.MOD_ID, dist = Dist.CLIENT)
@@ -78,27 +81,31 @@ public class ModMenu {
 	public static final boolean HAS_SINYTRA = ModList.get().isLoaded("connector");
 
 	public static boolean hasConfigScreen(ModContainer container) {
-		return IConfigScreenFactory.getForMod(container.getModInfo()).isPresent();
+		return getConfigScreenFactory(container) != null;
 	}
 
-	public static Screen getConfigScreen(ModContainer c, Screen menuScreen) {
-		configScreenFactories.putIfAbsent("minecraft", (modContainer, screen) -> new OptionsScreen(screen, Minecraft.getInstance().options));
+	public static @Nullable Screen getConfigScreen(ModContainer container, Screen parent) {
+		IConfigScreenFactory factory = getConfigScreenFactory(container);
+		if (factory != null) {
+			return factory.createScreen(container, parent);
+		}
+		return null;
+	}
 
-		if (ModMenu.getConfig().HIDDEN_CONFIGS.get().contains(c.getModId()) || "java".equals(c.getModId())) {
+	private static @Nullable IConfigScreenFactory getConfigScreenFactory(ModContainer container) {
+		if (ModMenu.getConfig().HIDDEN_CONFIGS.get().contains(container.getModId()) || "java".equals(container.getModId())) {
 			return null;
 		}
 
-		IConfigScreenFactory factory = configScreenFactories.get(c.getModId());
-		if (factory != null) {
-            return factory.createScreen(c, menuScreen);
-        }
+		configScreenFactories.putIfAbsent("minecraft", (modContainer, screen) ->
+				new OptionsScreen(screen, Minecraft.getInstance().options));
 
-		Optional<IConfigScreenFactory> factoryOptional = IConfigScreenFactory.getForMod(c.getModInfo());
+		Optional<IConfigScreenFactory> factoryOptional = IConfigScreenFactory.getForMod(container.getModInfo());
 
-		factoryOptional.ifPresent(f -> configScreenFactories.put(c.getModId(), f));
+		factoryOptional.ifPresent(f -> configScreenFactories.putIfAbsent(container.getModId(), f));
 
-        return factoryOptional.map(iConfigScreenFactory -> iConfigScreenFactory.createScreen(c, menuScreen)).orElse(null);
-    }
+		return configScreenFactories.get(container.getModId());
+	}
 
 	public ModMenu(IEventBus bus, ModContainer container) {
 		bus.addListener(this::onClientSetup);
