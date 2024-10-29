@@ -128,12 +128,14 @@ public class ModsScreen extends Screen {
 			public void render(GuiGraphics DrawContext, int mouseX, int mouseY, float delta) {
 				String modId = selected.getMod().getId();
 				if (selected != null) {
-					active = modHasConfigScreen.getOrDefault(modId, false);
+					active = getModHasConfigScreen(selected.getMod().getContainer());
 				} else {
 					active = false;
 					visible = false;
 				}
-				visible = selected != null && modHasConfigScreen.getOrDefault(modId, false) || modScreenErrors.containsKey(modId);
+				visible = selected != null && getModHasConfigScreen(selected.getMod().getContainer())
+						|| modScreenErrors.containsKey(modId);
+
 				if (modScreenErrors.containsKey(modId)) {
 					Throwable e = modScreenErrors.get(modId);
 					this.setTooltip(Tooltip.create(Component.translatable("mod_menu.configure.error", modId, modId).copy().append("\n\n").append(e.toString()).withStyle(ChatFormatting.RED)));
