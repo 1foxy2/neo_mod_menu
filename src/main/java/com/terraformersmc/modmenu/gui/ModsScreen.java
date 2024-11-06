@@ -663,7 +663,7 @@ public class ModsScreen extends Screen {
 		return isFabricMod(mod) || isNeoforgeMod(mod);
 	}
 
-	private static boolean isNeoforgeMod(Path mod) {
+	public static boolean isNeoforgeMod(Path mod) {
 		try (JarFile jarFile = new JarFile(mod.toFile())) {
 			return jarFile.getEntry("META-INF/neoforge.mods.toml") != null;
 		} catch (IOException | UnsupportedOperationException e) {

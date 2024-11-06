@@ -118,7 +118,9 @@ public class ModMenu {
 		for (ModContainer modContainer : ModList.get().getSortedMods()) {
 			Mod mod;
 
-			if (HAS_SINYTRA && ModsScreen.isFabricMod(modContainer.getModInfo().getOwningFile().getFile().getFilePath())) {
+			if (HAS_SINYTRA &&
+					ModsScreen.isFabricMod(modContainer.getModInfo().getOwningFile().getFile().getFilePath()) &&
+					!ModsScreen.isNeoforgeMod(modContainer.getModInfo().getOwningFile().getFile().getFilePath())) {
 				mod = new FabricMod(modContainer.getModId());
 			} else {
 				mod = new NeoforgeMod(modContainer);
