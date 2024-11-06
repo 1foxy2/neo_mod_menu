@@ -15,6 +15,7 @@ import com.terraformersmc.mod_menu.util.mod.java.JavaDummyMod;
 import com.terraformersmc.mod_menu.util.mod.neoforge.NeoforgeDummyParentMod;
 import com.terraformersmc.mod_menu.util.mod.neoforge.NeoforgeIconHandler;
 import com.terraformersmc.mod_menu.util.mod.neoforge.NeoforgeMod;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.options.OptionsScreen;
@@ -36,6 +37,8 @@ import net.neoforged.neoforge.client.gui.ConfigurationScreen;
 import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 import net.neoforged.neoforge.common.ModConfigSpec;
 import org.apache.commons.lang3.tuple.Pair;
+import org.sinytra.connector.ConnectorEarlyLoader;
+import org.sinytra.connector.util.ConnectorUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -114,7 +117,7 @@ public class ModMenu {
 		for (ModContainer modContainer : ModList.get().getSortedMods()) {
 			Mod mod;
 
-			if (HAS_SINYTRA && ModsScreen.isFabricMod(modContainer.getModInfo().getOwningFile().getFile().getFilePath())) {
+			if (HAS_SINYTRA && ConnectorEarlyLoader.isConnectorMod(modContainer.getModId())) {
 				mod = new FabricMod(modContainer.getModId());
 			} else {
 				mod = new NeoforgeMod(modContainer);
