@@ -42,6 +42,7 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nullable;
 import java.awt.*;
 import java.io.InputStreamReader;
+import java.nio.file.Path;
 import java.text.NumberFormat;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -118,9 +119,7 @@ public class ModMenu {
 		for (ModContainer modContainer : ModList.get().getSortedMods()) {
 			Mod mod;
 
-			if (HAS_SINYTRA &&
-					ModsScreen.isFabricMod(modContainer.getModInfo().getOwningFile().getFile().getFilePath()) &&
-					!ModsScreen.isNeoforgeMod(modContainer.getModInfo().getOwningFile().getFile().getFilePath())) {
+			if (HAS_SINYTRA && ConnectorEarlyLoader.isConnectorMod(modContainer.getModId())) {
 				mod = new FabricMod(modContainer.getModId());
 			} else {
 				mod = new NeoforgeMod(modContainer);

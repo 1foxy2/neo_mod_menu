@@ -651,7 +651,7 @@ public class ModsScreen extends Screen {
 		}, ModMenuScreenTexts.DROP_CONFIRM, Component.literal(modList)));
 	}
 
-	public static boolean isFabricMod(Path mod) {
+	private static boolean isFabricMod(Path mod) {
 		try (JarFile jarFile = new JarFile(mod.toFile())) {
 			return jarFile.getEntry("fabric.mod.json") != null;
 		} catch (IOException | UnsupportedOperationException e) {
@@ -663,7 +663,7 @@ public class ModsScreen extends Screen {
 		return isFabricMod(mod) || isNeoforgeMod(mod);
 	}
 
-	public static boolean isNeoforgeMod(Path mod) {
+	private static boolean isNeoforgeMod(Path mod) {
 		try (JarFile jarFile = new JarFile(mod.toFile())) {
 			return jarFile.getEntry("META-INF/neoforge.mods.toml") != null;
 		} catch (IOException | UnsupportedOperationException e) {
