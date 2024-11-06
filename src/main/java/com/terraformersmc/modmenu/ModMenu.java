@@ -36,6 +36,7 @@ import net.neoforged.neoforge.client.gui.ConfigurationScreen;
 import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 import net.neoforged.neoforge.common.ModConfigSpec;
 import org.apache.commons.lang3.tuple.Pair;
+import org.sinytra.connector.ConnectorEarlyLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
