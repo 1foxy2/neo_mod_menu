@@ -17,7 +17,6 @@ import net.minecraft.util.Tuple;
 import net.neoforged.fml.ModList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.sinytra.connector.ConnectorEarlyLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -111,9 +110,7 @@ public class FabricMod implements Mod {
 			badgeNames.add("client");
 		}
 
-		if (ConnectorEarlyLoader.isConnectorMod(getId()))
-			badgeNames.add("sinytra_fabric");
-		else badgeNames.add("sinytra_neoforge");
+		badgeNames.add("sinytra_fabric");
 	}
 
 	public Optional<net.neoforged.fml.ModContainer> getContainer() {
