@@ -127,6 +127,9 @@ public class NeoforgeMod implements Mod {
 
 		/* Add additional badges */
 		this.badges = modMenuData.getBadges();
+		if (container.getModInfo().getOwningFile().getFile().getDiscoveryAttributes().parent() != null) {
+			badgeNames.add("library");
+		}
 	/*	if (this.modInfo.getEnvironment() == ModEnvironment.CLIENT) { not sure how to check that
 			badges.add(Badge.CLIENT);
 		}*/
