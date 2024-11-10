@@ -1,6 +1,7 @@
 package com.terraformersmc.mod_menu.util.mod.fabric;
 
 import com.google.common.collect.Sets;
+import com.mojang.logging.LogUtils;
 import com.terraformersmc.mod_menu.ModMenu;
 import com.terraformersmc.mod_menu.util.VersionUtil;
 import com.terraformersmc.mod_menu.util.mod.Mod;
@@ -8,10 +9,7 @@ import com.terraformersmc.mod_menu.util.mod.ModBadge;
 import com.terraformersmc.mod_menu.util.mod.neoforge.NeoforgeIconHandler;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
-import net.fabricmc.loader.api.metadata.CustomValue;
-import net.fabricmc.loader.api.metadata.ModEnvironment;
-import net.fabricmc.loader.api.metadata.ModMetadata;
-import net.fabricmc.loader.api.metadata.Person;
+import net.fabricmc.loader.api.metadata.*;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.util.Tuple;
 import net.neoforged.fml.ModList;
@@ -106,6 +104,11 @@ public class FabricMod implements Mod {
 
 		/* Add additional badges */
 		this.badges = modMenuData.getBadges();
+		//TODO replace with if (container.getOrigin().getKind() == ModOrigin.Kind.NESTED) { if connector bug is fixed
+		if (forgeContainer.getModInfo().getOwningFile().getFile().getFilePath().toAbsolutePath().toString().contains("$")) {
+			badgeNames.add("library");
+		}
+
 		if (this.metadata.getEnvironment() == ModEnvironment.CLIENT) {
 			badgeNames.add("client");
 		}
