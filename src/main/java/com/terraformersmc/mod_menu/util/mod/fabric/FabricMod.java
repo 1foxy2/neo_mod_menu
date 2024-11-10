@@ -105,7 +105,6 @@ public class FabricMod implements Mod {
 		/* Add additional badges */
 		this.badges = modMenuData.getBadges();
 		//TODO replace with if (container.getOrigin().getKind() == ModOrigin.Kind.NESTED) { if connector bug is fixed
-		LogUtils.getLogger().warn(forgeContainer.getModInfo().getOwningFile().getFile().getFilePath().getFileName().toString());
 		if (forgeContainer.getModInfo().getOwningFile().getFile().getFilePath().getFileName().toString().contains("$")) {
 			badgeNames.add("library");
 		}
