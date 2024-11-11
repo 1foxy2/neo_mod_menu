@@ -50,6 +50,12 @@ public class NeoforgeMod implements Mod {
 
 		String id = modInfo.getModId();
 
+		if ("minecraft".equals(id))
+			badgeNames.add("minecraft");
+
+		else if (ModMenu.HAS_SINYTRA)
+			badgeNames.add("sinytra_neoforge");
+
 		issueTrackerUrl = modInfo.getConfig().<String>getConfigElement("issueTrackerURL").orElse(null);
 		website = modInfo.getConfig().<String>getConfigElement("displayURL").orElse(null);
 
@@ -127,15 +133,12 @@ public class NeoforgeMod implements Mod {
 
 		/* Add additional badges */
 		this.badges = modMenuData.getBadges();
+		if (container.getModInfo().getOwningFile().getFile().getDiscoveryAttributes().parent() != null) {
+			badgeNames.add("library");
+		}
 	/*	if (this.modInfo.getEnvironment() == ModEnvironment.CLIENT) { not sure how to check that
 			badges.add(Badge.CLIENT);
 		}*/
-
-		if ("minecraft".equals(getId()))
-			badgeNames.add("minecraft");
-
-		else if (ModMenu.HAS_SINYTRA)
-			badgeNames.add("sinytra_neoforge");
 	}
 
 	public Optional<ModContainer> getContainer() {

@@ -49,6 +49,7 @@ public class FabricMod implements Mod {
 		this.container = FabricLoader.getInstance().getModContainer(modId).get();
 		this.forgeContainer = ModList.get().getModContainerById(modId).get();
 		this.metadata = container.getMetadata();
+		badgeNames.add("sinytra_fabric");
 
 		String id = metadata.getId();
 
@@ -106,11 +107,14 @@ public class FabricMod implements Mod {
 
 		/* Add additional badges */
 		this.badges = modMenuData.getBadges();
+		//TODO replace with if (container.getOrigin().getKind() == ModOrigin.Kind.NESTED) { if connector bug is fixed
+		if (forgeContainer.getModInfo().getOwningFile().getFile().getFilePath().getFileName().toString().contains("$")) {
+			badgeNames.add("library");
+		}
+
 		if (this.metadata.getEnvironment() == ModEnvironment.CLIENT) {
 			badgeNames.add("client");
 		}
-
-		badgeNames.add("sinytra_fabric");
 	}
 
 	public Optional<net.neoforged.fml.ModContainer> getContainer() {

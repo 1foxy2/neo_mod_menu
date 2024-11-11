@@ -18,6 +18,7 @@ public class ModBadge {
             "deprecated", new ModBadge("modmenu.badge.deprecated", 0xff841426, 0xff530C17),
             "sinytra_fabric", new ModBadge("modmenu.badge.fabric", 0xffc7b48b, 0xff786d58),
             "sinytra_neoforge", new ModBadge("modmenu.badge.neoforge", 0xffff7C26, 0xffd85600),
+            //"sinytra_neoforge", new ModBadge("modmenu.badge.neoforge", 0xffe68c37, 0xffa44e37),
             "modpack", new ModBadge("modmenu.badge.modpack", 0xff7a2b7c, 0xff510d54),
             "minecraft", new ModBadge("modmenu.badge.minecraft", 0xff6f6c6a, 0xff31302f)
     );
