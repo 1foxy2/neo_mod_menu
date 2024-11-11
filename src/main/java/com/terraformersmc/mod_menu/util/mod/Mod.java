@@ -2,6 +2,7 @@ package com.terraformersmc.mod_menu.util.mod;
 
 import com.terraformersmc.mod_menu.ModMenu;
 import com.terraformersmc.mod_menu.TextPlaceholderApiCompat;
+import com.terraformersmc.mod_menu.config.ModMenuConfig;
 import com.terraformersmc.mod_menu.util.mod.neoforge.NeoforgeIconHandler;
 import eu.pb4.placeholders.api.ParserContext;
 import net.minecraft.client.renderer.texture.DynamicTexture;
@@ -69,15 +70,19 @@ public interface Mod {
 
 
 	default void reCalculateBadge() {
-		ModMenu.getConfig().mod_badges.putIfAbsent(getId(), new LinkedHashSet<>());
+		ModMenuConfig config = ModMenu.getConfig();
+		config.mod_badges.putIfAbsent(getId(), new LinkedHashSet<>());
 
-		if (!ModMenu.getConfig().DISABLE_DEFAULT_BADGES_ALL.get() &&
-				!ModMenu.getConfig().DISABLE_DEFAULT_BADGES.get().contains(getId())) {
-			ModMenu.getConfig().mod_badges.get(getId()).addAll(getBadgeNames());
-		}
+		Set<String> defaultBadges = new LinkedHashSet<>(getBadgeNames());
 
-		Set<String> badgelist = ModMenu.getConfig().mod_badges.get(this.getId());
+		if (config.disabled_mod_badges.containsKey(getId()))
+			defaultBadges.removeAll(config.disabled_mod_badges.get(getId()));
+
+		Set<String> badgelist = config.mod_badges.get(this.getId());
 		this.getBadges().addAll(ModBadge.convert(badgelist, this.getId()));
+		if (!ModMenu.getConfig().DISABLE_DEFAULT_BADGES_ALL.get() &&
+				!ModMenu.getConfig().DISABLE_DEFAULT_BADGES.get().contains(getId()))
+			this.getBadges().addAll(ModBadge.convert(defaultBadges, this.getId()));
 	}
 
 	@NotNull String getVersion();
