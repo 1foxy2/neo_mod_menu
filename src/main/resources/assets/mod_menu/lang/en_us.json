@@ -20,6 +20,7 @@
   "mod_menu.searchTerms.modpack": "modpack pack",
   "mod_menu.searchTerms.deprecated": "deprecated outdated old",
   "mod_menu.searchTerms.clientside": "clientside gameside",
+  "mod_menu.searchTerms.neoforge": "neoforge",
   "mod_menu.searchTerms.configurable": "configurations configs configures configurable options settings",
   "mod_menu.searchTerms.hasUpdate": "updates version",
   

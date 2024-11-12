@@ -19,10 +19,12 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.ComponentContents;
 import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
+import net.neoforged.neoforge.client.event.RegisterClientReloadListenersEvent;
 import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
 import net.neoforged.neoforge.client.event.ScreenEvent;
 import net.neoforged.neoforge.client.settings.KeyConflictContext;
@@ -226,6 +228,12 @@ public class ModMenuEventHandler {
 		@SubscribeEvent
 		public static void registerKeyMapping(RegisterKeyMappingsEvent event) {
 			event.register(ModMenuEventHandler.MENU_KEY_BIND.get());
+		}
+
+		@SubscribeEvent
+		public static void registerReloadManager(RegisterClientReloadListenersEvent event) {
+			event.registerReloadListener((ResourceManagerReloadListener) manager ->
+					ModMenu.createBadgesAndIcons());
 		}
 	}
 }
