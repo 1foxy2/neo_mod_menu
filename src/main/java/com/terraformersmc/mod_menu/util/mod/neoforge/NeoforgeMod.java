@@ -56,6 +56,8 @@ public class NeoforgeMod implements Mod {
 			badgeNames.add("sinytra_neoforge");
 
 		issueTrackerUrl = modInfo.getConfig().<String>getConfigElement("issueTrackerURL").orElse(null);
+		if (issueTrackerUrl == null)
+			issueTrackerUrl = modInfo.getOwningFile().getConfig().<String>getConfigElement("issueTrackerURL").orElse(null);
 		website = modInfo.getConfig().<String>getConfigElement("displayURL").orElse(null);
 
 		/* Load modern mod menu custom value data */
