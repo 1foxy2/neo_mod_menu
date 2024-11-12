@@ -102,7 +102,7 @@ public class ModMenuConfig {
                 .defineList("hidden_configs", ArrayList::new, String::new, object -> object instanceof String);
         LIBRARY_LIST = builder.comment("deprecated")
                 .defineList("library_list", ArrayList::new, String::new, object -> object instanceof String);
-        builder.push("disable_default_badges_section").comment("deprecated");
+        builder.comment("deprecated").push("disable_default_badges_section");
         DISABLE_DEFAULT_BADGES_ALL = builder
                 .define("disable_default_badges_all", false);
         DISABLE_DEFAULT_BADGES = builder
