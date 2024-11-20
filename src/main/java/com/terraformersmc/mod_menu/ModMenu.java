@@ -4,7 +4,6 @@ import com.google.common.collect.LinkedListMultimap;
 import com.google.gson.*;
 import com.mojang.blaze3d.platform.NativeImage;
 import com.terraformersmc.mod_menu.config.ModMenuConfig;
-import com.terraformersmc.mod_menu.gui.ModsScreen;
 import com.terraformersmc.mod_menu.util.EnumToLowerCaseJsonConverter;
 import com.terraformersmc.mod_menu.util.ModMenuScreenTexts;
 import com.terraformersmc.mod_menu.util.mod.Mod;
@@ -35,6 +34,7 @@ import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.apache.commons.lang3.tuple.Pair;
+import org.sinytra.connector.loader.ConnectorEarlyLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -108,14 +108,12 @@ public class ModMenu {
 		bus.addListener(this::onClientSetup);
 
 		ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, CONFIG.getValue());
-		//container.registerExtensionPoint(ConfigScreenHandler.ConfigScreenFactory.class, (modContainer, screen) ->
-		//		new ConfigurationScreen(container, screen, ModMenuConfigScreen::new));
 
 		// Fill mods map
 		ModList.get().forEachModContainer((s, modContainer) -> {
 			Mod mod;
 
-			if (HAS_SINYTRA && ModsScreen.isFabricMod(modContainer.getModInfo().getOwningFile().getFile().getFilePath())) {
+			if (HAS_SINYTRA && ConnectorEarlyLoader.isConnectorMod(modContainer.getModId())) {
 				mod = new FabricMod(modContainer.getModId());
 			} else {
 				mod = new NeoforgeMod(modContainer);

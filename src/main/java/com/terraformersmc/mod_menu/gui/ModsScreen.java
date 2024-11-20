@@ -474,7 +474,7 @@ public class ModsScreen extends Screen {
 		}, Component.translatable("mod_menu.dropConfirm"), Component.literal(modList)));
 	}
 
-	public static boolean isFabricMod(Path mod) {
+	private static boolean isFabricMod(Path mod) {
 		try (JarFile jarFile = new JarFile(mod.toFile())) {
 			return jarFile.getEntry("fabric.mod.json") != null;
 		} catch (IOException e) {

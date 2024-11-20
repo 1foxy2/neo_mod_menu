@@ -96,6 +96,9 @@ repositories {
     flatDir {
         dir 'libs'
     }
+    maven {
+        url "https://maven.su5ed.dev/releases"
+    }
 }
 
 dependencies {
@@ -104,9 +107,10 @@ dependencies {
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 
     compileOnly(files("./libs/fabric-api-base-0.4.31+ef105b4977.jar"))
-   // implementation files("./libs/fabric-key-binding-api-v1-1.0.37+561530ec77")
     compileOnly(files("./libs/fabric-resource-loader-v0-0.11.10+bcd08ed377.jar"))
-            compileOnly( files("./libs/fabric-loader-2.6.0+0.15.0+1.20.1-full.jar"))
+    compileOnly(files("./libs/fabric-loader-2.6.0+0.15.0+1.20.1-full.jar"))
+
+    implementation("org.sinytra:Connector:1.0.0-beta.46+1.20.1")
 }
 
 // This block of code expands all declared replace properties in the specified resource targets.
