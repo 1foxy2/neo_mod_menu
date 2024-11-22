@@ -2,7 +2,6 @@ package com.terraformersmc.mod_menu.util.mod.neoforge;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import com.mojang.logging.LogUtils;
 import com.terraformersmc.mod_menu.ModMenu;
 import com.terraformersmc.mod_menu.util.VersionUtil;
 import com.terraformersmc.mod_menu.util.mod.Mod;
@@ -14,6 +13,7 @@ import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.ModList;
 import net.neoforged.fml.javafmlmod.AutomaticEventSubscriber;
 import net.neoforged.fml.loading.moddiscovery.ModFileInfo;
+import net.neoforged.neoforgespi.language.IModFileInfo;
 import net.neoforged.neoforgespi.language.IModInfo;
 import net.neoforged.neoforgespi.language.ModFileScanData;
 import net.neoforged.neoforgespi.locating.IModFile;
@@ -36,7 +36,7 @@ public class NeoforgeMod implements Mod {
 	protected final ModMenuData modMenuData;
 
 	protected final Set<ModBadge> badges;
-	protected final Set<String> badgeNames = new LinkedHashSet<>();
+	protected final LinkedHashSet<String> badgeNames = new LinkedHashSet<>();
 
 	protected final Map<String, String> links = new HashMap<>();
 
@@ -56,22 +56,18 @@ public class NeoforgeMod implements Mod {
 
 		String id = modInfo.getModId();
 
-		if ("minecraft".equals(id))
-			badgeNames.add("minecraft");
-		else if (ModMenu.HAS_SINYTRA)
-				badgeNames.add("sinytra_neoforge");
-
+		IModFileInfo modFileInfo = modInfo.getOwningFile();
 
 		issueTrackerUrl = modInfo.getConfig().<String>getConfigElement("issueTrackerURL").orElse(null);
 		if (issueTrackerUrl == null)
-			issueTrackerUrl = modInfo.getOwningFile().getConfig().<String>getConfigElement("issueTrackerURL").orElse(null);
+			issueTrackerUrl = modFileInfo.getConfig().<String>getConfigElement("issueTrackerURL").orElse(null);
 		website = modInfo.getConfig().<String>getConfigElement("displayURL").orElse(null);
 
 		/* Load modern mod menu custom value data */
 		Optional<String> parentId = Optional.empty();
 		ModMenuData.DummyParentData parentData = null;
 
-		Optional<ModFileInfo> ownFile = Optional.ofNullable((ModFileInfo) container.getModInfo().getOwningFile());
+		Optional<ModFileInfo> ownFile = Optional.ofNullable((ModFileInfo) modFileInfo);
 		Optional<Map<String, Object>> modMenuValue = ownFile.flatMap(mfi -> mfi.getConfigElement("modproperties", "modmenu"));
 
 		if (modMenuValue.isPresent()) {
@@ -139,15 +135,14 @@ public class NeoforgeMod implements Mod {
 
 		/* Add additional badges */
 		this.badges = modMenuData.getBadges();
-		IModFile parent = container.getModInfo().getOwningFile().getFile().getDiscoveryAttributes().parent();
+		IModFile parent = modFileInfo.getFile().getDiscoveryAttributes().parent();
 		if (parent != null && parent.getType() != IModFile.Type.LIBRARY) {
 			badgeNames.add("library");
 		}
 		boolean isClientSide = false;
 
-		for (ModFileScanData.AnnotationData data : modInfo.getOwningFile().getFile().getScanResult().getAnnotatedBy(net.neoforged.fml.common.Mod.class, ElementType.TYPE).toList()) {
+		for (ModFileScanData.AnnotationData data : modFileInfo.getFile().getScanResult().getAnnotatedBy(net.neoforged.fml.common.Mod.class, ElementType.TYPE).toList()) {
 			var dist = AutomaticEventSubscriber.getSides(data.annotationData().get("dist"));
-			LogUtils.getLogger().warn(String.valueOf(dist));
 			if (!dist.contains(Dist.DEDICATED_SERVER))
 				isClientSide = true;
 			else {
@@ -156,11 +151,16 @@ public class NeoforgeMod implements Mod {
 			}
 		}
 
-		if (isClientSide && !id.equals("minecraft"))
-			badgeNames.add("client");
-	/*	if (this.modInfo.getEnvironment() == ModEnvironment.CLIENT) { not sure how to check that
-			badges.add(Badge.CLIENT);
-		}*/
+
+		if ("minecraft".equals(id))
+			badgeNames.add("minecraft");
+		else {
+			if (ModMenu.HAS_SINYTRA)
+					badgeNames.addFirst("sinytra_neoforge");
+
+			if (isClientSide)
+				badgeNames.add("client");
+		}
 	}
 
 	public Optional<ModContainer> getContainer() {

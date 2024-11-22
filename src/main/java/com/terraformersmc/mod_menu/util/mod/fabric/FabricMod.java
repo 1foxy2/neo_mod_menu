@@ -1,7 +1,6 @@
 package com.terraformersmc.mod_menu.util.mod.fabric;
 
 import com.google.common.collect.Sets;
-import com.mojang.logging.LogUtils;
 import com.terraformersmc.mod_menu.ModMenu;
 import com.terraformersmc.mod_menu.util.VersionUtil;
 import com.terraformersmc.mod_menu.util.mod.Mod;
@@ -105,10 +104,10 @@ public class FabricMod implements Mod {
 
 		/* Add additional badges */
 		this.badges = modMenuData.getBadges();
-		//TODO replace with if (container.getOrigin().getKind() == ModOrigin.Kind.NESTED) { if connector bug is fixed
-		if (forgeContainer.getModInfo().getOwningFile().getFile().getFilePath().getFileName().toString().contains("$")) {
-			badgeNames.add("library");
-		}
+		CustomValueUtil.getBoolean(
+				"fabric-loom:generated",
+				metadata
+		).ifPresent(value -> badgeNames.add("library"));
 
 		if (this.metadata.getEnvironment() == ModEnvironment.CLIENT) {
 			badgeNames.add("client");
