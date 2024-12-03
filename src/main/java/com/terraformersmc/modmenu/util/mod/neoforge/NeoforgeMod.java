@@ -8,16 +8,21 @@ import com.terraformersmc.modmenu.util.mod.Mod;
 import com.terraformersmc.modmenu.util.mod.ModBadge;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.util.Tuple;
+import net.neoforged.api.distmarker.Dist;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.ModList;
+import net.neoforged.fml.javafmlmod.AutomaticEventSubscriber;
 import net.neoforged.fml.loading.moddiscovery.ModFileInfo;
 import net.neoforged.neoforgespi.language.IModInfo;
+import net.neoforged.neoforgespi.language.ModFileScanData;
+import net.neoforged.neoforgespi.locating.IModFile;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.awt.*;
+import java.lang.annotation.ElementType;
 import java.util.List;
 import java.util.*;
 
@@ -52,11 +57,12 @@ public class NeoforgeMod implements Mod {
 
 		if ("minecraft".equals(id))
 			badgeNames.add("minecraft");
-
 		else if (ModMenu.HAS_SINYTRA)
 			badgeNames.add("sinytra_neoforge");
 
 		issueTrackerUrl = modInfo.getConfig().<String>getConfigElement("issueTrackerURL").orElse(null);
+		if (issueTrackerUrl == null)
+			issueTrackerUrl = modInfo.getOwningFile().getConfig().<String>getConfigElement("issueTrackerURL").orElse(null);
 		website = modInfo.getConfig().<String>getConfigElement("displayURL").orElse(null);
 
 		/* Load modern mod menu custom value data */
@@ -124,21 +130,30 @@ public class NeoforgeMod implements Mod {
 
 		/* Hardcode parents and badges for connector-extras */
 		if (id.startsWith("connectorextras") || id.startsWith("modmenu")) {
-			if (ModList.get().isLoaded("connector")) {
-				modMenuData.fillParentIfEmpty("connector");
-			}
+			modMenuData.fillParentIfEmpty("connector");
 
 			badgeNames.add("library");
 		}
 
 		/* Add additional badges */
 		this.badges = modMenuData.getBadges();
-		if (container.getModInfo().getOwningFile().getFile().getDiscoveryAttributes().parent() != null) {
+		IModFile parent = container.getModInfo().getOwningFile().getFile().getDiscoveryAttributes().parent();
+		if (parent != null && parent.getType() != IModFile.Type.LIBRARY) {
 			badgeNames.add("library");
 		}
-	/*	if (this.modInfo.getEnvironment() == ModEnvironment.CLIENT) { not sure how to check that
-			badges.add(Badge.CLIENT);
-		}*/
+
+		boolean isClientSide = false;
+		for (ModFileScanData.AnnotationData data : modInfo.getOwningFile().getFile().getScanResult().getAnnotatedBy(net.neoforged.fml.common.Mod.class, ElementType.TYPE).toList()) {
+			var dist = AutomaticEventSubscriber.getSides(data.annotationData().get("dist"));
+			if (!dist.contains(Dist.DEDICATED_SERVER))
+				isClientSide = true;
+			else {
+				isClientSide = false;
+				break;
+			}
+		}
+		if (isClientSide && !id.equals("minecraft"))
+			badgeNames.add("client");
 	}
 
 	public Optional<ModContainer> getContainer() {

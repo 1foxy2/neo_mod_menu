@@ -99,6 +99,9 @@ public class ModMenu {
 			return null;
 		}
 
+		if (configScreenFactories.containsKey(container.getModId()))
+			return configScreenFactories.get(container.getModId());
+
 		configScreenFactories.putIfAbsent("minecraft", (modContainer, screen) ->
 				new OptionsScreen(screen, Minecraft.getInstance().options));
 
@@ -177,8 +180,6 @@ public class ModMenu {
 	}
 
 	public void onClientSetup(FMLClientSetupEvent event) {
-		ModList.get().getMods().forEach(info -> IConfigScreenFactory.getForMod(info).ifPresent(
-				factory -> configScreenFactories.put(info.getModId(), factory)));
 		getConfig().onLoad();
 	}
 

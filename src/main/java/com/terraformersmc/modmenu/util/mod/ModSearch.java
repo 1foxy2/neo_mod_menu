@@ -7,6 +7,7 @@ import net.minecraft.util.Tuple;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class ModSearch {
@@ -38,11 +39,23 @@ public class ModSearch {
 		String modDescription = mod.getDescription();
 		String modSummary = mod.getSummary();
 
+		boolean hasCustomBadge = false;
+		for (Map.Entry<String, ModBadge> badgeEntry : ModBadge.CUSTOM_BADGES.entrySet()) {
+			String searchTerms = badgeEntry.getValue().getComponent().getString();
+			if (I18n.exists("mod_menu.searchTerms." + badgeEntry.getKey()))
+				searchTerms = I18n.get("mod_menu.searchTerms." + badgeEntry.getKey());
+			if (searchTerms.contains(query) && mod.getBadges().contains(badgeEntry.getValue())) {
+				hasCustomBadge = true;
+				break;
+			}
+		}
+
 		String library = I18n.get("modmenu.searchTerms.library");
 		String sinytra = I18n.get("modmenu.searchTerms.sinytra");
 		String modpack = I18n.get("modmenu.searchTerms.modpack");
 		String deprecated = I18n.get("modmenu.searchTerms.deprecated");
 		String clientside = I18n.get("modmenu.searchTerms.clientside");
+		String neoforge = I18n.get("modmenu.searchTerms.neoforge");
 		String configurable = I18n.get("modmenu.searchTerms.configurable");
 		String hasUpdate = I18n.get("modmenu.searchTerms.hasUpdate");
 
@@ -63,12 +76,12 @@ public class ModSearch {
 			|| modSummary.toLowerCase(Locale.ROOT).contains(query) // Search mod summary
 			|| authorMatches(mod, query) // Search via author
 			|| library.contains(query) && mod.getBadges().contains(ModBadge.LIBRARY) // Search for lib mods
-			|| sinytra.contains(query) && mod.getBadges()
-			.contains(ModBadge.DEFAULT_BADGES.get("sinytra_fabric")) // Search for sinytra mods
+			|| sinytra.contains(query) && mod.getBadges().contains(ModBadge.DEFAULT_BADGES.get("sinytra_fabric")) // Search for sinytra mods
 			|| modpack.contains(query) && mod.getBadges().contains(ModBadge.DEFAULT_BADGES.get("modpack")) // Search for modpack mods
-			|| deprecated.contains(query) && mod.getBadges()
-			.contains(ModBadge.DEFAULT_BADGES.get("deprecated")) // Search for deprecated mods
+			|| deprecated.contains(query) && mod.getBadges().contains(ModBadge.DEFAULT_BADGES.get("deprecated")) // Search for deprecated mods
+				|| deprecated.contains(query) && mod.getBadges().contains(ModBadge.DEFAULT_BADGES.get("deprecated")) // Search for deprecated mods
 			|| clientside.contains(query) && mod.getBadges().contains(ModBadge.DEFAULT_BADGES.get("client")) // Search for clientside mods
+				|| neoforge.contains(query) && mod.getBadges().contains(ModBadge.DEFAULT_BADGES.get("sinytra_neoforge")) // Search for neoforge mods
 			|| configurable.contains(query) && screen.getModHasConfigScreen(mod.getContainer())// Search for mods that can be configured
 			// Search for mods that have updates
 		) {
