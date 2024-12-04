@@ -76,7 +76,7 @@ public class DescriptionListWidget extends AbstractSelectionList<DescriptionList
 	}
 
 	@Override
-	protected int getScrollbarPosition() {
+	protected int scrollBarX() {
 		return this.width - 6 + this.getX();
 	}
 
@@ -281,13 +281,13 @@ public class DescriptionListWidget extends AbstractSelectionList<DescriptionList
 
 	public void renderScrollBar(BufferBuilder bufferBuilder, Tesselator tessellator) {
 		MeshData builtBuffer;
-		int scrollbarStartX = this.getScrollbarPosition();
+		int scrollbarStartX = this.scrollBarX();
 		int scrollbarEndX = scrollbarStartX + 6;
-		int maxScroll = this.getMaxScroll();
+		int maxScroll = this.maxScrollAmount();
 		if (maxScroll > 0) {
-			int p = (int) ((float) ((this.getBottom() - this.getY()) * (this.getBottom() - this.getY())) / (float) this.getMaxPosition());
+			int p = (int) ((float) ((this.getBottom() - this.getY()) * (this.getBottom() - this.getY())) / (float) this.contentHeight());
 			p = Mth.clamp(p, 32, this.getBottom() - this.getY() - 8);
-			int q = (int) this.getScrollAmount() * (this.getBottom() - this.getY() - p) / maxScroll + this.getY();
+			int q = (int) this.scrollAmount() * (this.getBottom() - this.getY() - p) / maxScroll + this.getY();
 			if (q < this.getY()) {
 				q = this.getY();
 			}

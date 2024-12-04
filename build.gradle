@@ -77,7 +77,8 @@ configurations {
     runtimeClasspath.extendsFrom localRuntime
 }
 
-var generateModMetadata = tasks.register("generateModMetadata", ProcessResources) {
+
+processResources {
     var replaceProperties = [
             minecraft_version      : minecraft_version,
             minecraft_version_range: minecraft_version_range,
@@ -96,10 +97,6 @@ var generateModMetadata = tasks.register("generateModMetadata", ProcessResources
     }
     inputs.properties replaceProperties
 }
-
-sourceSets.main.resources.srcDir generateModMetadata
-
-neoForge.ideSyncTask generateModMetadata
 
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8' // Use the UTF-8 charset for Java compilation

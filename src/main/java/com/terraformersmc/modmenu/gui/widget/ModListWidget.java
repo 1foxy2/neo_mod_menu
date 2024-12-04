@@ -52,13 +52,13 @@ public class ModListWidget extends ObjectSelectionList<ModListEntry> implements 
 	@Override
 	public void setScrollAmount(double amount) {
 		super.setScrollAmount(amount);
-		int denominator = Math.max(0, this.getMaxPosition() - (this.getBottom() - this.getY() - 4));
+		int denominator = Math.max(0, this.contentHeight() - (this.getBottom() - this.getY() - 4));
 		if (denominator <= 0) {
 			parent.updateScrollPercent(0);
 		} else {
-			parent.updateScrollPercent(getScrollAmount() / Math.max(
+			parent.updateScrollPercent(scrollAmount() / Math.max(
 				0,
-				this.getMaxPosition() - (this.getBottom() - this.getY() - 4)
+				this.contentHeight() - (this.getBottom() - this.getY() - 4)
 			));
 		}
 	}
@@ -202,8 +202,8 @@ public class ModListWidget extends ObjectSelectionList<ModListEntry> implements 
 			}
 		}
 
-		if (getScrollAmount() > Math.max(0, this.getMaxPosition() - (this.getBottom() - this.getY() - 4))) {
-			setScrollAmount(Math.max(0, this.getMaxPosition() - (this.getBottom() - this.getY() - 4)));
+		if (scrollAmount() > Math.max(0, this.contentHeight() - (this.getBottom() - this.getY() - 4))) {
+			setScrollAmount(Math.max(0, this.contentHeight() - (this.getBottom() - this.getY() - 4)));
 		}
 	}
 
@@ -278,35 +278,6 @@ public class ModListWidget extends ObjectSelectionList<ModListEntry> implements 
 		super.ensureVisible(entry);
 	}
 
-	@Override
-	protected void updateScrollingState(double double_1, double double_2, int int_1) {
-		super.updateScrollingState(double_1, double_2, int_1);
-		this.scrolling = int_1 == 0 && double_1 >= (double) this.getScrollbarPosition() && double_1 < (double) (this.getScrollbarPosition() + 6);
-	}
-
-	@Override
-	public boolean mouseClicked(double double_1, double double_2, int int_1) {
-		this.updateScrollingState(double_1, double_2, int_1);
-		if (!this.isMouseOver(double_1, double_2)) {
-			return false;
-		} else {
-			ModListEntry entry = this.getEntryAtPos(double_1, double_2);
-			if (entry != null) {
-				if (entry.mouseClicked(double_1, double_2, int_1)) {
-					this.setFocused(entry);
-					this.setDragging(true);
-					return true;
-				}
-			} else if (int_1 == 0 && this.clickedHeader((int) (double_1 - (double) (this.getX() + this.width / 2 - this.getRowWidth() / 2)),
-				(int) (double_2 - (double) this.getY()) + (int) this.getScrollAmount() - 4
-			)) {
-				return true;
-			}
-
-			return this.scrolling;
-		}
-	}
-
 	public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
 		if (keyCode == GLFW.GLFW_KEY_UP || keyCode == GLFW.GLFW_KEY_DOWN) {
 			return super.keyPressed(keyCode, scanCode, modifiers);
@@ -318,21 +289,21 @@ public class ModListWidget extends ObjectSelectionList<ModListEntry> implements 
 	}
 
 	public final ModListEntry getEntryAtPos(double x, double y) {
-		int int_5 = Mth.floor(y - (double) this.getY()) - this.headerHeight + (int) this.getScrollAmount() - 4;
+		int int_5 = Mth.floor(y - (double) this.getY()) - this.headerHeight + (int) this.scrollAmount() - 4;
 		int index = int_5 / this.itemHeight;
-		return x < (double) this.getScrollbarPosition() && x >= (double) getRowLeft() && x <= (double) (getRowLeft() + getRowWidth()) && index >= 0 && int_5 >= 0 && index < this.getItemCount() ?
+		return x < (double) this.scrollBarX() && x >= (double) getRowLeft() && x <= (double) (getRowLeft() + getRowWidth()) && index >= 0 && int_5 >= 0 && index < this.getItemCount() ?
 			this.children().get(index) :
 			null;
 	}
 
 	@Override
-	protected int getScrollbarPosition() {
+	protected int scrollBarX() {
 		return this.width - 6;
 	}
 
 	@Override
 	public int getRowWidth() {
-		return this.width - (Math.max(0, this.getMaxPosition() - (this.getBottom() - this.getY() - 4)) > 0 ? 18 : 12);
+		return this.width - (Math.max(0, this.contentHeight() - (this.getBottom() - this.getY() - 4)) > 0 ? 18 : 12);
 	}
 
 	@Override
@@ -353,8 +324,8 @@ public class ModListWidget extends ObjectSelectionList<ModListEntry> implements 
 	}
 
 	@Override
-	protected int getMaxPosition() {
-		return super.getMaxPosition() + 4;
+	protected int contentHeight() {
+		return super.contentHeight() + 4;
 	}
 
 	public int getDisplayedCountFor(Set<String> set) {
