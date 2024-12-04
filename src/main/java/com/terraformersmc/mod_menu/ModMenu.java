@@ -93,6 +93,9 @@ public class ModMenu {
 			return null;
 		}
 
+		if (configScreenFactories.containsKey(container.getModId()))
+			return configScreenFactories.get(container.getModId());
+
 		configScreenFactories.putIfAbsent("minecraft", (modContainer, screen) ->
 				new OptionsScreen(screen, Minecraft.getInstance().options));
 
