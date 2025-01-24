@@ -1,7 +1,7 @@
 plugins {
     id 'java-library'
     id 'maven-publish'
-    id 'net.neoforged.moddev' version '2.0.52-beta'
+    id 'net.neoforged.moddev' version '2.0.71'
 }
 
 tasks.named('wrapper', Wrapper).configure {
@@ -22,6 +22,7 @@ repositories {
     maven {
         url "https://maven.su5ed.dev/releases"
     }
+    maven { url 'https://jitpack.io' }
 }
 
 dependencies {
@@ -29,6 +30,7 @@ dependencies {
     compileOnly "org.sinytra.forgified-fabric-api:forgified-fabric-api:0.102.0+2.0.12+1.21.1"
     //runtimeOnly "org.sinytra.forgified-fabric-api:forgified-fabric-api:0.102.0+2.0.12+1.21.1"
     compileOnly "org.sinytra:connector:2.0.0-beta.3+1.21.1"
+    jarJar(implementation 'com.github.1foxy2:TextPlaceholderAPI-neoforge:443152240f')
 }
 
 neoForge {
