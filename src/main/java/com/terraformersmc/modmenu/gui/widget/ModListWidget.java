@@ -80,7 +80,11 @@ public class ModListWidget extends ObjectSelectionList<ModListEntry> implements 
 	@Override
 	public void setSelected(ModListEntry entry) {
 		super.setSelected(entry);
-		selectedModId = entry.getMod().getId();
+		if (entry == null) {
+			selectedModId = null;
+		} else {
+			selectedModId = entry.getMod().getId();
+		}
 		parent.updateSelectedEntry(getSelected());
 	}
 
