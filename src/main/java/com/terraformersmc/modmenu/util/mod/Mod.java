@@ -80,14 +80,13 @@ public interface Mod {
 
 	default void reCalculateBadge() {
 		BetterModListConfig config = ModMenu.getConfig();
-		config.mod_badges.putIfAbsent(getId(), new LinkedHashSet<>());
 
 		Set<String> defaultBadges = new LinkedHashSet<>(getBadgeNames());
 
 		if (config.disabled_mod_badges.containsKey(getId()))
 			defaultBadges.removeAll(config.disabled_mod_badges.get(getId()));
 
-		Set<String> badgelist = config.mod_badges.get(this.getId());
+		Set<String> badgelist = config.mod_badges.computeIfAbsent(this.getId(), v -> new LinkedHashSet<>());
 		this.getBadges().clear();
 		this.getBadges().addAll(ModBadge.convert(badgelist, this.getId()));
 		this.getBadges().addAll(ModBadge.convert(defaultBadges, this.getId()));
