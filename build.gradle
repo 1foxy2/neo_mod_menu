@@ -99,7 +99,10 @@ repositories {
     maven {
         url "https://maven.su5ed.dev/releases"
     }
+    maven { url 'https://jitpack.io' }
 }
+
+jarJar.enable()
 
 dependencies {
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
@@ -110,7 +113,9 @@ dependencies {
     compileOnly(files("./libs/fabric-resource-loader-v0-0.11.10+bcd08ed377.jar"))
     compileOnly(files("./libs/fabric-loader-2.6.0+0.15.0+1.20.1-full.jar"))
 
-    implementation("org.sinytra:Connector:1.0.0-beta.46+1.20.1")
+    compileOnly("org.sinytra:Connector:1.0.0-beta.46+1.20.1")
+    implementation fg.deobf('com.github.1foxy2:TextPlaceholderAPI-neoforge:2c9c884ab1')
+    jarJar('com.github.1foxy2:TextPlaceholderAPI-neoforge:2c9c884ab1')
 }
 
 // This block of code expands all declared replace properties in the specified resource targets.

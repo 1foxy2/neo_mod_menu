@@ -25,6 +25,12 @@ public interface Mod {
 	@NotNull
 	default String getTranslatedName() {
 		String translationKey = "mod_menu.nameTranslation." + getId();
+		if (!I18n.exists(translationKey)) {
+			translationKey = "modmenu.nameTranslation." + getId();
+		}
+		if (!I18n.exists(translationKey)) {
+			translationKey = "modmenu.nameTranslation." + getId().replace("_", "-");
+		}
 		if ((getId().equals("minecraft") || getId().equals("java") || ModMenu.getConfig().TRANSLATE_NAMES.get()) && I18n.exists(
 			translationKey)) {
 			return I18n.get(translationKey);
@@ -43,6 +49,12 @@ public interface Mod {
 	@NotNull
 	default String getTranslatedSummary() {
 		String translationKey = "mod_menu.summaryTranslation." + getId();
+		if (!I18n.exists(translationKey)) {
+			translationKey = "modmenu.summaryTranslation." + getId();
+		}
+		if (!I18n.exists(translationKey)) {
+			translationKey = "modmenu.summaryTranslation." + getId().replace("_", "-");
+		}
 		if ((getId().equals("minecraft") || getId().equals("java") || ModMenu.getConfig().TRANSLATE_DESCRIPTIONS.get()) && I18n.exists(
 			translationKey)) {
 			return I18n.get(translationKey);
@@ -55,6 +67,12 @@ public interface Mod {
 	@NotNull
 	default String getTranslatedDescription() {
 		String translatableDescriptionKey = "mod_menu.descriptionTranslation." + getId();
+		if (!I18n.exists(translatableDescriptionKey)) {
+			translatableDescriptionKey = "modmenu.descriptionTranslation." + getId();
+		}
+		if (!I18n.exists(translatableDescriptionKey)) {
+			translatableDescriptionKey = "modmenu.descriptionTranslation." + getId().replace("_", "-");
+		}
 		if ((getId().equals("minecraft") || getId().equals("java") || ModMenu.getConfig().TRANSLATE_DESCRIPTIONS.get()) && I18n.exists(
 			translatableDescriptionKey)) {
 			return I18n.get(translatableDescriptionKey);
