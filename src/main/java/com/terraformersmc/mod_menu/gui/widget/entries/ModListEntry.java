@@ -119,7 +119,7 @@ public class ModListEntry extends ObjectSelectionList.Entry<ModListEntry> {
 				x + rowWidth,
 				mod,
 				list.getParent()
-			).draw(guiGraphics, mouseX, mouseY);
+			).draw(guiGraphics);
 		}
 		if (!ModMenu.getConfig().COMPACT_LIST.get()) {
 			String summary = mod.getSummary();

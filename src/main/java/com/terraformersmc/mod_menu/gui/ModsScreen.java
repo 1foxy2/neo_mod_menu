@@ -158,7 +158,7 @@ public class ModsScreen extends Screen {
 		this.filtersWidth = librariesWidth + sortingWidth + 2;
 		this.searchRowWidth = this.searchBoxX + searchBoxWidth + 22;
 
-		this.updateFiltersX();
+		this.updateFiltersX(true);
 
 		if (!ModMenu.getConfig().CONFIG_MODE.get()) {
 			this.filtersButton = LegacyTexturedButtonWidget.legacyTexturedBuilder(ModMenuScreenTexts.TOGGLE_FILTER_OPTIONS,
@@ -346,8 +346,8 @@ public class ModsScreen extends Screen {
 			);
 		}
 		if (!ModMenu.getConfig().CONFIG_MODE.get()) {
-			Component fullModCount = this.computeModCountText(true);
-			if (!ModMenu.getConfig().CONFIG_MODE.get() && this.updateFiltersX()) {
+			Component fullModCount = this.computeModCountText(true, false);
+			if (!ModMenu.getConfig().CONFIG_MODE.get() && this.updateFiltersX(false)) {
 				if (this.filterOptionsShown) {
 					if (!ModMenu.getConfig().SHOW_LIBRARIES.get() ||
 						font.width(fullModCount) <= this.filtersX - 5) {
@@ -360,14 +360,14 @@ public class ModsScreen extends Screen {
 						);
 					} else {
 						guiGraphics.drawString(font,
-							computeModCountText(false).getVisualOrderText(),
+							computeModCountText(false, false).getVisualOrderText(),
 							this.searchBoxX,
 							46,
 							0xFFFFFF,
 							true
 						);
 						guiGraphics.drawString(font,
-							computeLibraryCountText().getVisualOrderText(),
+							computeLibraryCountText(false).getVisualOrderText(),
 							this.searchBoxX,
 							57,
 							0xFFFFFF,
@@ -386,14 +386,14 @@ public class ModsScreen extends Screen {
 						);
 					} else {
 						guiGraphics.drawString(font,
-							computeModCountText(false).getVisualOrderText(),
+							computeModCountText(false, false).getVisualOrderText(),
 							this.searchBoxX,
 							46,
 							0xFFFFFF,
 							true
 						);
 						guiGraphics.drawString(font,
-							computeLibraryCountText().getVisualOrderText(),
+							computeLibraryCountText(false).getVisualOrderText(),
 							this.searchBoxX,
 							57,
 							0xFFFFFF,
@@ -455,7 +455,7 @@ public class ModsScreen extends Screen {
 				this.init = false;
 			}
 			if (!ModMenu.getConfig().HIDE_BADGES.get()) {
-				modBadgeRenderer.draw(guiGraphics, mouseX, mouseY);
+				modBadgeRenderer.draw(guiGraphics);
 			}
 			if (mod.isReal()) {
 				guiGraphics.drawString(font,
@@ -487,42 +487,42 @@ public class ModsScreen extends Screen {
 		}
 	}
 
-	private Component computeModCountText(boolean includeLibs) {
+	private Component computeModCountText(boolean includeLibs, boolean onInit) {
 		int[] rootMods = formatModCount(ModMenu.ROOT_MODS.values()
 			.stream()
 			.filter(mod -> !mod.isHidden() && !mod.getBadges().contains(ModBadge.LIBRARY))
 			.map(Mod::getId)
-			.collect(Collectors.toSet()));
+			.collect(Collectors.toSet()), onInit);
 
-		if (includeLibs && ModMenu.getConfig().SHOW_LIBRARIES.get()) {
+		if (includeLibs && ModMenu.getConfig().SHOW_LIBRARIES.get() && !onInit) {
 			int[] rootLibs = formatModCount(ModMenu.ROOT_MODS.values()
 				.stream()
 				.filter(mod -> !mod.isHidden() && mod.getBadges().contains(ModBadge.LIBRARY))
 				.map(Mod::getId)
-				.collect(Collectors.toSet()));
+				.collect(Collectors.toSet()), false);
 			return TranslationUtil.translateNumeric("mod_menu.showingModsLibraries", rootMods, rootLibs);
 		} else {
 			return TranslationUtil.translateNumeric("mod_menu.showingMods", rootMods);
 		}
 	}
 
-	private Component computeLibraryCountText() {
-		if (ModMenu.getConfig().SHOW_LIBRARIES.get()) {
+	private Component computeLibraryCountText(boolean onInit) {
+		if (ModMenu.getConfig().SHOW_LIBRARIES.get() && !onInit) {
 			int[] rootLibs = formatModCount(ModMenu.ROOT_MODS.values()
 				.stream()
 				.filter(mod -> !mod.isHidden() && mod.getBadges().contains(ModBadge.LIBRARY))
 				.map(Mod::getId)
-				.collect(Collectors.toSet()));
+				.collect(Collectors.toSet()), false);
 			return TranslationUtil.translateNumeric("mod_menu.showingLibraries", rootLibs);
 		} else {
 			return Component.literal(null);
 		}
 	}
 
-	private int[] formatModCount(Set<String> set) {
+	private int[] formatModCount(Set<String> set, boolean allVisible) {
 		int visible = this.modList.getDisplayedCountFor(set);
 		int total = set.size();
-		if (visible == total) {
+		if (visible == total || allVisible) {
 			return new int[]{ total };
 		}
 		return new int[]{ visible, total };
@@ -594,10 +594,10 @@ public class ModsScreen extends Screen {
 		return this.searchBox.getValue();
 	}
 
-	private boolean updateFiltersX() {
-		if ((this.filtersWidth + font.width(this.computeModCountText(true)) + 20) >= this.searchRowWidth &&
-			((this.filtersWidth + font.width(computeModCountText(false)) + 20) >= this.searchRowWidth ||
-				(this.filtersWidth + font.width(this.computeLibraryCountText()) + 20) >= this.searchRowWidth
+	private boolean updateFiltersX(boolean onInit) {
+		if ((this.filtersWidth + font.width(this.computeModCountText(true, onInit)) + 20) >= this.searchRowWidth &&
+			((this.filtersWidth + font.width(this.computeModCountText(false, onInit)) + 20) >= this.searchRowWidth ||
+				(this.filtersWidth + font.width(this.computeLibraryCountText(onInit)) + 20) >= this.searchRowWidth
 			)) {
 			this.filtersX = this.paneWidth / 2 - this.filtersWidth / 2;
 			return !filterOptionsShown;

@@ -58,17 +58,18 @@ public class BadgeScreen extends Screen {
                                 config.mod_badges.get(mod.getId()).remove(badgeEntry.getKey());
 
                                 if (mod.getBadgeNames().contains(badgeEntry.getKey())) {
-                                    config.disabled_mod_badges.putIfAbsent(mod.getId(), new LinkedHashSet<>());
-                                    config.disabled_mod_badges.get(mod.getId()).add(badgeEntry.getKey());
+                                    config.disabled_mod_badges.computeIfAbsent(mod.getId(),
+                                            v -> new LinkedHashSet<>()).add(badgeEntry.getKey());
                                 }
                             } else {
                                 mod.getBadges().add(badge);
 
                                 Set<String> disabled_badges = config.disabled_mod_badges.get(mod.getId());
-                                if (disabled_badges != null && disabled_badges.contains(badgeEntry.getKey()))
+                                if (disabled_badges != null && disabled_badges.contains(badgeEntry.getKey())) {
                                     disabled_badges.remove(badgeEntry.getKey());
-                                else
+                                } else {
                                     config.mod_badges.get(mod.getId()).add(badgeEntry.getKey());
+                                }
                             }
                             ((BadgeToogleButton) button).toggle();
                         }, mod.getBadges().contains(badge))
@@ -92,7 +93,7 @@ public class BadgeScreen extends Screen {
                 int badgeWidth = minecraft.font.width(badge.getComponent().getVisualOrderText()) + 6;
                 DrawingUtil.drawBadge(guiGraphics, posX, 43 + 11 * i, badgeWidth,
                         badge.getComponent().getVisualOrderText(),
-                        badge.getOutlineColor(), badge.getFillColor(), 0xCACACA);
+                        badge.getOutlineColor(), badge.getFillColor(), badge.getTextColor());
                 i++;
             }
         }

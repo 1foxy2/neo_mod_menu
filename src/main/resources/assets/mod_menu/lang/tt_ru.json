@@ -1,9 +1,9 @@
 {
-  "category.modmenu.name": "Mod Menu",
-  "key.modmenu.open_menu": "Мод исемлеген ачу",
+  "category.mod_menu.name": "Mod Menu",
+  "key.mod_menu.open_menu": "Мод исемлеген ачу",
   "mod_menu.title": "Модлар",
-  "mod_menu.nameTranslation.modmenu": "Mod Menu",
-  "mod_menu.descriptionTranslation.modmenu": "Утыртылган модлар исемлеген карау өчен мод менюсын өсти.",
+  "mod_menu.nameTranslation.mod_menu": "Mod Menu",
+  "mod_menu.descriptionTranslation.mod_menu": "Утыртылган модлар исемлеген карау өчен мод менюсын өсти.",
   
   "mod_menu.loaded": "(%s йөкләнгән)",
   "mod_menu.loaded.short": "(%s)",
@@ -16,7 +16,6 @@
   
   "mod_menu.search": "Модлар эзләү",
   "mod_menu.searchTerms.library": "api апи апиай китапханә",
-  "mod_menu.searchTerms.sinytra": "sinytra fabric loader фордж форҗ форж патчворк фмл патчуорк",
   "mod_menu.searchTerms.modpack": "җыелма модпак модҗыелма җыелмасы",
   "mod_menu.searchTerms.deprecated": "искергән иске борынгы әүвәл",
   "mod_menu.searchTerms.clientside": "клиент клиентлы",
@@ -36,7 +35,7 @@
   "mod_menu.badge.library": "Китапханә",
   "mod_menu.badge.clientsideOnly": "Клиент",
   "mod_menu.badge.deprecated": "Искергән",
-  "mod_menu.badge.fabric": "Fabric",
+  "mod_menu.badge.forge": "Forge",
   "mod_menu.badge.modpack": "Мод җыелмасы",
   "mod_menu.badge.minecraft": "Minecraft",
   
@@ -63,13 +62,14 @@
   "mod_menu.experimental": "(Mod Menu яңарту тикшерүчесе — эксперименталь функция!)",
   "mod_menu.childHasUpdate": "Бу модның бала өчен яңарту бар.",
   "mod_menu.updateText": "%2$s сайтында %1$s версиясе",
+  "mod_menu.install_version": "%s версиясен утырту",
   "mod_menu.downloadLink": "Йөкләнү",
   
   "mod_menu.buymeacoffee": "Buy Me a Coffee",
   "mod_menu.coindrop": "Coindrop",
   "mod_menu.crowdin": "Crowdin",
   "mod_menu.curseforge": "CurseForge",
-  "mod_menu.original": "original",
+  "mod_menu.discord": "Discord",
   "mod_menu.donate": "Иганә итү",
   "mod_menu.flattr": "Flattr",
   "mod_menu.github_releases": "GitHub-тагы чыгарылышлар",
@@ -83,7 +83,7 @@
   "mod_menu.paypal": "PayPal",
   "mod_menu.reddit": "Reddit",
   "mod_menu.twitch": "Twitch",
-  "mod_menu.twitter": "Twitter",
+  "mod_menu.twitter": "X (Twitter)",
   "mod_menu.wiki": "Вики",
   "mod_menu.youtube": "YouTube",
   
@@ -152,6 +152,8 @@
   "mod_menu.configuration.mods_button_style.shrink": "[Realms] уңда",
   "mod_menu.configuration.mods_button_style.icon": "Тамгачык",
   "mod_menu.configuration.game_menu_button_style": "Менюда",
+  "mod_menu.configuration.game_menu_button_style.insert": "Уртада",
+  "mod_menu.configuration.game_menu_button_style.replace": "«Статистика» астында",
   "mod_menu.configuration.game_menu_button_style.icon": "Тамгачык",
   "mod_menu.configuration.random_java_colors": "Java төсе",
   "mod_menu.configuration.random_java_colors.true": "Җитештерүчедән",
@@ -171,8 +173,8 @@
   "mod_menu.configuration.quick_configure": "Тиз көйләүләр",
   "mod_menu.configuration.quick_configure.true": "Кушык",
   "mod_menu.configuration.quick_configure.false": "Сүнек",
-  "mod_menu.configuration.update_channel": "Update Channel",
-  "mod_menu.configuration.update_channel.alpha": "All",
-  "mod_menu.configuration.update_channel.beta": "Release & Beta",
-  "mod_menu.configuration.update_channel.release": "Release"
+  "mod_menu.configuration.update_channel": "Яңарту каналы",
+  "mod_menu.configuration.update_channel.alpha": "Барлык",
+  "mod_menu.configuration.update_channel.beta": "Чыгарылыш & бета",
+  "mod_menu.configuration.update_channel.release": "Чыгарылыш"
 }

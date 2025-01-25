@@ -1,9 +1,9 @@
 {
-  "category.modmenu.name": "Mod Menu",
-  "key.modmenu.open_menu": "Open Mod Menu",
+  "category.modmenu.name": "Better ModList",
+  "key.modmenu.open_menu": "Open Mod List",
   "mod_menu.title": "Mods",
-  "mod_menu.nameTranslation.modmenu": "Mod Menu",
-  "mod_menu.descriptionTranslation.modmenu": "Adds a mod menu to view the list of mods you have installed.",
+  "mod_menu.nameTranslation.mod_menu": "Better ModList",
+  "mod_menu.descriptionTranslation.mod_menu": "Enhances neoforge's mods screen. unofficial port of Mod Menu.",
   
   "mod_menu.loaded": "(%s Loaded)",
   "mod_menu.loaded.short": "(%s)",
