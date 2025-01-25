@@ -16,6 +16,7 @@ authors="${mod_authors}" #optional
 description='''${mod_description}'''
 
 [modproperties.modmenu]
+badges=["client"]
 links=["mod_menu.original=https://modrinth.com/mod/modmenu"]
 contributors=[
     "shedaniel",

@@ -55,7 +55,7 @@ public class NeoforgeMod implements Mod {
 			badgeNames.add("minecraft");
 		} else {
 			if (ModMenu.HAS_SINYTRA)
-				badgeNames.add("sinytra_neoforge");
+				badgeNames.add("forge");
 		}
 
 		ModFileInfo modFileInfo = (ModFileInfo) modInfo.getOwningFile();
