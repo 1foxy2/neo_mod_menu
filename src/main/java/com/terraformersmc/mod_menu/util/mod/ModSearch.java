@@ -82,7 +82,7 @@ public class ModSearch {
 			|| modpack.contains(query) && mod.getBadges().contains(ModBadge.DEFAULT_BADGES.get("modpack")) // Search for modpack mods
 			|| deprecated.contains(query) && mod.getBadges().contains(ModBadge.DEFAULT_BADGES.get("deprecated")) // Search for deprecated mods
 			|| clientside.contains(query) && mod.getBadges().contains(ModBadge.DEFAULT_BADGES.get("client")) // Search for clientside mods
-			|| neoforge.contains(query) && mod.getBadges().contains(ModBadge.DEFAULT_BADGES.get("sinytra_forge")) // Search for neoforge mods
+			|| neoforge.contains(query) && mod.getBadges().contains(ModBadge.DEFAULT_BADGES.get("forge")) // Search for neoforge mods
 			|| hasCustomBadge // Search for custom badge
 			|| configurable.contains(query) && screen.getModHasConfigScreen(mod.getContainer())// Search for mods that can be configured
 			// Search for mods that have updates

@@ -73,8 +73,7 @@ public class ModMenu {
 	public static final Map<String, BiFunction<Minecraft, Screen, Screen>> configScreenFactories = new HashMap<>();
 
 	private static int cachedDisplayedModCount = -1;
-	public static final boolean HAS_SINYTRA = ModList.get().isLoaded("connector");
-	public static final boolean TEXT_PLACEHOLDER_COMPAT = ModList.get().isLoaded("placeholder_api");
+	public static final boolean HAS_SINYTRA = ModList.get().isLoaded("connectormod");
 
 	public static boolean hasConfigScreen(ModContainer container) {
 		return getConfigScreenFactory(container) != null;
@@ -251,7 +250,7 @@ public class ModMenu {
 							ModBadge badge = new ModBadge(jsonObject.get("name").getAsString(),
 									new Color(outlineColor.get(0).getAsInt(), outlineColor.get(1).getAsInt(), outlineColor.get(2).getAsInt()).getRGB(),
 									new Color(fillColor.get(0).getAsInt(), fillColor.get(1).getAsInt(), fillColor.get(2).getAsInt()).getRGB(),
-									textColor == null ? 0 : new Color(textColor.get(0).getAsInt(), textColor.get(1).getAsInt(), textColor.get(2).getAsInt()).getRGB());
+									textColor == null ? 0xCACACA : new Color(textColor.get(0).getAsInt(), textColor.get(1).getAsInt(), textColor.get(2).getAsInt()).getRGB());
 
 							ModBadge.CUSTOM_BADGES.put(id, badge);
 						} catch (Exception e) {

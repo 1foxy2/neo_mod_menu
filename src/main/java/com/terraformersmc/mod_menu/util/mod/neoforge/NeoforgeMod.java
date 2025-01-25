@@ -129,7 +129,7 @@ public class NeoforgeMod implements Mod {
 
 		/* Hardcode parents and badges for connector-extras */
 		if (id.startsWith("connectorextras") || id.equals("modmenu")) {
-			modMenuData.fillParentIfEmpty("connector");
+			modMenuData.fillParentIfEmpty("connectormod");
 
 			badgeNames.add("library");
 		}

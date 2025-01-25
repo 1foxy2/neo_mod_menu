@@ -17,7 +17,7 @@ public class ModBadge {
             "client", new ModBadge("mod_menu.badge.clientsideOnly", 0xff2b4b7c, 0xff0e2a55),
             "deprecated", new ModBadge("mod_menu.badge.deprecated", 0xff841426, 0xff530C17),
             "sinytra_fabric", new ModBadge("mod_menu.badge.fabric", 0xffc7b48b, 0xff786d58),
-            "sinytra_forge", new ModBadge("mod_menu.badge.forge", 0xffe68c37, 0xffa44e37),
+            "forge", new ModBadge("mod_menu.badge.forge", 0xff3c4d63, 0xff26303d),
             "modpack", new ModBadge("mod_menu.badge.modpack", 0xff7a2b7c, 0xff510d54),
             "minecraft", new ModBadge("mod_menu.badge.minecraft", 0xff6f6c6a, 0xff31302f)
     );

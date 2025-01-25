@@ -89,9 +89,9 @@ public class DescriptionListWidget extends AbstractSelectionList<DescriptionList
 				int wrapWidth = getRowWidth() - 5;
 
 				Mod mod = lastSelected.getMod();
-				String description = mod.getTranslatedDescription();
-				if (!description.isEmpty()) {
-					for (FormattedCharSequence line : textRenderer.split(Component.literal(description.replaceAll("\n", "\n\n")), wrapWidth)) {
+				Component description = mod.getFormattedDescription();
+				if (!description.getString().isEmpty()) {
+					for (FormattedCharSequence line : textRenderer.split(description, wrapWidth)) {
 						children().add(new DescriptionEntry(line));
 					}
 				}
