@@ -63,6 +63,7 @@
   "modmenu.experimental": "(Mod Menu яңарту тикшерүчесе — эксперименталь функция!)",
   "modmenu.childHasUpdate": "Бу модның бала өчен яңарту бар.",
   "modmenu.updateText": "%2$s сайтында %1$s версиясе",
+  "modmenu.install_version": "%s версиясен утырту",
   "modmenu.downloadLink": "Йөкләнү",
   
   "modmenu.buymeacoffee": "Buy Me a Coffee",
@@ -83,7 +84,7 @@
   "modmenu.paypal": "PayPal",
   "modmenu.reddit": "Reddit",
   "modmenu.twitch": "Twitch",
-  "modmenu.twitter": "Twitter",
+  "modmenu.twitter": "X (Twitter)",
   "modmenu.wiki": "Вики",
   "modmenu.youtube": "YouTube",
   
@@ -108,6 +109,7 @@
   "option.modmenu.sorting": "Тәртипләү",
   "option.modmenu.sorting.ascending": "A-Z",
   "option.modmenu.sorting.descending": "Z-A",
+  "option.modmenu.sorting.has_update": "Яңарту бар",
   "option.modmenu.show_libraries": "Китапханәләр",
   "option.modmenu.show_libraries.true": "Күренә",
   "option.modmenu.show_libraries.false": "Яшерен",
@@ -152,6 +154,8 @@
   "option.modmenu.mods_button_style.shrink": "[Realms] уңда",
   "option.modmenu.mods_button_style.icon": "Тамгачык",
   "option.modmenu.game_menu_button_style": "Менюда",
+  "option.modmenu.game_menu_button_style.insert": "Уртада",
+  "option.modmenu.game_menu_button_style.replace": "«Статистика» астында",
   "option.modmenu.game_menu_button_style.icon": "Тамгачык",
   "option.modmenu.random_java_colors": "Java төсе",
   "option.modmenu.random_java_colors.true": "Җитештерүчедән",
@@ -171,8 +175,8 @@
   "option.modmenu.quick_configure": "Тиз көйләүләр",
   "option.modmenu.quick_configure.true": "Кушык",
   "option.modmenu.quick_configure.false": "Сүнек",
-  "option.modmenu.update_channel": "Update Channel",
-  "option.modmenu.update_channel.alpha": "All",
-  "option.modmenu.update_channel.beta": "Release & Beta",
-  "option.modmenu.update_channel.release": "Release"
+  "option.modmenu.update_channel": "Яңарту каналы",
+  "option.modmenu.update_channel.alpha": "Барлык",
+  "option.modmenu.update_channel.beta": "Чыгарылыш & бета",
+  "option.modmenu.update_channel.release": "Чыгарылыш"
 }
