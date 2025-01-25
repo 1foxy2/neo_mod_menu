@@ -107,10 +107,11 @@ public class FabricMod implements Mod {
 
 		/* Add additional badges */
 		this.badges = modMenuData.getBadges();
-		//TODO replace with if (container.getOrigin().getKind() == ModOrigin.Kind.NESTED) { if connector bug is fixed
-		if (forgeContainer.getModInfo().getOwningFile().getFile().getFilePath().getFileName().toString().contains("$")) {
-			badgeNames.add("library");
-		}
+
+		CustomValueUtil.getBoolean(
+				"fabric-loom:generated",
+				metadata
+		).ifPresent(value -> badgeNames.add("library"));
 
 		if (this.metadata.getEnvironment() == ModEnvironment.CLIENT) {
 			badgeNames.add("client");
