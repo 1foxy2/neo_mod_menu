@@ -42,8 +42,10 @@ public class ModSearch {
 		boolean hasCustomBadge = false;
 		for (Map.Entry<String, ModBadge> badgeEntry : ModBadge.CUSTOM_BADGES.entrySet()) {
 			String searchTerms = badgeEntry.getValue().getComponent().getString();
-			if (I18n.exists("mod_menu.searchTerms." + badgeEntry.getKey()))
-				searchTerms = I18n.get("mod_menu.searchTerms." + badgeEntry.getKey());
+
+			if (I18n.exists("modmenu.searchTerms." + badgeEntry.getKey()))
+				searchTerms = I18n.get("modmenu.searchTerms." + badgeEntry.getKey());
+
 			if (searchTerms.contains(query) && mod.getBadges().contains(badgeEntry.getValue())) {
 				hasCustomBadge = true;
 				break;
@@ -57,7 +59,6 @@ public class ModSearch {
 		String clientside = I18n.get("modmenu.searchTerms.clientside");
 		String neoforge = I18n.get("modmenu.searchTerms.neoforge");
 		String configurable = I18n.get("modmenu.searchTerms.configurable");
-		String hasUpdate = I18n.get("modmenu.searchTerms.hasUpdate");
 
 		// Libraries are currently hidden, ignore them entirely
 		if (mod.isHidden() || !ModMenu.getConfig().SHOW_LIBRARIES.get() && mod.getBadges().contains(ModBadge.LIBRARY)) {
@@ -82,6 +83,7 @@ public class ModSearch {
 				|| deprecated.contains(query) && mod.getBadges().contains(ModBadge.DEFAULT_BADGES.get("deprecated")) // Search for deprecated mods
 			|| clientside.contains(query) && mod.getBadges().contains(ModBadge.DEFAULT_BADGES.get("client")) // Search for clientside mods
 				|| neoforge.contains(query) && mod.getBadges().contains(ModBadge.DEFAULT_BADGES.get("sinytra_neoforge")) // Search for neoforge mods
+				|| hasCustomBadge
 			|| configurable.contains(query) && screen.getModHasConfigScreen(mod.getContainer())// Search for mods that can be configured
 			// Search for mods that have updates
 		) {
