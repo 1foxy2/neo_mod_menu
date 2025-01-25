@@ -50,20 +50,23 @@ public class NeoforgeMod implements Mod {
 
 		String id = modInfo.getModId();
 
+		ModFileInfo modFileInfo = (ModFileInfo) modInfo.getOwningFile();
+
 		issueTrackerUrl = modInfo.getConfig().<String>getConfigElement("issueTrackerURL").orElse(null);
+		if (issueTrackerUrl == null)
+			issueTrackerUrl = modFileInfo.getConfig().<String>getConfigElement("issueTrackerURL").orElse(null);
 		website = modInfo.getConfig().<String>getConfigElement("displayURL").orElse(null);
 
 		/* Load modern mod menu custom value data */
 		Optional<String> parentId = Optional.empty();
 		ModMenuData.DummyParentData parentData = null;
 
-		Optional<ModFileInfo> ownFile = Optional.ofNullable((ModFileInfo) container.getModInfo().getOwningFile());
-		Optional<Map<String, Object>> modMenuValue = ownFile.flatMap(mfi -> mfi.getConfigElement("modproperties", "modmenu"));
+		Optional<Map<String, Object>> modMenuValue = modFileInfo.getConfigElement("modproperties", "modmenu");
 
 		if (modMenuValue.isPresent()) {
 			Map<String, Object> modMenuMap = modMenuValue.get();
 
-			Optional<Map<String, Object>> parentValues = ownFile.flatMap(mfi -> mfi.getConfigElement("modproperties", "modmenu_parent"));
+			Optional<Map<String, Object>> parentValues = modFileInfo.getConfigElement("modproperties", "modmenu_parent");
 			if (parentValues.isPresent() && !parentValues.get().isEmpty()) {
 				Set<String> parentBadges = new LinkedHashSet<>();
 

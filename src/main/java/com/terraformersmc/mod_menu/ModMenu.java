@@ -46,7 +46,6 @@ import java.util.*;
 import java.util.function.BiFunction;
 import java.util.stream.Stream;
 
-@net.minecraftforge.fml.common.Mod(ModMenu.MOD_ID)
 public class ModMenu {
 	public static final String MOD_ID = "mod_menu";
 	public static final Logger LOGGER = LoggerFactory.getLogger("Mod Menu");
