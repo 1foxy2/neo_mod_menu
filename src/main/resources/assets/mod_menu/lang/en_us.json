@@ -1,9 +1,9 @@
 {
-  "category.modmenu.name": "Mod Menu",
-  "key.modmenu.open_menu": "Open Mod Menu",
+  "category.modmenu.name": "Better ModList",
+  "key.modmenu.open_menu": "Open Mod List",
   "mod_menu.title": "Mods",
-  "mod_menu.nameTranslation.modmenu": "Mod Menu",
-  "mod_menu.descriptionTranslation.modmenu": "Adds a mod menu to view the list of mods you have installed.",
+  "mod_menu.nameTranslation.mod_menu": "Better ModList",
+  "mod_menu.descriptionTranslation.mod_menu": "Enhances neoforge's mods screen. unofficial port of Mod Menu.",
   
   "mod_menu.loaded": "(%s Loaded)",
   "mod_menu.loaded.short": "(%s)",
@@ -20,6 +20,7 @@
   "mod_menu.searchTerms.modpack": "modpack pack",
   "mod_menu.searchTerms.deprecated": "deprecated outdated old",
   "mod_menu.searchTerms.clientside": "clientside gameside",
+  "mod_menu.searchTerms.forge": "forge",
   "mod_menu.searchTerms.configurable": "configurations configs configures configurable options settings",
   "mod_menu.searchTerms.hasUpdate": "updates version",
   
@@ -37,6 +38,7 @@
   "mod_menu.badge.clientsideOnly": "Client",
   "mod_menu.badge.deprecated": "Deprecated",
   "mod_menu.badge.fabric": "Fabric",
+  "mod_menu.badge.forge": "Forge",
   "mod_menu.badge.modpack": "Modpack",
   "mod_menu.badge.minecraft": "Minecraft",
   
@@ -140,6 +142,8 @@
   "mod_menu.configuration.count_libraries": "Libraries",
   "mod_menu.configuration.count_libraries.true": "Counted",
   "mod_menu.configuration.count_libraries.false": "Not Counted",
+  "mod_menu.configuration.mod_parents": "Mod's parents",
+  "mod_menu.configuration.mod_parents.tooltip": "needs restart",
   "mod_menu.configuration.count_hidden_mods": "Hidden Mods",
   "mod_menu.configuration.count_hidden_mods.true": "Counted",
   "mod_menu.configuration.count_hidden_mods.false": "Not Counted",
@@ -186,6 +190,7 @@
   "mod_menu.configuration.count": "Count",
   "mod_menu.configuration.main": "Main",
   "mod_menu.configuration.hide": "Hide",
+  "mod_menu.configuration.disable_default_badges_section": "Disable Default Badges",
 
   "mod_menu.configuration.hidden_mods": "Hidden mods",
   "mod_menu.configuration.hidden_configs": "Hidden configs",

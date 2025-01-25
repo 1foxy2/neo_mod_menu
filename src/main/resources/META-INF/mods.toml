@@ -16,7 +16,6 @@ authors="${mod_authors}" #optional
 description='''${mod_description}'''
 
 [modproperties.modmenu]
-badges=["client"]
 links=["mod_menu.original=https://modrinth.com/mod/modmenu"]
 contributors=[
     "shedaniel",
@@ -91,21 +90,21 @@ sources="https://github.com/1foxy2/neo_mod_menu"
 mandatory=true
     versionRange="${forge_version_range}" #mandatory
     ordering="NONE"
-    side="BOTH"
+    side="CLIENT"
 
 [[dependencies.${mod_id}]]
     modId="minecraft"
 mandatory=true
     versionRange="${minecraft_version_range}"
     ordering="NONE"
-    side="BOTH"
+    side="CLIENT"
 
 [[dependencies.${mod_id}]]
     modId="connectormod"
 mandatory=false
     versionRange="[0,)"
     ordering="AFTER"
-    side="BOTH"
+    side="CLIENT"
 
 # Features are specific properties of the game environment, that you may want to declare you require. This example declares
 # that your mod requires GL version 3.2 or higher. Other features will be added. They are side aware so declaring this won't

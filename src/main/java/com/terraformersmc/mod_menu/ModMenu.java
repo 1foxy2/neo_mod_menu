@@ -73,7 +73,8 @@ public class ModMenu {
 	public static final Map<String, BiFunction<Minecraft, Screen, Screen>> configScreenFactories = new HashMap<>();
 
 	private static int cachedDisplayedModCount = -1;
-	public static final boolean HAS_SINYTRA = ModList.get().isLoaded("connectormod");
+	public static final boolean HAS_SINYTRA = ModList.get().isLoaded("connector");
+	public static final boolean TEXT_PLACEHOLDER_COMPAT = ModList.get().isLoaded("placeholder_api");
 
 	public static boolean hasConfigScreen(ModContainer container) {
 		return getConfigScreenFactory(container) != null;
@@ -169,11 +170,7 @@ public class ModMenu {
 	}
 
 	public void onClientSetup(FMLClientSetupEvent event) {
-		ModList.get().getMods().forEach(info -> ConfigScreenHandler.getScreenFactoryFor(info).ifPresent(
-				factory -> configScreenFactories.put(info.getModId(), factory)));
 		getConfig().onLoad();
-		createBadgesAndIcons();
-		addBadges();
 	}
 
 	public static void clearModCountCache() {
@@ -236,41 +233,45 @@ public class ModMenu {
 		ModBadge.CUSTOM_BADGES.clear();
 		NeoforgeIconHandler.modResourceIconCache.clear();
 		Stream<PackResources> resourcePacks = Minecraft.getInstance().getResourceManager().listPacks();
-		resourcePacks.forEach(packResources -> {
-			packResources.listResources(PackType.CLIENT_RESOURCES, MOD_ID, "badge", (key, value) -> {
-				try {
-					JsonObject jsonObject = GsonHelper.parse(new InputStreamReader(value.get()));
-					JsonArray fillColor = jsonObject.getAsJsonArray("fill_color");
-					JsonArray outlineColor = jsonObject.getAsJsonArray("outline_color");
-					String id = key.getPath().replace("badge/", "").replace(".json", "");
-					ModBadge badge = new ModBadge(jsonObject.get("name").getAsString(),
-							new Color(outlineColor.get(0).getAsInt(), outlineColor.get(1).getAsInt(), outlineColor.get(2).getAsInt()).getRGB(),
-							new Color(fillColor.get(0).getAsInt(), fillColor.get(1).getAsInt(), fillColor.get(2).getAsInt()).getRGB());
+		resourcePacks.forEach(packResources ->
+				packResources.getNamespaces(PackType.CLIENT_RESOURCES).forEach(namespace -> {
+					packResources.listResources(PackType.CLIENT_RESOURCES, namespace, "badge", (key, value) -> {
+						try {
+							JsonObject jsonObject = GsonHelper.parse(new InputStreamReader(value.get()));
+							JsonArray fillColor = jsonObject.getAsJsonArray("fill_color");
+							JsonArray outlineColor = jsonObject.getAsJsonArray("outline_color");
+							JsonArray textColor;
+							try {
+								textColor = jsonObject.getAsJsonArray("text_color");
+							} catch (Exception ignored) {
+								textColor = null;
+							}
 
-					ModBadge.CUSTOM_BADGES.put(id, badge);
-				} catch (Exception e) {
-					LOGGER.warn("incorrect badge json from {} {}", key, e.getMessage());
-				}
-			});
-			packResources.listResources(PackType.CLIENT_RESOURCES, MOD_ID, "modicon", (key, value) -> {
-				try {
-					NativeImage image = NativeImage.read(value.get());
-					Tuple<DynamicTexture, Dimension> tex = new Tuple<>(new DynamicTexture(image),
-							new Dimension(image.getWidth(), image.getHeight()));
-					String id = key.getPath().replace("modicon/", "").replace(".png", "");
-					NeoforgeIconHandler.modResourceIconCache.put(id, tex);
-				} catch (Exception e) {
-					LOGGER.warn(e.getMessage());
-				}
-			});
-		});
+							String id = key.getPath().replace("badge/", "").replace(".json", "");
+							ModBadge badge = new ModBadge(jsonObject.get("name").getAsString(),
+									new Color(outlineColor.get(0).getAsInt(), outlineColor.get(1).getAsInt(), outlineColor.get(2).getAsInt()).getRGB(),
+									new Color(fillColor.get(0).getAsInt(), fillColor.get(1).getAsInt(), fillColor.get(2).getAsInt()).getRGB(),
+									textColor == null ? 0 : new Color(textColor.get(0).getAsInt(), textColor.get(1).getAsInt(), textColor.get(2).getAsInt()).getRGB());
+
+							ModBadge.CUSTOM_BADGES.put(id, badge);
+						} catch (Exception e) {
+							LOGGER.warn("incorrect badge json from {} because {}", key, e.getMessage());
+						}
+					});
+					packResources.listResources(PackType.CLIENT_RESOURCES, namespace, "modicon", (key, value) -> {
+						try {
+							NativeImage image = NativeImage.read(value.get());
+							Tuple<DynamicTexture, Dimension> tex = new Tuple<>(new DynamicTexture(image),
+									new Dimension(image.getWidth(), image.getHeight()));
+							String id = key.getPath().replace("modicon/", "").replace(".png", "");
+							NeoforgeIconHandler.modResourceIconCache.put(id, tex);
+						} catch (Exception e) {
+							LOGGER.warn(e.getMessage());
+						}
+					});
+				}));
 		ModMenu.shouldResetCache = true;
-	}
 
-	public static void addBadges() {
-		Set<Mod> allMods = new HashSet<>();
-		allMods.addAll(ROOT_MODS.values());
-		allMods.addAll(MODS.values());
-		allMods.forEach(Mod::reCalculateBadge);
+		MODS.values().forEach(Mod::reCalculateBadge);
 	}
 }

@@ -23,20 +23,19 @@ public class ModBadgeRenderer {
 		this.client = Minecraft.getInstance();
 	}
 
-	public void draw(GuiGraphics guiGraphics, int mouseX, int mouseY) {
+	public void draw(GuiGraphics guiGraphics) {
 		this.badgeX = startX;
 		this.badgeY = startY;
 		Set<ModBadge> badges = mod.getBadges();
-		badges.forEach(badge -> drawBadge(guiGraphics, badge, mouseX, mouseY));
+		badges.forEach(badge -> drawBadge(guiGraphics, badge));
 	}
 
-	public void drawBadge(GuiGraphics guiGraphics, ModBadge badge, int mouseX, int mouseY) {
+	public void drawBadge(GuiGraphics guiGraphics, ModBadge badge) {
 		this.drawBadge(guiGraphics,
 			badge.getComponent().getVisualOrderText(),
 			badge.getOutlineColor(),
 			badge.getFillColor(),
-			mouseX,
-			mouseY
+			badge.getTextColor()
 		);
 	}
 
@@ -45,12 +44,11 @@ public class ModBadgeRenderer {
 		FormattedCharSequence charSequence,
 		int outlineColor,
 		int fillColor,
-		int mouseX,
-		int mouseY
+		int textColor
 	) {
 		int width = client.font.width(charSequence) + 6;
 		if (badgeX + width < badgeMax) {
-			DrawingUtil.drawBadge(guiGraphics, badgeX, badgeY, width, charSequence, outlineColor, fillColor, 0xCACACA);
+			DrawingUtil.drawBadge(guiGraphics, badgeX, badgeY, width, charSequence, outlineColor, fillColor, textColor);
 			badgeX += width + 3;
 		}
 	}

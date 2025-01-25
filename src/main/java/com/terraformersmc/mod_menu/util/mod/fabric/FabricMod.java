@@ -49,6 +49,7 @@ public class FabricMod implements Mod {
 		this.container = FabricLoader.getInstance().getModContainer(modId).get();
 		this.forgeContainer = ModList.get().getModContainerById(modId).get();
 		this.metadata = container.getMetadata();
+		badgeNames.add("sinytra_fabric");
 
 		String id = metadata.getId();
 
@@ -86,9 +87,9 @@ public class FabricMod implements Mod {
 				}
 			}
 			badgeNames.addAll(CustomValueUtil.getStringSet("badges", modMenuObject).orElse(new HashSet<>()));
-			CustomValueUtil.getStringMap("links", modMenuObject).orElse(new HashMap<>()).forEach((key, vakue) -> {
+			CustomValueUtil.getStringMap("links", modMenuObject).orElse(new HashMap<>()).forEach((key, value) -> {
 				if (key.startsWith("modmenu")) key = key.replace("modmenu", "mod_menu");
-				links.put(key, vakue);
+				links.put(key, value);
 			});
 			allowsUpdateChecks = CustomValueUtil.getBoolean("update_checker", modMenuObject).orElse(true);
 		}
@@ -107,6 +108,11 @@ public class FabricMod implements Mod {
 
 		/* Add additional badges */
 		this.badges = modMenuData.getBadges();
+		CustomValueUtil.getBoolean(
+				"fabric-loom:generated",
+				metadata
+		).ifPresent(value -> badgeNames.add("library"));
+
 		if (this.metadata.getEnvironment() == ModEnvironment.CLIENT) {
 			badgeNames.add("client");
 		}

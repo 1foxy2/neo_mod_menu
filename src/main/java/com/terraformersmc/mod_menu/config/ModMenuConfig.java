@@ -47,6 +47,7 @@ public class ModMenuConfig {
   //  public static final ForgeConfigSpec.BooleanValue DISABLE_UPDATE_CHECKER;
 
     public final Map<String, Set<String>> mod_badges = new HashMap<>();
+    public final Map<String, Set<String>> disabled_mod_badges = new HashMap<>();
 
     public ModMenuConfig(ForgeConfigSpec.Builder builder) {
         builder.push("main");
@@ -133,9 +134,18 @@ public class ModMenuConfig {
     public void onLoad() {
         this.MOD_BADGES.get().forEach(badge -> {
             String[] badgeKeyValue = badge.split("=");
-            if (badgeKeyValue.length != 1)
-                this.mod_badges.put(badgeKeyValue[0], new LinkedHashSet<>(Arrays.stream(badgeKeyValue[1].split(", ")).toList()));
-            else this.mod_badges.put(badgeKeyValue[0], new LinkedHashSet<>());
+            if (badgeKeyValue.length != 1) {
+                Set<String> badges = new LinkedHashSet<>();
+                Set<String> disabledBadges = new LinkedHashSet<>();
+                Arrays.stream(badgeKeyValue[1].split(", ")).toList().forEach(badgeId -> {
+                    if (badgeId.startsWith("!"))
+                        disabledBadges.add(badgeId.substring(1));
+                    else
+                        badges.add(badgeId);
+                });
+                this.mod_badges.put(badgeKeyValue[0], badges);
+                this.disabled_mod_badges.put(badgeKeyValue[0], disabledBadges);
+            }
         });
         if (!this.LIBRARY_LIST.get().isEmpty()) {
             this.LIBRARY_LIST.get().forEach(string -> {
@@ -198,6 +208,10 @@ public class ModMenuConfig {
     public void save() {
         List<String> list = new ArrayList<>();
         this.mod_badges.forEach((key, values) -> {
+            Set<String> disabledBadges = disabled_mod_badges.get(key);
+            if (values.isEmpty() && disabledBadges == null)
+                return;
+
             StringBuilder string = new StringBuilder();
             for (String value : values) {
                 if (!string.isEmpty())
@@ -206,7 +220,16 @@ public class ModMenuConfig {
                 string.append(value);
             }
 
-            list.add(key + "=" + string);
+            if (disabledBadges != null)
+                for (String value : disabledBadges) {
+                    if (!string.isEmpty())
+                        string.append(", ");
+
+                    string.append("!").append(value);
+                }
+
+            if (!string.isEmpty())
+                list.add(key + "=" + string);
         });
 
         this.MOD_BADGES.set(list);

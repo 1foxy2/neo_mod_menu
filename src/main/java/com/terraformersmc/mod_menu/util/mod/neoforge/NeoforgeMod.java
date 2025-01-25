@@ -50,6 +50,14 @@ public class NeoforgeMod implements Mod {
 
 		String id = modInfo.getModId();
 
+
+		if ("minecraft".equals(getId())) {
+			badgeNames.add("minecraft");
+		} else {
+			if (ModMenu.HAS_SINYTRA)
+				badgeNames.add("sinytra_neoforge");
+		}
+
 		ModFileInfo modFileInfo = (ModFileInfo) modInfo.getOwningFile();
 
 		issueTrackerUrl = modInfo.getConfig().<String>getConfigElement("issueTrackerURL").orElse(null);
@@ -120,23 +128,14 @@ public class NeoforgeMod implements Mod {
 		}
 
 		/* Hardcode parents and badges for connector-extras */
-		if (id.startsWith("connectorextras") || id.startsWith("modmenu")) {
-			if (ModList.get().isLoaded("connectormod")) {
-				modMenuData.fillParentIfEmpty("connectormod");
-			}
+		if (id.startsWith("connectorextras") || id.equals("modmenu")) {
+			modMenuData.fillParentIfEmpty("connector");
 
 			badgeNames.add("library");
 		}
 
 		/* Add additional badges */
 		this.badges = modMenuData.getBadges();
-	/*	if (this.modInfo.getEnvironment() == ModEnvironment.CLIENT) { not sure how to check that
-			badges.add(Badge.CLIENT);
-		}*/
-
-		if ("minecraft".equals(getId())) {
-			badgeNames.add("minecraft");
-		}
 	}
 
 	public Optional<ModContainer> getContainer() {
@@ -157,7 +156,7 @@ public class NeoforgeMod implements Mod {
 	public @NotNull Tuple<DynamicTexture, Dimension> getIcon(NeoforgeIconHandler iconHandler, int i, boolean isSmall) {
 		String iconSourceId = getId();
 
-		String iconResourceId = iconSourceId  + (isSmall ? "_small" : "");
+	    String iconResourceId = iconSourceId  + (isSmall ? "_small" : "");
 		if (NeoforgeIconHandler.modResourceIconCache.containsKey(iconResourceId))
 			return NeoforgeIconHandler.modResourceIconCache.get(iconResourceId);
 

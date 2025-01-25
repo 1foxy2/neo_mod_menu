@@ -91,7 +91,7 @@ public class ModListEntry extends ObjectSelectionList.Entry<ModListEntry> {
 		guiGraphics.drawString(font, Language.getInstance().getVisualOrder(trimmedName), x + iconSize + 3, y + 1, 0xFFFFFF, false);
 		var updateBadgeXOffset = 0;
 		if (!ModMenu.getConfig().HIDE_BADGES.get()) {
-			new ModBadgeRenderer(x + iconSize + 3 + font.width(name) + 2 + updateBadgeXOffset, y, x + rowWidth, mod, list.getParent()).draw(guiGraphics, mouseX, mouseY);
+			new ModBadgeRenderer(x + iconSize + 3 + font.width(name) + 2 + updateBadgeXOffset, y, x + rowWidth, mod, list.getParent()).draw(guiGraphics);
 		}
 		if (!ModMenu.getConfig().COMPACT_LIST.get()) {
 			String summary = mod.getSummary();

@@ -19,7 +19,9 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.ComponentContents;
 import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.client.event.RegisterClientReloadListenersEvent;
 import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
 import net.minecraftforge.client.event.ScreenEvent;
 import net.minecraftforge.client.settings.KeyConflictContext;
@@ -225,6 +227,12 @@ public class ModMenuEventHandler {
 		@SubscribeEvent
 		public static void registerKeyMapping(RegisterKeyMappingsEvent event) {
 			event.register(ModMenuEventHandler.MENU_KEY_BIND.get());
+		}
+
+		@SubscribeEvent
+		public static void registerReloadManager(RegisterClientReloadListenersEvent event) {
+			event.registerReloadListener((ResourceManagerReloadListener) manager ->
+					ModMenu.createBadgesAndIcons());
 		}
 	}
 }

@@ -343,7 +343,7 @@ public class ModsScreen extends Screen {
 				init = false;
 			}
 			if (!ModMenu.getConfig().HIDE_BADGES.get()) {
-				modBadgeRenderer.draw(guiGraphics, mouseX, mouseY);
+				modBadgeRenderer.draw(guiGraphics);
 			}
 			if (mod.isReal()) {
 				guiGraphics.drawString(font, mod.getPrefixedVersion(), x + imageOffset, RIGHT_PANE_Y + 2 + lineSpacing, 0x808080, false);

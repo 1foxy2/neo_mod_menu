@@ -7,7 +7,6 @@
   "client": [
     "AccessorGridLayout",
     "MixinBrandingControl",
-    "MixinMinecraft",
     "MixinPauseScreen",
     "MixinTitleScreen",
     "MixinTitleScreenUpdateIndicator"

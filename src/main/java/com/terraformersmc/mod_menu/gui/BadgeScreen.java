@@ -1,6 +1,7 @@
 package com.terraformersmc.mod_menu.gui;
 
 import com.terraformersmc.mod_menu.ModMenu;
+import com.terraformersmc.mod_menu.config.ModMenuConfig;
 import com.terraformersmc.mod_menu.gui.widget.BadgeToogleButton;
 import com.terraformersmc.mod_menu.util.DrawingUtil;
 import com.terraformersmc.mod_menu.util.mod.Mod;
@@ -12,7 +13,9 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Set;
 
 public class BadgeScreen extends Screen {
     private @Nullable AbstractWidget badgeButton;
@@ -44,12 +47,24 @@ public class BadgeScreen extends Screen {
             for (Map.Entry<String, ModBadge> badgeEntry : badgeMap.entrySet()) {
                 ModBadge badge = badgeEntry.getValue();
                 this.addRenderableWidget(BadgeToogleButton.badgeButtonBuilder(CommonComponents.EMPTY, button -> {
+                            ModMenuConfig config = ModMenu.getConfig();
                             if (mod.getBadges().contains(badge)) {
                                 mod.getBadges().remove(badge);
-                                ModMenu.getConfig().mod_badges.get(mod.getId()).remove(badgeEntry.getKey());
+                                config.mod_badges.get(mod.getId()).remove(badgeEntry.getKey());
+
+                                if (mod.getBadgeNames().contains(badgeEntry.getKey())) {
+                                    config.disabled_mod_badges.computeIfAbsent(mod.getId(),
+                                            v -> new LinkedHashSet<>()).add(badgeEntry.getKey());
+                                }
                             } else {
                                 mod.getBadges().add(badge);
-                                ModMenu.getConfig().mod_badges.get(mod.getId()).add(badgeEntry.getKey());
+
+                                Set<String> disabled_badges = config.disabled_mod_badges.get(mod.getId());
+                                if (disabled_badges != null && disabled_badges.contains(badgeEntry.getKey())) {
+                                    disabled_badges.remove(badgeEntry.getKey());
+                                } else {
+                                    config.mod_badges.get(mod.getId()).add(badgeEntry.getKey());
+                                }
                             }
                             ((BadgeToogleButton) button).toggle();
                         }, mod.getBadges().contains(badge))
@@ -73,7 +88,7 @@ public class BadgeScreen extends Screen {
                 int badgeWidth = minecraft.font.width(badge.getComponent().getVisualOrderText()) + 6;
                 DrawingUtil.drawBadge(guiGraphics, posX, 43 + 11 * i, badgeWidth,
                         badge.getComponent().getVisualOrderText(),
-                        badge.getOutlineColor(), badge.getFillColor(), 0xCACACA);
+                        badge.getOutlineColor(), badge.getFillColor(), badge.getTextColor());
                 i++;
             }
         }
