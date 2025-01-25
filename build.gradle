@@ -115,7 +115,7 @@ dependencies {
 
     compileOnly("org.sinytra:Connector:1.0.0-beta.46+1.20.1")
     implementation fg.deobf('com.github.1foxy2:TextPlaceholderAPI-neoforge:2c9c884ab1')
-    jarJar('com.github.1foxy2:TextPlaceholderAPI-neoforge:2c9c884ab1')
+    jarJar('com.github.1foxy2:TextPlaceholderAPI-neoforge:[2.0,3.0)')
 }
 
 // This block of code expands all declared replace properties in the specified resource targets.
