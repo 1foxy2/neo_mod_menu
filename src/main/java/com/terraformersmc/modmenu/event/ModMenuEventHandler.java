@@ -23,8 +23,8 @@ import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.client.event.AddClientReloadListenersEvent;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
-import net.neoforged.neoforge.client.event.RegisterClientReloadListenersEvent;
 import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
 import net.neoforged.neoforge.client.event.ScreenEvent;
 import net.neoforged.neoforge.client.settings.KeyConflictContext;
@@ -231,9 +231,9 @@ public class ModMenuEventHandler {
 		}
 
 		@SubscribeEvent
-		public static void registerReloadManager(RegisterClientReloadListenersEvent event) {
-			event.registerReloadListener((ResourceManagerReloadListener) manager ->
-					ModMenu.createBadgesAndIcons());
+		public static void registerReloadManager(AddClientReloadListenersEvent event) {
+			event.addListener(ResourceLocation.fromNamespaceAndPath(ModMenu.MOD_ID, "create_badges_and_icons"),
+					(ResourceManagerReloadListener) manager -> ModMenu.createBadgesAndIcons());
 		}
 	}
 }
