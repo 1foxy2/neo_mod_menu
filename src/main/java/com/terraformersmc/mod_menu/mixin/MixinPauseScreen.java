@@ -57,21 +57,16 @@ public abstract class MixinPauseScreen extends Screen {
 							}
 						}
 					}
-					boolean isShortFeedback = ModMenuEventHandler.buttonHasText(widget, "menu.feedback");
 					boolean isLongFeedback = ModMenuEventHandler.buttonHasText(widget, "menu.sendFeedback");
 
-					if (isShortFeedback || isLongFeedback) {
+					if (isLongFeedback) {
 						modsButtonIndex = i + 1;
 						vanillaButtonsY = widget.getY();
 						if (style == ModMenuConfig.GameMenuButtonStyle.REPLACE) {
-							buttons.set(i, new ModMenuButtonWidget(
-									widget.getX(),
-									widget.getY(),
-									isShortFeedback ? widget.getWidth() : fullWidthButton,
-									widget.getHeight(),
-									ModMenu.createModsButtonText(true),
-									this
-							));
+							if (widget instanceof AbstractWidget cw) {
+								cw.visible = false;
+								cw.active = false;
+							}
 							buttons.stream()
 									.filter(w -> ModMenuEventHandler.buttonHasText(w, "menu.reportBugs"))
 									.forEach(w -> {
@@ -93,6 +88,15 @@ public abstract class MixinPauseScreen extends Screen {
 						buttons.add(modsButtonIndex, new ModMenuButtonWidget(
 								this.width / 2 - 102,
 								buttonsY + spacing,
+								fullWidthButton,
+								20,
+								ModMenu.createModsButtonText(true),
+								this
+						));
+					} else if (style == ModMenuConfig.GameMenuButtonStyle.REPLACE) {
+						buttons.add(new ModMenuButtonWidget(
+								this.width / 2 - 102,
+								vanillaButtonsY,
 								fullWidthButton,
 								20,
 								ModMenu.createModsButtonText(true),
