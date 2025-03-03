@@ -96,11 +96,11 @@ public interface Mod {
 		if (config.disabled_mod_badges.containsKey(getId()))
 			defaultBadges.removeAll(config.disabled_mod_badges.get(getId()));
 
-		Set<String> badgelist = config.mod_badges.get(this.getId());
-		this.getBadges().addAll(ModBadge.convert(badgelist, this.getId()));
 		if (!ModMenu.getConfig().DISABLE_DEFAULT_BADGES_ALL.get() &&
 				!ModMenu.getConfig().DISABLE_DEFAULT_BADGES.get().contains(getId()))
 			this.getBadges().addAll(ModBadge.convert(defaultBadges, this.getId()));
+		Set<String> badgelist = config.mod_badges.get(this.getId());
+		this.getBadges().addAll(ModBadge.convert(badgelist, this.getId()));
 	}
 
 	@NotNull String getVersion();
