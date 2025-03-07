@@ -27,7 +27,6 @@ import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.RegisterClientReloadListenersEvent;
 import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
 import net.neoforged.neoforge.client.event.ScreenEvent;
-import net.neoforged.neoforge.client.gui.widget.ModsButton;
 import net.neoforged.neoforge.client.settings.KeyConflictContext;
 import net.neoforged.neoforge.common.util.Lazy;
 import org.lwjgl.glfw.GLFW;
@@ -45,14 +44,15 @@ public class ModMenuEventHandler {
 	public static void onScreenInit(ScreenEvent.Init.Post event) {
 		Screen screen = event.getScreen();
 		if (ModMenu.getConfig().MODIFY_TITLE_SCREEN.get() && screen instanceof TitleScreen) {
+			removeModsButton(screen);
 			afterTitleScreenInit(screen);
 		}
 	}
 
-	private static void removeModsButton(Screen screen, Button button) {
-		screen.renderables.remove(button);
-		screen.narratables.remove(button);
-		screen.children.remove(button);
+	private static void removeModsButton(Screen screen) {
+		screen.renderables.removeIf(button -> buttonHasText((LayoutElement) button, "fml.menu.mods"));
+		screen.narratables.removeIf(button -> buttonHasText((LayoutElement) button, "fml.menu.mods"));
+		screen.children.removeIf(button -> buttonHasText((LayoutElement) button, "fml.menu.mods"));
 	}
 
 	private static void afterTitleScreenInit(Screen screen) {
@@ -63,13 +63,6 @@ public class ModMenuEventHandler {
 		int buttonsY = screen.height / 4 + 48;
 		boolean replacedRealmButton = false;
 		boolean isRealmsButton;
-		Button modsButton = null;
-        for (Renderable renderable : buttons) {
-			if (renderable instanceof ModsButton button) {
-				modsButton = button;
-			}
-        }
-
 		for (int i = 0; i < buttons.size(); i++) {
 			Renderable widget = buttons.get(i);
 			if (widget instanceof Button button && !(button instanceof PlainTextButton)) {
@@ -89,15 +82,14 @@ public class ModMenuEventHandler {
 				}
 				if (isRealmsButton) {
 					if (ModMenu.getConfig().MODS_BUTTON_STYLE.get() ==
-                            ModMenuConfig.TitleMenuButtonStyle.REPLACE_REALMS) {
-						if (modsButton != null) {
-							modsButton.setX(button.getX());
-							modsButton.setY(button.getY());
-							modsButton.setWidth(button.getWidth());
-							modsButton.setHeight(button.getHeight());
-						}
-						removeModsButton(screen, modsButton);
-						set(screen, i, modsButton);
+							ModMenuConfig.TitleMenuButtonStyle.REPLACE_REALMS) {
+						ModMenuEventHandler.set(screen, i, new ModMenuButtonWidget(button.getX(),
+								button.getY(),
+								button.getWidth(),
+								button.getHeight(),
+								ModMenu.createModsButtonText(true),
+								screen
+						));
 					} else {
 						if (ModMenu.getConfig().MODS_BUTTON_STYLE.get() ==
 								ModMenuConfig.TitleMenuButtonStyle.SHRINK) {
@@ -112,13 +104,25 @@ public class ModMenuEventHandler {
 			}
 
 		}
-		if (modsButtonIndex != -1 && modsButton != null) {
+		if (modsButtonIndex != -1) {
 			if (ModMenu.getConfig().MODS_BUTTON_STYLE.get() == ModMenuConfig.TitleMenuButtonStyle.CLASSIC) {
-				modsButton.setY(buttonsY + spacing);
+				add(screen, modsButtonIndex, new ModMenuButtonWidget(screen.width / 2 - 100,
+						buttonsY + spacing,
+						200,
+						20,
+						ModMenu.createModsButtonText(true),
+						screen
+				));
 			} else if (ModMenu.getConfig().MODS_BUTTON_STYLE.get() == ModMenuConfig.TitleMenuButtonStyle.SHRINK) {
-				modsButton.setX((screen.width / 2 + 2));
-				modsButton.setY((buttonsY));
-				modsButton.setWidth((98));
+				add(screen, modsButtonIndex,
+						new ModMenuButtonWidget(screen.width / 2 + 2,
+								buttonsY,
+								98,
+								20,
+								ModMenu.createModsButtonText(true),
+								screen
+						)
+				);
 			} else if (ModMenu.getConfig().MODS_BUTTON_STYLE.get() == ModMenuConfig.TitleMenuButtonStyle.ICON) {
 				add(screen, modsButtonIndex, new UpdateCheckerTexturedButtonWidget(screen.width / 2 + 104,
 						buttonsY,
@@ -133,7 +137,6 @@ public class ModMenuEventHandler {
 						button -> Minecraft.getInstance().setScreen(new ModsScreen(screen)),
 						ModMenu.createModsButtonText(true)
 				));
-				removeModsButton(screen, modsButton);
 			}
 		}
 	}

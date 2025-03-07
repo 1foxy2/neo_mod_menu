@@ -2,11 +2,7 @@ package com.terraformersmc.mod_menu.mixin;
 
 import com.terraformersmc.mod_menu.ModMenu;
 import com.terraformersmc.mod_menu.config.ModMenuConfig;
-import com.terraformersmc.mod_menu.gui.ModsScreen;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.TitleScreen;
-import net.minecraft.network.chat.Component;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
@@ -25,43 +21,5 @@ public class MixinTitleScreen {
 			}
 		}
 		return height;
-	}
-
-	@ModifyArg(
-			method = "init",
-			at = @At(
-					value = "INVOKE",
-					target = "Lnet/minecraft/client/gui/components/Button;builder(" +
-							"Lnet/minecraft/network/chat/Component;" +
-							"Lnet/minecraft/client/gui/components/Button$OnPress;" +
-							")Lnet/minecraft/client/gui/components/Button$Builder;",
-					ordinal = 0
-			),
-			index = 0
-	)
-	private Component bettermodlist$modifyForgeModsButton(Component message) {
-		if (ModMenu.getConfig().MODIFY_TITLE_SCREEN.get()) {
-			return ModMenu.createModsButtonText(true);
-		}
-		return message;
-	}
-
-	@ModifyArg(
-			method = "init",
-			at = @At(
-					value = "INVOKE",
-					target = "Lnet/minecraft/client/gui/components/Button;builder(" +
-							"Lnet/minecraft/network/chat/Component;" +
-							"Lnet/minecraft/client/gui/components/Button$OnPress;" +
-							")Lnet/minecraft/client/gui/components/Button$Builder;",
-					ordinal = 0
-			),
-			index = 1
-	)
-	private Button.OnPress bettermodlist$modifyForgeModsButton(Button.OnPress onPress) {
-		if (ModMenu.getConfig().MODIFY_TITLE_SCREEN.get()) {
-			return button -> Minecraft.getInstance().setScreen(new ModsScreen((TitleScreen) (Object) this));
-		}
-		return onPress;
 	}
 }
