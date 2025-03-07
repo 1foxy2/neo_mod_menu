@@ -21,6 +21,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.List;
 
+import static com.terraformersmc.mod_menu.event.ModMenuEventHandler.buttonHasText;
+
 @Mixin(PauseScreen.class)
 public abstract class MixinPauseScreen extends Screen {
 	protected MixinPauseScreen(Component title) {
@@ -43,21 +45,21 @@ public abstract class MixinPauseScreen extends Screen {
 				for (int i = 0; i < buttons.size(); i++) {
 					LayoutElement widget = buttons.get(i);
 
-					if (ModMenuEventHandler.buttonHasText(widget, "menu.returnToMenu")
-							|| ModMenuEventHandler.buttonHasText(widget, "menu.disconnect"))
+					if (buttonHasText(widget, "menu.returnToMenu")
+							|| buttonHasText(widget, "menu.disconnect"))
 						hadExitButton = true;
 
 					ModMenuEventHandler.shiftButtons(widget, hadExitButton, spacing + (hadExitButton ? 12 : -12));
 
 					if (style == ModMenuConfig.GameMenuButtonStyle.INSERT) {
 						if (!(widget instanceof AbstractWidget button) || button.visible) {
-							ModMenuEventHandler.shiftButtons(widget, modsButtonIndex == -1 || ModMenuEventHandler.buttonHasText(widget, "menu.reportBugs", "menu.server_links"), spacing);
+							ModMenuEventHandler.shiftButtons(widget, modsButtonIndex == -1 || buttonHasText(widget, "menu.reportBugs", "menu.server_links"), spacing);
 							if (modsButtonIndex == -1) {
 								buttonsY = widget.getY();
 							}
 						}
 					}
-					boolean isLongFeedback = ModMenuEventHandler.buttonHasText(widget, "menu.sendFeedback");
+					boolean isLongFeedback = buttonHasText(widget, "menu.sendFeedback");
 
 					if (isLongFeedback) {
 						modsButtonIndex = i + 1;
@@ -68,7 +70,7 @@ public abstract class MixinPauseScreen extends Screen {
 								cw.active = false;
 							}
 							buttons.stream()
-									.filter(w -> ModMenuEventHandler.buttonHasText(w, "menu.reportBugs"))
+									.filter(w -> buttonHasText(w, "menu.reportBugs"))
 									.forEach(w -> {
 										if (w instanceof AbstractWidget cw) {
 											cw.visible = false;
