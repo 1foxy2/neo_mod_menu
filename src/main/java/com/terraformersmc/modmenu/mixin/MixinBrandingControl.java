@@ -41,7 +41,6 @@ public abstract class MixinBrandingControl {
                 neoForge = neoForge.replace(I18n.get("fml.menu.branding", "", ModList.get().size()),
                         I18n.get(replacementKey, count));
             } else  {
-
                 neoForge = neoForge.replace(I18n.get("fml.menu.branding", "", ModList.get().size()),
                         I18n.get("menu.modded"));
             }

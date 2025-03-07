@@ -11,10 +11,14 @@ import org.spongepowered.asm.mixin.injection.ModifyArg;
 public class MixinTitleScreen {
 	@ModifyArg(at = @At(value = "INVOKE", target = "Lcom/mojang/realmsclient/gui/screens/RealmsNotificationsScreen;init(Lnet/minecraft/client/Minecraft;II)V"), method = "init", index = 2)
 	private int adjustRealmsHeight(int height) {
-		if (ModMenu.getConfig().MODIFY_TITLE_SCREEN.get() && ModMenu.getConfig().MODS_BUTTON_STYLE.get() == BetterModListConfig.TitleMenuButtonStyle.CLASSIC) {
-			return height + 16;
-		} else if (ModMenu.getConfig().MODS_BUTTON_STYLE.get() == BetterModListConfig.TitleMenuButtonStyle.REPLACE_REALMS || ModMenu.getConfig().MODS_BUTTON_STYLE.get() == BetterModListConfig.TitleMenuButtonStyle.SHRINK) {
-			return -99999;
+		if (ModMenu.getConfig().MODIFY_TITLE_SCREEN.get()) {
+			if (ModMenu.getConfig().MODS_BUTTON_STYLE.get() == BetterModListConfig.TitleMenuButtonStyle.CLASSIC) {
+				return height + 16;
+			} else if (ModMenu.getConfig().MODS_BUTTON_STYLE.get() == BetterModListConfig.TitleMenuButtonStyle.ICON) {
+				return height + 64;
+			} else {
+				return -99999;
+			}
 		}
 		return height;
 	}
