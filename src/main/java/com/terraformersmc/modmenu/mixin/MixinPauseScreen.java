@@ -21,6 +21,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.List;
 
+import static com.terraformersmc.modmenu.event.ModMenuEventHandler.buttonHasText;
+
 @Mixin(PauseScreen.class)
 public abstract class MixinPauseScreen extends Screen {
 	protected MixinPauseScreen(Component title) {
@@ -43,37 +45,32 @@ public abstract class MixinPauseScreen extends Screen {
 				for (int i = 0; i < buttons.size(); i++) {
 					LayoutElement widget = buttons.get(i);
 
-					if (ModMenuEventHandler.buttonHasText(widget, "menu.returnToMenu")
-							|| ModMenuEventHandler.buttonHasText(widget, "menu.disconnect"))
+					if (buttonHasText(widget, "menu.returnToMenu")
+							|| buttonHasText(widget, "menu.disconnect"))
 						hadExitButton = true;
 
 					ModMenuEventHandler.shiftButtons(widget, hadExitButton, spacing + (hadExitButton ? 12 : -12));
 
 					if (style == BetterModListConfig.GameMenuButtonStyle.INSERT) {
 						if (!(widget instanceof AbstractWidget button) || button.visible) {
-							ModMenuEventHandler.shiftButtons(widget, modsButtonIndex == -1 || ModMenuEventHandler.buttonHasText(widget, "menu.reportBugs", "menu.server_links"), spacing);
+							ModMenuEventHandler.shiftButtons(widget, modsButtonIndex == -1 || buttonHasText(widget, "menu.reportBugs", "menu.server_links"), spacing);
 							if (modsButtonIndex == -1) {
 								buttonsY = widget.getY();
 							}
 						}
 					}
-					boolean isShortFeedback = ModMenuEventHandler.buttonHasText(widget, "menu.feedback");
-					boolean isLongFeedback = ModMenuEventHandler.buttonHasText(widget, "menu.sendFeedback");
+					boolean isLongFeedback = buttonHasText(widget, "menu.sendFeedback");
 
-					if (isShortFeedback || isLongFeedback) {
+					if (isLongFeedback) {
 						modsButtonIndex = i + 1;
 						vanillaButtonsY = widget.getY();
 						if (style == BetterModListConfig.GameMenuButtonStyle.REPLACE) {
-							buttons.set(i, new ModMenuButtonWidget(
-									widget.getX(),
-									widget.getY(),
-									isShortFeedback ? widget.getWidth() : fullWidthButton,
-									widget.getHeight(),
-									ModMenu.createModsButtonText(true),
-									this
-							));
+							if (widget instanceof AbstractWidget cw) {
+								cw.visible = false;
+								cw.active = false;
+							}
 							buttons.stream()
-									.filter(w -> ModMenuEventHandler.buttonHasText(w, "menu.reportBugs"))
+									.filter(w -> buttonHasText(w, "menu.reportBugs"))
 									.forEach(w -> {
 										if (w instanceof AbstractWidget cw) {
 											cw.visible = false;
@@ -93,6 +90,15 @@ public abstract class MixinPauseScreen extends Screen {
 						buttons.add(modsButtonIndex, new ModMenuButtonWidget(
 								this.width / 2 - 102,
 								buttonsY + spacing,
+								fullWidthButton,
+								20,
+								ModMenu.createModsButtonText(true),
+								this
+						));
+					} else if (style == BetterModListConfig.GameMenuButtonStyle.REPLACE) {
+						buttons.add(new ModMenuButtonWidget(
+								this.width / 2 - 102,
+								vanillaButtonsY,
 								fullWidthButton,
 								20,
 								ModMenu.createModsButtonText(true),
