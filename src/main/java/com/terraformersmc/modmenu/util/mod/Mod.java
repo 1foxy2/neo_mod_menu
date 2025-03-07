@@ -88,8 +88,8 @@ public interface Mod {
 
 		Set<String> badgelist = config.mod_badges.computeIfAbsent(this.getId(), v -> new LinkedHashSet<>());
 		this.getBadges().clear();
-		this.getBadges().addAll(ModBadge.convert(badgelist, this.getId()));
 		this.getBadges().addAll(ModBadge.convert(defaultBadges, this.getId()));
+		this.getBadges().addAll(ModBadge.convert(badgelist, this.getId()));
 	}
 
 	@NotNull String getVersion();
