@@ -39,7 +39,7 @@ public abstract class MixinPauseScreen extends Screen {
 				int buttonsY = this.height / 4 + 8;
 				BetterModListConfig.GameMenuButtonStyle style = ModMenu.getConfig().GAME_MENU_BUTTON_STYLE.get();
 				int vanillaButtonsY = this.height / 4 + 72 - 16 + 1;
-				final int fullWidthButton = 204;
+				int fullWidthButton = 204;
 				boolean hadExitButton = false;
 
 				for (int i = 0; i < buttons.size(); i++) {
@@ -69,6 +69,9 @@ public abstract class MixinPauseScreen extends Screen {
 							if (widget instanceof AbstractWidget cw) {
 								cw.visible = false;
 								cw.active = false;
+							}
+							if (isShortFeedback) {
+								fullWidthButton = widget.getWidth();
 							}
 							buttons.stream()
 									.filter(w -> buttonHasText(w, "menu.reportBugs"))
