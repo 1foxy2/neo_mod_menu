@@ -59,9 +59,10 @@ public abstract class MixinPauseScreen extends Screen {
 							}
 						}
 					}
-					boolean isLongFeedback = buttonHasText(widget, "menu.sendFeedback");
+					boolean isShortFeedback = ModMenuEventHandler.buttonHasText(widget, "menu.feedback");
+					boolean isLongFeedback = ModMenuEventHandler.buttonHasText(widget, "menu.sendFeedback");
 
-					if (isLongFeedback) {
+					if (isShortFeedback || isLongFeedback) {
 						modsButtonIndex = i + 1;
 						vanillaButtonsY = widget.getY();
 						if (style == BetterModListConfig.GameMenuButtonStyle.REPLACE) {
