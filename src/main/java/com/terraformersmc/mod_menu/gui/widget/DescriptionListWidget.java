@@ -67,7 +67,7 @@ public class DescriptionListWidget extends AbstractSelectionList<DescriptionList
 
 		if(copyFrom != null) {
 			updateSelectedModIfRequired(copyFrom.selectedMod);
-			setScrollAmount(copyFrom.scrollAmount());
+			setScrollAmount(copyFrom.getScrollAmount());
 		}
 
 		if(parent.getSelectedEntry() != null) {

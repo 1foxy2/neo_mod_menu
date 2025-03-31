@@ -47,7 +47,7 @@ public class ModListWidget extends ObjectSelectionList<ModListEntry> implements 
 		this.parent = parent;
 		if (list != null) {
 			this.mods = list.mods;
-			this.restoreScrollY = list.scrollAmount();
+			this.restoreScrollY = list.getScrollAmount();
 		}
 	}
 
