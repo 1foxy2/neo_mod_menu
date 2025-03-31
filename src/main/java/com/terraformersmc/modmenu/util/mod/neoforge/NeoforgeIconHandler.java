@@ -44,7 +44,7 @@ public class NeoforgeIconHandler implements Closeable {
 			return null;
 		} catch (Throwable t) {
 			if (!iconPath.equals("assets/" + iconSource.getModId() + "/icon.png") && !iconPath.equals("icon.png") && !iconPath.contains("_small.png")) {
-				LOGGER.error("Invalid mod icon for icon source {}: {}", iconSource.getModId(), iconPath, t);
+				LOGGER.error("Invalid mod icon for icon source {}: {}", iconSource.getModId(), iconPath);
 			}
 			return null;
 		}
