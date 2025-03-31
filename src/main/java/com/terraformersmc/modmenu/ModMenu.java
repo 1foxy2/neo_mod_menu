@@ -5,7 +5,6 @@ import com.google.gson.*;
 import com.mojang.blaze3d.platform.NativeImage;
 import com.terraformersmc.modmenu.config.BetterModListConfig;
 import com.terraformersmc.modmenu.config.BetterModListConfigScreen;
-import com.terraformersmc.modmenu.gui.ModsScreen;
 import com.terraformersmc.modmenu.util.EnumToLowerCaseJsonConverter;
 import com.terraformersmc.modmenu.util.ModMenuScreenTexts;
 import com.terraformersmc.modmenu.util.mod.Mod;
