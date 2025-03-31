@@ -32,6 +32,7 @@ public class ModListWidget extends ObjectSelectionList<ModListEntry> implements 
 	private String selectedModId = null;
 	private boolean scrolling;
 	private final NeoforgeIconHandler iconHandler = new NeoforgeIconHandler();
+	private Double restoreScrollY = null;
 
 	public ModListWidget(
 		Minecraft client,
@@ -46,6 +47,7 @@ public class ModListWidget extends ObjectSelectionList<ModListEntry> implements 
 		this.parent = parent;
 		if (list != null) {
 			this.mods = list.mods;
+			this.restoreScrollY = list.scrollAmount();
 		}
 	}
 
@@ -113,6 +115,14 @@ public class ModListWidget extends ObjectSelectionList<ModListEntry> implements 
 	protected ModListEntry remove(int index) {
 		addedMods.remove(getEntry(index).mod);
 		return super.remove(index);
+	}
+
+	public void finalizeInit() {
+		reloadFilters();
+		if(restoreScrollY != null) {
+			setScrollAmount(restoreScrollY);
+			restoreScrollY = null;
+		}
 	}
 
 	public void reloadFilters() {

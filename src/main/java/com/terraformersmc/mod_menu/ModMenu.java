@@ -42,8 +42,12 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nullable;
 import java.awt.*;
 import java.io.InputStreamReader;
+import java.nio.file.Path;
 import java.text.NumberFormat;
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 @net.neoforged.fml.common.Mod(value = ModMenu.MOD_ID, dist = Dist.CLIENT)

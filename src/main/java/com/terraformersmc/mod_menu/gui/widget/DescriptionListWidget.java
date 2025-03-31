@@ -50,7 +50,7 @@ public class DescriptionListWidget extends AbstractSelectionList<DescriptionList
 
 	private final ModsScreen parent;
 	private final Font textRenderer;
-	private ModListEntry lastSelected = null;
+	private Mod selectedMod = null;
 
 	public DescriptionListWidget(
 		Minecraft client,
@@ -58,11 +58,21 @@ public class DescriptionListWidget extends AbstractSelectionList<DescriptionList
 		int height,
 		int y,
 		int itemHeight,
+		DescriptionListWidget copyFrom,
 		ModsScreen parent
 	) {
 		super(client, width, height, y, itemHeight);
 		this.parent = parent;
 		this.textRenderer = client.font;
+
+		if(copyFrom != null) {
+			updateSelectedModIfRequired(copyFrom.selectedMod);
+			setScrollAmount(copyFrom.scrollAmount());
+		}
+
+		if(parent.getSelectedEntry() != null) {
+			updateSelectedModIfRequired(parent.getSelectedEntry().getMod());
+		}
 	}
 
 	@Override
@@ -82,127 +92,136 @@ public class DescriptionListWidget extends AbstractSelectionList<DescriptionList
 
 	@Override
 	public void updateWidgetNarration(NarrationElementOutput builder) {
-		Mod mod = parent.getSelectedEntry().getMod();
-		builder.add(NarratedElementType.TITLE, mod.getTranslatedName() + " " + mod.getPrefixedVersion());
+		if(selectedMod != null) {
+			builder.add(
+					NarratedElementType.TITLE,
+					selectedMod.getTranslatedName() + " " + selectedMod.getPrefixedVersion());
+		}
 	}
+	private void rebuildUI() {
+		if (selectedMod == null) {
+			return;
+		}
 
-	@Override
-	public void renderListItems(GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
-		ModListEntry selectedEntry = parent.getSelectedEntry();
-		if (selectedEntry != lastSelected) {
-			lastSelected = selectedEntry;
-			clearEntries();
-			setScrollAmount(-Double.MAX_VALUE);
-			if (lastSelected != null) {
-				DescriptionEntry emptyEntry = new DescriptionEntry(FormattedCharSequence.EMPTY);
-				int wrapWidth = getRowWidth() - 5;
+		DescriptionEntry emptyEntry = new DescriptionEntry(FormattedCharSequence.EMPTY);
+		int wrapWidth = getRowWidth() - 5;
 
-				Mod mod = lastSelected.getMod();
-				Component description = mod.getFormattedDescription();
-				if (!description.getString().isEmpty()) {
-					for (FormattedCharSequence line : textRenderer.split(description, wrapWidth)) {
-						children().add(new DescriptionEntry(line));
-					}
+		Mod mod = selectedMod;
+		Component description = mod.getFormattedDescription();
+		if (!description.getString().isEmpty()) {
+			for (FormattedCharSequence line : textRenderer.split(description, wrapWidth)) {
+				children().add(new DescriptionEntry(line));
+			}
+		}
+
+		Map<String, String> links = mod.getLinks();
+		String sourceLink = mod.getSource();
+		if ((!links.isEmpty() || sourceLink != null) && !ModMenu.getConfig().HIDE_MOD_LINKS.get()) {
+			children().add(emptyEntry);
+
+			for (FormattedCharSequence line : textRenderer.split(LINKS_TEXT, wrapWidth)) {
+				children().add(new DescriptionEntry(line));
+			}
+
+			if (sourceLink != null) {
+				int indent = 8;
+				for (FormattedCharSequence line : textRenderer.split(SOURCE_TEXT, wrapWidth - 16)) {
+					children().add(new LinkEntry(line, sourceLink, indent));
+					indent = 16;
 				}
+			}
 
-				Map<String, String> links = mod.getLinks();
-				String sourceLink = mod.getSource();
-				if ((!links.isEmpty() || sourceLink != null) && !ModMenu.getConfig().HIDE_MOD_LINKS.get()) {
-					children().add(emptyEntry);
-
-					for (FormattedCharSequence line : textRenderer.split(LINKS_TEXT, wrapWidth)) {
-						children().add(new DescriptionEntry(line));
-					}
-
-					if (sourceLink != null) {
-						int indent = 8;
-						for (FormattedCharSequence line : textRenderer.split(SOURCE_TEXT, wrapWidth - 16)) {
-							children().add(new LinkEntry(line, sourceLink, indent));
-							indent = 16;
-						}
-					}
-
-					links.forEach((key, value) -> {
-						int indent = 8;
-						for (FormattedCharSequence line : textRenderer.split(Component.translatable(key)
+			links.forEach((key, value) -> {
+				int indent = 8;
+				for (FormattedCharSequence line : textRenderer.split(Component.translatable(key)
 								.withStyle(ChatFormatting.BLUE)
 								.withStyle(ChatFormatting.UNDERLINE),
-							wrapWidth - 16
-						)) {
-							children().add(new LinkEntry(line, value, indent));
-							indent = 16;
-						}
-					});
+						wrapWidth - 16
+				)) {
+					children().add(new LinkEntry(line, value, indent));
+					indent = 16;
 				}
+			});
+		}
 
-				Set<String> licenses = mod.getLicense();
-				if (!ModMenu.getConfig().HIDE_MOD_LICENSE.get() && !licenses.isEmpty()) {
+		Set<String> licenses = mod.getLicense();
+		if (!ModMenu.getConfig().HIDE_MOD_LICENSE.get() && !licenses.isEmpty()) {
+			children().add(emptyEntry);
+
+			for (FormattedCharSequence line : textRenderer.split(LICENSE_TEXT, wrapWidth)) {
+				children().add(new DescriptionEntry(line));
+			}
+
+			for (String license : licenses) {
+				int indent = 8;
+				for (FormattedCharSequence line : textRenderer.split(Component.literal(license), wrapWidth - 16)) {
+					children().add(new DescriptionEntry(line, indent));
+					indent = 16;
+				}
+			}
+		}
+
+		if (!ModMenu.getConfig().HIDE_MOD_CREDITS.get()) {
+			if ("minecraft".equals(mod.getId())) {
+				children().add(emptyEntry);
+
+				for (FormattedCharSequence line : textRenderer.split(VIEW_CREDITS_TEXT, wrapWidth)) {
+					children().add(new MojangCreditsEntry(line));
+				}
+			} else if (!"java".equals(mod.getId())) {
+				var credits = mod.getCredits();
+
+				if (!credits.isEmpty()) {
 					children().add(emptyEntry);
 
-					for (FormattedCharSequence line : textRenderer.split(LICENSE_TEXT, wrapWidth)) {
+					for (FormattedCharSequence line : textRenderer.split(CREDITS_TEXT, wrapWidth)) {
 						children().add(new DescriptionEntry(line));
 					}
 
-					for (String license : licenses) {
+					var iterator = credits.entrySet().iterator();
+
+					while (iterator.hasNext()) {
 						int indent = 8;
-						for (FormattedCharSequence line : textRenderer.split(Component.literal(license), wrapWidth - 16)) {
+
+						var role = iterator.next();
+						var roleName = role.getKey();
+
+						for (var line : textRenderer.split(this.creditsRoleText(roleName),
+								wrapWidth - 16
+						)) {
 							children().add(new DescriptionEntry(line, indent));
 							indent = 16;
 						}
-					}
-				}
 
-				if (!ModMenu.getConfig().HIDE_MOD_CREDITS.get()) {
-					if ("minecraft".equals(mod.getId())) {
-						children().add(emptyEntry);
+						for (var contributor : role.getValue()) {
+							indent = 16;
 
-						for (FormattedCharSequence line : textRenderer.split(VIEW_CREDITS_TEXT, wrapWidth)) {
-							children().add(new MojangCreditsEntry(line));
+							for (var line : textRenderer.split(Component.literal(contributor), wrapWidth - 24)) {
+								children().add(new DescriptionEntry(line, indent));
+								indent = 24;
+							}
 						}
-					} else if (!"java".equals(mod.getId())) {
-						var credits = mod.getCredits();
 
-						if (!credits.isEmpty()) {
+						if (iterator.hasNext()) {
 							children().add(emptyEntry);
-
-							for (FormattedCharSequence line : textRenderer.split(CREDITS_TEXT, wrapWidth)) {
-								children().add(new DescriptionEntry(line));
-							}
-
-							var iterator = credits.entrySet().iterator();
-
-							while (iterator.hasNext()) {
-								int indent = 8;
-
-								var role = iterator.next();
-								var roleName = role.getKey();
-
-								for (var line : textRenderer.split(this.creditsRoleText(roleName),
-									wrapWidth - 16
-								)) {
-									children().add(new DescriptionEntry(line, indent));
-									indent = 16;
-								}
-
-								for (var contributor : role.getValue()) {
-									indent = 16;
-
-									for (var line : textRenderer.split(Component.literal(contributor), wrapWidth - 24)) {
-										children().add(new DescriptionEntry(line, indent));
-										indent = 24;
-									}
-								}
-
-								if (iterator.hasNext()) {
-									children().add(emptyEntry);
-								}
-							}
 						}
 					}
 				}
 			}
 		}
+	}
 
+	public void updateSelectedModIfRequired(Mod mod) {
+		if (mod != selectedMod) {
+			selectedMod = mod;
+			clearEntries();
+			setScrollAmount(-Double.MAX_VALUE);
+			rebuildUI();
+		}
+	}
+
+	@Override
+	public void renderListItems(GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
 		Tesselator tessellator = Tesselator.getInstance();
 		BufferBuilder bufferBuilder;
 		MeshData builtBuffer;
