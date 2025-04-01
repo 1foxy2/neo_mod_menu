@@ -53,7 +53,7 @@ public class ModMenuConfig {
         builder.push("main");
         SORTING = builder
                 .defineEnum("sorting", Sorting.ASCENDING);
-        COMPACT_LIST = builder
+        COMPACT_LIST = builder.comment("Makes list more compacted")
                 .define("compact_list", false);
         MODS_BUTTON_STYLE = builder
                 .defineEnum("mods_button_style", TitleMenuButtonStyle.CLASSIC);
@@ -61,44 +61,44 @@ public class ModMenuConfig {
                 .defineEnum("game_menu_button_style", GameMenuButtonStyle.REPLACE);
         MOD_COUNT_LOCATION = builder
                 .defineEnum("mod_count_location", ModCountLocation.TITLE_SCREEN);
-        EASTER_EGGS = builder
+        EASTER_EGGS = builder.comment("Shows secret mod count translations defined by modmenu.mods.MOD_COUND.secret")
                 .define("easter_eggs", true);
-        RANDOM_JAVA_COLORS = builder
+        RANDOM_JAVA_COLORS = builder.comment("Makes java mod have random colors")
                 .define("random_java_colors", false);
-        TRANSLATE_NAMES = builder
+        TRANSLATE_NAMES = builder.comment("Make mod names translatable defining by modmenu.nameTranslation.modid")
                 .define("translate_names", true);
-        TRANSLATE_DESCRIPTIONS = builder
+        TRANSLATE_DESCRIPTIONS = builder.comment("Make mod descriptions translatable defining by modmenu.descriptionTranslation.modid")
                 .define("translate_descriptions", true);
-        QUICK_CONFIGURE = builder
+        QUICK_CONFIGURE = builder.comment().comment("Shows config button above mod icon on the left")
                 .define("quick_configure", true);
-        MODIFY_TITLE_SCREEN = builder
+        MODIFY_TITLE_SCREEN = builder.comment("Modifies title screen, if false will be neoforge default with default mods button")
                 .define("modify_title_screen", true);
-        MODIFY_GAME_MENU = builder
+        MODIFY_GAME_MENU = builder.comment("Changes pause screen's button position and replaces neoforge's mods button with better modlist's one")
                 .define("modify_game_menu", true);
-        CONFIG_MODE = builder
+        CONFIG_MODE = builder.comment("Will only show mods with config available")
                 .define("config_mode", false);
-        DISABLE_DRAG_AND_DROP = builder
+        DISABLE_DRAG_AND_DROP = builder.comment("Disables drag and drop mods adding")
                 .define("disable_drag_and_drop", false);
         builder.pop();
 
         builder.push("hide");
-        SHOW_LIBRARIES = builder
+        SHOW_LIBRARIES = builder.comment("Shows mods with library badge")
                 .define("show_libraries", false);
-        HIDE_MOD_LINKS = builder
+        HIDE_MOD_LINKS = builder.comment("Hides links of the mod")
                 .define("hide_mod_links", false);
-        HIDE_MOD_LICENSE = builder
+        HIDE_MOD_LICENSE = builder.comment("Hides mod's license")
                 .define("hide_mod_license", false);
-        HIDE_BADGES = builder
+        HIDE_BADGES = builder.comment("Hides mod's badges")
                 .define("hide_badges", false);
-        HIDE_MOD_CREDITS = builder
+        HIDE_MOD_CREDITS = builder.comment("Hides mod's credits")
                 .define("hide_mod_credits", false);
-        HIDE_CONFIG_BUTTONS = builder
+        HIDE_CONFIG_BUTTONS = builder.comment("Hides mod's config button")
                 .define("hide_config_buttons", false);
-        HIDE_BADGE_BUTTONS = builder
+        HIDE_BADGE_BUTTONS = builder.comment("hides button which allows changing mod's badge")
                 .define("hide_badge_buttons", true);
-        HIDDEN_MODS = builder
+        HIDDEN_MODS = builder.comment("Add modid of the mod to hide it from the modlist")
                 .defineList("hidden_mods", ArrayList::new, String::new, object -> object instanceof String);
-        HIDDEN_CONFIGS = builder
+        HIDDEN_CONFIGS = builder.comment("Add modid of the mod to hide its config")
                 .defineList("hidden_configs", ArrayList::new, String::new, object -> object instanceof String);
         LIBRARY_LIST = builder.comment("deprecated")
                 .defineList("library_list", ArrayList::new, String::new, object -> object instanceof String);
@@ -111,17 +111,17 @@ public class ModMenuConfig {
         builder.pop();
 
         builder.push("count");
-        COUNT_HIDDEN_MODS = builder
+        COUNT_HIDDEN_MODS = builder.comment("Makes hidden mods count added to the total mods count")
                 .define("count_hidden_mods", true);
-        COUNT_CHILDREN = builder
+        COUNT_CHILDREN = builder.comment("Makes childrens count get added to the total mods count")
                 .define("count_children", true);
-        COUNT_LIBRARIES = builder
+        COUNT_LIBRARIES = builder.comment("Makes libraries count get added to the total mods count")
                 .define("count_libraries", true);
         builder.pop();
 
-        MOD_BADGES = builder
+        MOD_BADGES = builder.comment("Adds badge to mod in this format \"modid=badge1, badge2\"")
                 .defineList("mod_badges", ArrayList::new, String::new, object -> object instanceof String);
-        MOD_PARENTS = builder
+        MOD_PARENTS = builder.comment("Make mods apear under another mod in this format \"parenModId=childId1, childId2\"")
                 .defineList("mod_parents", ArrayList::new, String::new, object -> object instanceof String);
 
         //    UPDATE_CHECKER = builder
