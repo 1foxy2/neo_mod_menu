@@ -115,6 +115,9 @@ public class NeoforgeMod implements Mod {
 		}
 
 		for (String string : modInfo.getConfig().getConfigElement("authors").orElse("").toString().split(", ")) {
+			if (string.isEmpty()) {
+				continue;
+			}
 			if (string.contains(",")) authors.addAll(Arrays.stream(string.split(",")).toList());
 
 			authors.add(string);
