@@ -122,6 +122,7 @@
   "option.modmenu.hide_badge_buttons.true": "Hidden",
   "option.modmenu.hide_badge_buttons.false": "Shown",
   "option.modmenu.hide_badges": "Mod Badges",
+  "option.modmenu.hide_badge": "Badge",
   "option.modmenu.hide_badges.true": "Hidden",
   "option.modmenu.hide_badges.false": "Shown",
   "option.modmenu.compact_list": "List",

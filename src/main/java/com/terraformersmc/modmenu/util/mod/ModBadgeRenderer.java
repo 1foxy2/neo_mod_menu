@@ -1,5 +1,6 @@
 package com.terraformersmc.modmenu.util.mod;
 
+import com.terraformersmc.modmenu.ModMenu;
 import com.terraformersmc.modmenu.gui.ModsScreen;
 import com.terraformersmc.modmenu.util.DrawingUtil;
 import net.minecraft.client.Minecraft;
@@ -27,7 +28,12 @@ public class ModBadgeRenderer {
 		this.badgeX = startX;
 		this.badgeY = startY;
 		Set<ModBadge> badges = mod.getBadges();
-		badges.forEach(badge -> drawBadge(guiGraphics, badge));
+		badges.forEach(badge -> {
+					if (!ModMenu.getConfig().HIDE_BADGE.get().contains(badge.getId())) {
+						drawBadge(guiGraphics, badge);
+					}
+				}
+		);
 	}
 
 	public void drawBadge(GuiGraphics guiGraphics, ModBadge badge) {
