@@ -44,6 +44,7 @@ public class ModMenuConfig {
     public final ModConfigSpec.ConfigValue<List<? extends String>> MOD_PARENTS;
     public final ModConfigSpec.ConfigValue<List<? extends String>> DISABLE_DEFAULT_BADGES;
     public final ModConfigSpec.BooleanValue DISABLE_DEFAULT_BADGES_ALL;
+    public final ModConfigSpec.ConfigValue<List<? extends String>> HIDE_BADGE;
   //  public static final ModConfigSpec.BooleanValue DISABLE_UPDATE_CHECKER;
 
     public final Map<String, Set<String>> mod_badges = new HashMap<>();
@@ -90,6 +91,8 @@ public class ModMenuConfig {
                 .define("hide_mod_license", false);
         HIDE_BADGES = builder.comment("Hides mod's badges")
                 .define("hide_badges", false);
+        HIDE_BADGE = builder.comment("Add id of the badge to hide it")
+                .defineList("hide_badge", ArrayList::new, String::new, object -> object instanceof String);
         HIDE_MOD_CREDITS = builder.comment("Hides mod's credits")
                 .define("hide_mod_credits", false);
         HIDE_CONFIG_BUTTONS = builder.comment("Hides mod's config button")
