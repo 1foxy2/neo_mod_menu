@@ -1,6 +1,8 @@
 package com.terraformersmc.modmenu;
 
 import com.google.common.collect.LinkedListMultimap;
+import com.google.common.collect.ListMultimap;
+import com.google.common.collect.Multimaps;
 import com.google.gson.*;
 import com.mojang.blaze3d.platform.NativeImage;
 import com.terraformersmc.modmenu.config.BetterModListConfig;
@@ -21,6 +23,7 @@ import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackResources;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.util.GsonHelper;
@@ -48,6 +51,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Stream;
 
 @net.neoforged.fml.common.Mod(value = ModMenu.MOD_ID, dist = Dist.CLIENT)
@@ -72,11 +76,11 @@ public class ModMenu {
 				.configure(BetterModListConfig::new);
 	}
 
-	public static final Map<String, Mod> MODS = new HashMap<>();
-	public static final Map<String, Mod> ROOT_MODS = new HashMap<>();
-	public static final LinkedListMultimap<Mod, Mod> PARENT_MAP = LinkedListMultimap.create();
+	public static final Map<String, Mod> MODS = new ConcurrentHashMap<>();
+	public static final Map<String, Mod> ROOT_MODS = new ConcurrentHashMap<>();
+	public static final ListMultimap<Mod, Mod> PARENT_MAP = Multimaps.synchronizedListMultimap(LinkedListMultimap.create());
 
-	public static final Map<String, IConfigScreenFactory> configScreenFactories = new HashMap<>();
+	public static final Map<String, IConfigScreenFactory> configScreenFactories = new ConcurrentHashMap<>();
 
 	private static int cachedDisplayedModCount = -1;
 	public static final boolean HAS_SINYTRA = ModList.get().isLoaded("connector");
@@ -270,7 +274,7 @@ public class ModMenu {
 					packResources.listResources(PackType.CLIENT_RESOURCES, namespace, "modicon", (key, value) -> {
 						try {
 							NativeImage image = NativeImage.read(value.get());
-							Tuple<DynamicTexture, Dimension> tex = new Tuple<>(new DynamicTexture(image),
+							Tuple<DynamicTexture, Dimension> tex = new Tuple<>(new DynamicTexture(key::toString, image),
 									new Dimension(image.getWidth(), image.getHeight()));
 							String id = key.getPath().replace("modicon/", "").replace(".png", "");
 							NeoforgeIconHandler.modResourceIconCache.put(id, tex);

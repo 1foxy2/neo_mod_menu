@@ -63,37 +63,43 @@ public class ParentEntry extends ModListEntry {
 		int childrenBadgeY = y + iconSize - childrenBadgeHeight;
 		int childrenOutlineColor = 0xff107454;
 		int childrenFillColor = 0xff093929;
-		guiGraphics.fill(childrenBadgeX + 1,
+		guiGraphics.fill(
+			childrenBadgeX + 1,
 			childrenBadgeY,
 			childrenBadgeX + childrenBadgeWidth - 1,
 			childrenBadgeY + 1,
 			childrenOutlineColor
 		);
-		guiGraphics.fill(childrenBadgeX,
+		guiGraphics.fill(
+			childrenBadgeX,
 			childrenBadgeY + 1,
 			childrenBadgeX + 1,
 			childrenBadgeY + childrenBadgeHeight - 1,
 			childrenOutlineColor
 		);
-		guiGraphics.fill(childrenBadgeX + childrenBadgeWidth - 1,
+		guiGraphics.fill(
+			childrenBadgeX + childrenBadgeWidth - 1,
 			childrenBadgeY + 1,
 			childrenBadgeX + childrenBadgeWidth,
 			childrenBadgeY + childrenBadgeHeight - 1,
 			childrenOutlineColor
 		);
-		guiGraphics.fill(childrenBadgeX + 1,
+		guiGraphics.fill(
+			childrenBadgeX + 1,
 			childrenBadgeY + 1,
 			childrenBadgeX + childrenBadgeWidth - 1,
 			childrenBadgeY + childrenBadgeHeight - 1,
 			childrenFillColor
 		);
-		guiGraphics.fill(childrenBadgeX + 1,
+		guiGraphics.fill(
+			childrenBadgeX + 1,
 			childrenBadgeY + childrenBadgeHeight - 1,
 			childrenBadgeX + childrenBadgeWidth - 1,
 			childrenBadgeY + childrenBadgeHeight,
 			childrenOutlineColor
 		);
-		guiGraphics.drawString(font,
+		guiGraphics.drawString(
+			font,
 			str.getVisualOrderText(),
 			(int) (childrenBadgeX + (float) childrenBadgeWidth / 2 - (float) childrenWidth / 2),
 			childrenBadgeY + 1,
@@ -106,7 +112,9 @@ public class ParentEntry extends ModListEntry {
 			int xOffset = list.getParent().showModChildren.contains(getMod().getId()) ? iconSize : 0;
 			int yOffset = hoveringIcon ? iconSize : 0;
 			RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-			guiGraphics.blit(RenderType::guiTextured, PARENT_MOD_TEXTURE,
+			guiGraphics.blit(
+				RenderType::guiTextured,
+				PARENT_MOD_TEXTURE,
 				x,
 				y,
 				xOffset,
@@ -145,6 +153,7 @@ public class ParentEntry extends ModListEntry {
 		} else {
 			list.getParent().showModChildren.add(id);
 		}
+
 		list.filter(list.getParent().getSearchInput(), false);
 	}
 
@@ -157,6 +166,7 @@ public class ParentEntry extends ModListEntry {
 			} else {
 				list.getParent().showModChildren.add(modId);
 			}
+
 			list.filter(list.getParent().getSearchInput(), false);
 			return true;
 		} else if (keyCode == GLFW.GLFW_KEY_LEFT) {
@@ -164,16 +174,18 @@ public class ParentEntry extends ModListEntry {
 				list.getParent().showModChildren.remove(modId);
 				list.filter(list.getParent().getSearchInput(), false);
 			}
+
 			return true;
 		} else if (keyCode == GLFW.GLFW_KEY_RIGHT) {
 			if (!list.getParent().showModChildren.contains(modId)) {
 				list.getParent().showModChildren.add(modId);
 				list.filter(list.getParent().getSearchInput(), false);
+				return true;
 			} else {
 				return list.keyPressed(GLFW.GLFW_KEY_DOWN, 0, 0);
 			}
-			return true;
 		}
+
 		return super.keyPressed(keyCode, scanCode, modifiers);
 	}
 

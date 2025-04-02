@@ -37,8 +37,13 @@ import java.util.List;
 @EventBusSubscriber(modid = ModMenu.MOD_ID, value = Dist.CLIENT)
 public class ModMenuEventHandler {
 	public static final ResourceLocation MODS_BUTTON_TEXTURE = ResourceLocation.fromNamespaceAndPath(ModMenu.NAMESPACE, "textures/gui/mods_button.png");
-	private static final Lazy<KeyMapping> MENU_KEY_BIND = Lazy.of(() -> new KeyMapping("key.modmenu.open_menu",
-			KeyConflictContext.IN_GAME, InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_UNKNOWN, "key.categories.misc"));;
+	private static final Lazy<KeyMapping> MENU_KEY_BIND = Lazy.of(() -> new KeyMapping(
+			"key.modmenu.open_menu",
+			KeyConflictContext.IN_GAME,
+			InputConstants.Type.KEYSYM,
+			GLFW.GLFW_KEY_UNKNOWN,
+			"key.categories.misc"
+	));;
 
 	@SubscribeEvent
 	public static void onScreenInit(ScreenEvent.Init.Post event) {
@@ -74,10 +79,6 @@ public class ModMenuEventHandler {
 			if (widget instanceof Button button && !(button instanceof PlainTextButton)) {
 				shiftButtons(button, replacedRealmButton, spacing + (replacedRealmButton ? -12 : 8));
 
-				isRealmsButton = buttonHasText(button, "menu.online");
-				if (isRealmsButton)
-					replacedRealmButton = true;
-
 				if (ModMenu.getConfig().MODS_BUTTON_STYLE.get() == BetterModListConfig.TitleMenuButtonStyle.CLASSIC) {
 					if (button.visible) {
 						shiftButtons(button, modsButtonIndex == -1, spacing);
@@ -86,7 +87,9 @@ public class ModMenuEventHandler {
 						}
 					}
 				}
-				if (isRealmsButton) {
+
+				if (buttonHasText(button, "menu.online")) {
+					replacedRealmButton = true;
 					if (ModMenu.getConfig().MODS_BUTTON_STYLE.get() ==
 							BetterModListConfig.TitleMenuButtonStyle.REPLACE_REALMS) {
 						if (modsButton != null) {
@@ -102,6 +105,7 @@ public class ModMenuEventHandler {
 								BetterModListConfig.TitleMenuButtonStyle.SHRINK) {
 							button.setWidth(98);
 						}
+
 						modsButtonIndex = i + 1;
 						if (button.visible) {
 							buttonsY = button.getY();

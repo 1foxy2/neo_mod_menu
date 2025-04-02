@@ -30,7 +30,7 @@ public abstract class MixinBrandingControl {
     private static void replaceBranding(boolean includeMC, boolean reverse, BiConsumer<Integer, String> lineConsumer, CallbackInfo ci) {
         if (ModMenu.getConfig().MODIFY_TITLE_SCREEN.get()) {
             final List<String> brandings = getBrandings(includeMC, reverse);
-            String neoForge = brandings.get(0);
+            String neoForge = brandings.getFirst();
             if (ModMenu.getConfig().MOD_COUNT_LOCATION.get().isOnTitleScreen()) {
                 String count = ModMenu.getDisplayedModCount();
                 String specificKey = "modmenu.mods." + count;

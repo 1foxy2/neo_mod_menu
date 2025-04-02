@@ -1,5 +1,6 @@
 package com.terraformersmc.modmenu.gui.widget.entries;
 
+import com.mojang.blaze3d.opengl.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.terraformersmc.modmenu.ModMenu;
 import com.terraformersmc.modmenu.gui.widget.ModListWidget;
@@ -67,11 +68,13 @@ public class ModListEntry extends ObjectSelectionList.Entry<ModListEntry> {
 		rowWidth -= getXOffset();
 		int iconSize = ModMenu.getConfig().COMPACT_LIST.get() ? COMPACT_ICON_SIZE : FULL_ICON_SIZE;
 		String modId = mod.getId();
+
 		if ("java".equals(modId)) {
 			DrawingUtil.drawRandomVersionBackground(mod, guiGraphics, x, y, iconSize, iconSize);
 		}
+
 		RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-		RenderSystem.enableBlend();
+		GlStateManager._enableBlend();
 
 		if (this.getIconTexture().getB().height == this.getIconTexture().getB().width) {
 			guiGraphics.blit(RenderType::guiTextured,
@@ -94,18 +97,19 @@ public class ModListEntry extends ObjectSelectionList.Entry<ModListEntry> {
 					this.getSquareIconTexture().getB().width, this.getSquareIconTexture().getB().height);
 		}
 
+		GlStateManager._disableBlend();
 
-		RenderSystem.disableBlend();
 		Component name = Component.literal(mod.getTranslatedName());
 		FormattedText trimmedName = name;
 		int maxNameWidth = rowWidth - iconSize - 3;
 		Font font = this.client.font;
 		if (font.width(name) > maxNameWidth) {
 			FormattedText ellipsis = FormattedText.of("...");
-			trimmedName = FormattedText.composite(font.substrByWidth(name, maxNameWidth - font.width(ellipsis)),
-				ellipsis
+			trimmedName = FormattedText.composite(font.substrByWidth(name,
+							maxNameWidth - font.width(ellipsis)), ellipsis
 			);
 		}
+
 		guiGraphics.drawString(font,
 			Language.getInstance().getVisualOrder(trimmedName),
 			x + iconSize + 3,
@@ -113,18 +117,20 @@ public class ModListEntry extends ObjectSelectionList.Entry<ModListEntry> {
 			0xFFFFFF,
 			true
 		);
-		var updateBadgeXOffset = 0;
+
 		if (!ModMenu.getConfig().HIDE_BADGES.get()) {
-			new ModBadgeRenderer(x + iconSize + 3 + font.width(name) + 2 + updateBadgeXOffset,
+			new ModBadgeRenderer(x + iconSize + 3 + font.width(name) + 2,
 				y,
 				x + rowWidth,
 				mod,
 				list.getParent()
 			).draw(guiGraphics);
 		}
+
 		if (!ModMenu.getConfig().COMPACT_LIST.get()) {
 			String summary = mod.getSummary();
-			DrawingUtil.drawWrappedString(guiGraphics,
+			DrawingUtil.drawWrappedString(
+				guiGraphics,
 				summary,
 				(x + iconSize + 3 + 4),
 				(y + client.font.lineHeight + 2),
@@ -133,7 +139,8 @@ public class ModListEntry extends ObjectSelectionList.Entry<ModListEntry> {
 				0x808080
 			);
 		} else {
-			DrawingUtil.drawWrappedString(guiGraphics,
+			DrawingUtil.drawWrappedString(
+				guiGraphics,
 				mod.getPrefixedVersion(),
 				(x + iconSize + 3),
 				(y + client.font.lineHeight + 2),
@@ -152,7 +159,9 @@ public class ModListEntry extends ObjectSelectionList.Entry<ModListEntry> {
 				guiGraphics.fill(x, y, x + iconSize, y + iconSize, -1601138544);
 				boolean hoveringIcon = mouseX - x < iconSize;
 				if (this.list.getParent().modScreenErrors.containsKey(modId)) {
-					guiGraphics.blitSprite(RenderType::guiTextured, hoveringIcon ? ERROR_HIGHLIGHTED_ICON : ERROR_ICON,
+					guiGraphics.blitSprite(
+						RenderType::guiTextured,
+						hoveringIcon ? ERROR_HIGHLIGHTED_ICON : ERROR_ICON,
 						x,
 						y,
 						iconSize,
@@ -168,7 +177,9 @@ public class ModListEntry extends ObjectSelectionList.Entry<ModListEntry> {
 					}
 				} else {
 					int v = hoveringIcon ? iconSize : 0;
-					guiGraphics.blit(RenderType::guiTextured, MOD_CONFIGURATION_ICON,
+					guiGraphics.blit(
+						RenderType::guiTextured,
+						MOD_CONFIGURATION_ICON,
 						x,
 						y,
 						0.0F,
@@ -194,6 +205,7 @@ public class ModListEntry extends ObjectSelectionList.Entry<ModListEntry> {
 				this.openConfig();
 			}
 		}
+
 		this.sinceLastClick = Util.getMillis();
 		return true;
 	}
@@ -218,19 +230,15 @@ public class ModListEntry extends ObjectSelectionList.Entry<ModListEntry> {
 		if (this.iconLocation == null) {
 			this.iconLocation = new Tuple<>(ResourceLocation.fromNamespaceAndPath(ModMenu.NAMESPACE, mod.getId() + "_icon"), new Dimension());
 			Tuple<DynamicTexture, Dimension> icon = mod.getIcon(list.getNeoforgeIconHandler(),
-				64 * this.client.options.guiScale().get(), false);
+					64 * this.client.options.guiScale().get(), false);
 
 
-			if (icon != null) {
-				float multiplier = 32f / icon.getB().height;
-				this.iconLocation.setB(new Dimension(
-						(int) (icon.getB().width * multiplier),
-						(int) (icon.getB().height * multiplier)));
+			float multiplier = 32f / icon.getB().height;
+			this.iconLocation.setB(new Dimension(
+					(int) (icon.getB().width * multiplier),
+					(int) (icon.getB().height * multiplier)));
 
-				this.client.getTextureManager().register(this.iconLocation.getA(), icon.getA());
-			} else {
-				this.iconLocation.setA(UNKNOWN_ICON);
-			}
+			this.client.getTextureManager().register(this.iconLocation.getA(), icon.getA());
 		}
 		return iconLocation;
 	}

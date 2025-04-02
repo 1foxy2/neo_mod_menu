@@ -53,7 +53,9 @@ public class LegacyTexturedButtonWidget extends ImageButton {
 			v += this.hoveredVOffset;
 		}
 
-		guiGraphics.blit(RenderType::guiTextured, this.texture,
+		guiGraphics.blit(
+			RenderType::guiTextured,
+			this.texture,
 			this.getX(),
 			this.getY(),
 			this.u,
@@ -126,7 +128,8 @@ public class LegacyTexturedButtonWidget extends ImageButton {
 		}
 
 		public LegacyTexturedButtonWidget build() {
-			return new LegacyTexturedButtonWidget(this.x,
+			return new LegacyTexturedButtonWidget(
+				this.x,
 				this.y,
 				this.width,
 				this.height,

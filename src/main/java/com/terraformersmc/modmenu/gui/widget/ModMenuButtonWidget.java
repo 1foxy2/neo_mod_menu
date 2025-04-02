@@ -8,7 +8,8 @@ import net.minecraft.network.chat.Component;
 
 public class ModMenuButtonWidget extends Button {
 	public ModMenuButtonWidget(int x, int y, int width, int height, Component text, Screen screen) {
-		super(x,
+		super(
+				x,
 				y,
 				width,
 				height,

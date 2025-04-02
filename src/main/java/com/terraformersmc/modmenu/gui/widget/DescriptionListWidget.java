@@ -1,11 +1,15 @@
 package com.terraformersmc.modmenu.gui.widget;
 
-import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.buffers.BufferType;
+import com.mojang.blaze3d.buffers.BufferUsage;
+import com.mojang.blaze3d.buffers.GpuBuffer;
+import com.mojang.blaze3d.pipeline.RenderPipeline;
+import com.mojang.blaze3d.pipeline.RenderTarget;
+import com.mojang.blaze3d.systems.RenderPass;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 import com.terraformersmc.modmenu.ModMenu;
 import com.terraformersmc.modmenu.gui.ModsScreen;
-import com.terraformersmc.modmenu.gui.widget.entries.ModListEntry;
 import com.terraformersmc.modmenu.util.mod.Mod;
 import net.minecraft.ChatFormatting;
 import net.minecraft.Util;
@@ -20,15 +24,13 @@ import net.minecraft.client.gui.narration.NarratedElementType;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.ConfirmLinkScreen;
 import net.minecraft.client.gui.screens.CreditsAndAttributionScreen;
-import net.minecraft.client.renderer.CoreShaders;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
+import net.minecraft.util.ARGB;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.Mth;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class DescriptionListWidget extends AbstractSelectionList<DescriptionListWidget.DescriptionEntry> {
 
@@ -222,84 +224,49 @@ public class DescriptionListWidget extends AbstractSelectionList<DescriptionList
 
 	@Override
 	public void renderListItems(GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
-		Tesselator tessellator = Tesselator.getInstance();
-		BufferBuilder bufferBuilder;
-		MeshData builtBuffer;
-
-		//		{
-		//			RenderSystem.setShader(GameRenderer::getPositionTexColorProgram);
-		//			RenderSystem.setShaderTexture(0, Screen.OPTIONS_BACKGROUND_TEXTURE);
-		//			RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-		//			bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR);
-		//			bufferBuilder.vertex(this.getX(), this.getBottom(), 0.0D).texture(this.getX() / 32.0F, (this.getBottom() + (int) this.getScrollAmount()) / 32.0F).color(32, 32, 32, 255);
-		//			bufferBuilder.vertex(this.getRight(), this.getBottom(), 0.0D).texture(this.getRight() / 32.0F, (this.getBottom() + (int) this.getScrollAmount()) / 32.0F).color(32, 32, 32, 255);
-		//			bufferBuilder.vertex(this.getRight(), this.getY(), 0.0D).texture(this.getRight() / 32.0F, (this.getY() + (int) this.getScrollAmount()) / 32.0F).color(32, 32, 32, 255);
-		//			bufferBuilder.vertex(this.getX(), this.getY(), 0.0D).texture(this.getX() / 32.0F, (this.getY() + (int) this.getScrollAmount()) / 32.0F).color(32, 32, 32, 255);
-		//			tessellator.draw();
-		//		}
-
 		this.enableScissor(guiGraphics);
 		super.renderListItems(guiGraphics, mouseX, mouseY, delta);
 		guiGraphics.disableScissor();
 
-		RenderSystem.depthFunc(515);
-		RenderSystem.disableDepthTest();
-		RenderSystem.enableBlend();
-		RenderSystem.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA,
-			GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA,
-			GlStateManager.SourceFactor.ZERO,
-			GlStateManager.DestFactor.ONE
-		);
-		//RenderSystem.setShader(GameRenderer::getPositionColorShader);
-		RenderSystem.setShader(CoreShaders.POSITION_COLOR);
-
-		bufferBuilder = tessellator.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
-		bufferBuilder.addVertex(this.getX(), (this.getY() + 4), 0.0F).
-
-			setColor(0, 0, 0, 0);
-
-		bufferBuilder.addVertex(this.getRight(), (this.getY() + 4), 0.0F).
-
-			setColor(0, 0, 0, 0);
-
-		bufferBuilder.addVertex(this.getRight(), this.getY(), 0.0F).
-
-			setColor(0, 0, 0, 255);
-
-		bufferBuilder.addVertex(this.getX(), this.getY(), 0.0F).
-
-			setColor(0, 0, 0, 255);
-
-		bufferBuilder.addVertex(this.getX(), this.getBottom(), 0.0F).
-
-			setColor(0, 0, 0, 255);
-
-		bufferBuilder.addVertex(this.getRight(), this.getBottom(), 0.0F).
-
-			setColor(0, 0, 0, 255);
-
-		bufferBuilder.addVertex(this.getRight(), (this.getBottom() - 4), 0.0F).
-
-			setColor(0, 0, 0, 0);
-
-		bufferBuilder.addVertex(this.getX(), (this.getBottom() - 4), 0.0F).
-
-			setColor(0, 0, 0, 0);
-
-		try {
-			builtBuffer = bufferBuilder.buildOrThrow();
-			BufferUploader.drawWithShader(builtBuffer);
-			builtBuffer.close();
-		} catch (Exception e) {
-			// Ignored
+		RenderPipeline pipeline = RenderPipelines.GUI;
+		try (ByteBufferBuilder byteBufferBuilder = new ByteBufferBuilder(pipeline.getVertexFormat().getVertexSize() * 4)) {
+			BufferBuilder bufferBuilder = new BufferBuilder(byteBufferBuilder,
+					pipeline.getVertexFormatMode(), pipeline.getVertexFormat());
+			final int black = ARGB.opaque(0);
+			bufferBuilder.addVertex(this.getX(), (this.getY() + 4), 0.0F).setColor(0);
+			bufferBuilder.addVertex(this.getRight(), (this.getY() + 4), 0.0F).setColor(0);
+			bufferBuilder.addVertex(this.getRight(), this.getY(), 0.0F).setColor(black);
+			bufferBuilder.addVertex(this.getX(), this.getY(), 0.0F).setColor(black);
+			bufferBuilder.addVertex(this.getX(), this.getBottom(), 0.0F).setColor(black);
+			bufferBuilder.addVertex(this.getRight(), this.getBottom(), 0.0F).setColor(black);
+			bufferBuilder.addVertex(this.getRight(), (this.getBottom() - 4), 0.0F).setColor(0);
+			bufferBuilder.addVertex(this.getX(), (this.getBottom() - 4), 0.0F).setColor(0);
+			this.renderScrollBar(bufferBuilder);
+			try (MeshData builtBuffer = bufferBuilder.build()) {
+				if (builtBuffer == null) {
+					byteBufferBuilder.close();
+					return;
+				}
+				RenderTarget framebuffer = Minecraft.getInstance().getMainRenderTarget();
+				RenderSystem.AutoStorageIndexBuffer autoStorageIndexBuffer = RenderSystem.getSequentialBuffer(pipeline.getVertexFormatMode());
+				VertexFormat.IndexType indexType = autoStorageIndexBuffer.type();
+				GpuBuffer vertexBuffer = RenderSystem.getDevice().createBuffer(() -> "Description List",
+						BufferType.VERTICES, BufferUsage.DYNAMIC_WRITE, builtBuffer.vertexBuffer().remaining());
+				GpuBuffer indexBuffer = autoStorageIndexBuffer.getBuffer(builtBuffer.drawState().indexCount());
+				RenderSystem.getDevice().createCommandEncoder().writeToBuffer(vertexBuffer, builtBuffer.vertexBuffer(), 0);
+				try (RenderPass renderPass = RenderSystem.getDevice().createCommandEncoder().createRenderPass(
+						framebuffer.getColorTexture(), OptionalInt.empty(),
+						framebuffer.getDepthTexture(), OptionalDouble.empty())) {
+					renderPass.setPipeline(pipeline);
+					renderPass.setVertexBuffer(0, vertexBuffer);
+					renderPass.setIndexBuffer(indexBuffer, indexType);
+					renderPass.drawIndexed(0, builtBuffer.drawState().indexCount());
+				}
+			}
 		}
-		this.renderScrollBar(bufferBuilder, tessellator);
-
-		RenderSystem.disableBlend();
 	}
 
-	public void renderScrollBar(BufferBuilder bufferBuilder, Tesselator tessellator) {
-		MeshData builtBuffer;
+	public void renderScrollBar(BufferBuilder bufferBuilder) {
 		int scrollbarStartX = this.scrollBarX();
 		int scrollbarEndX = scrollbarStartX + 6;
 		int maxScroll = this.maxScrollAmount();
@@ -311,26 +278,21 @@ public class DescriptionListWidget extends AbstractSelectionList<DescriptionList
 				q = this.getY();
 			}
 
-			bufferBuilder = tessellator.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
-			bufferBuilder.addVertex(scrollbarStartX, this.getBottom(), 0.0F).setColor(0, 0, 0, 255);
-			bufferBuilder.addVertex(scrollbarEndX, this.getBottom(), 0.0F).setColor(0, 0, 0, 255);
-			bufferBuilder.addVertex(scrollbarEndX, this.getY(), 0.0F).setColor(0, 0, 0, 255);
-			bufferBuilder.addVertex(scrollbarStartX, this.getY(), 0.0F).setColor(0, 0, 0, 255);
-			bufferBuilder.addVertex(scrollbarStartX, q + p, 0.0F).setColor(128, 128, 128, 255);
-			bufferBuilder.addVertex(scrollbarEndX, q + p, 0.0F).setColor(128, 128, 128, 255);
-			bufferBuilder.addVertex(scrollbarEndX, q, 0.0F).setColor(128, 128, 128, 255);
-			bufferBuilder.addVertex(scrollbarStartX, q, 0.0F).setColor(128, 128, 128, 255);
-			bufferBuilder.addVertex(scrollbarStartX, q + p - 1, 0.0F).setColor(192, 192, 192, 255);
-			bufferBuilder.addVertex(scrollbarEndX - 1, q + p - 1, 0.0F).setColor(192, 192, 192, 255);
-			bufferBuilder.addVertex(scrollbarEndX - 1, q, 0.0F).setColor(192, 192, 192, 255);
-			bufferBuilder.addVertex(scrollbarStartX, q, 0.0F).setColor(192, 192, 192, 255);
-			try {
-				builtBuffer = bufferBuilder.buildOrThrow();
-				BufferUploader.drawWithShader(builtBuffer);
-				builtBuffer.close();
-			} catch (Exception e) {
-				// Ignored
-			}
+			final int black = ARGB.opaque(0);
+			final int firstColor = ARGB.colorFromFloat(255, 128, 128, 128);
+			final int lastColor = ARGB.colorFromFloat(255, 192, 192, 192);
+			bufferBuilder.addVertex(scrollbarStartX, this.getBottom(), 0.0F).setColor(black);
+			bufferBuilder.addVertex(scrollbarEndX, this.getBottom(), 0.0F).setColor(black);
+			bufferBuilder.addVertex(scrollbarEndX, this.getY(), 0.0F).setColor(black);
+			bufferBuilder.addVertex(scrollbarStartX, this.getY(), 0.0F).setColor(black);
+			bufferBuilder.addVertex(scrollbarStartX, q + p, 0.0F).setColor(firstColor);
+			bufferBuilder.addVertex(scrollbarEndX, q + p, 0.0F).setColor(firstColor);
+			bufferBuilder.addVertex(scrollbarEndX, q, 0.0F).setColor(firstColor);
+			bufferBuilder.addVertex(scrollbarStartX, q, 0.0F).setColor(firstColor);
+			bufferBuilder.addVertex(scrollbarStartX, q + p - 1, 0.0F).setColor(lastColor);
+			bufferBuilder.addVertex(scrollbarEndX - 1, q + p - 1, 0.0F).setColor(lastColor);
+			bufferBuilder.addVertex(scrollbarEndX - 1, q, 0.0F).setColor(lastColor);
+			bufferBuilder.addVertex(scrollbarStartX, q, 0.0F).setColor(lastColor);
 		}
 	}
 
@@ -407,6 +369,7 @@ public class DescriptionListWidget extends AbstractSelectionList<DescriptionList
 			if (isMouseOver(mouseX, mouseY)) {
 				minecraft.setScreen(new MinecraftCredits());
 			}
+
 			return super.mouseClicked(mouseX, mouseY, button);
 		}
 
@@ -439,6 +402,7 @@ public class DescriptionListWidget extends AbstractSelectionList<DescriptionList
 					minecraft.setScreen(parent);
 				}, link, false));
 			}
+
 			return super.mouseClicked(mouseX, mouseY, button);
 		}
 	}

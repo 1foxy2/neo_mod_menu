@@ -99,7 +99,7 @@ public class FabricMod implements Mod {
 		/* Automatically set the mod containing a Loom-generated library as its parent */
 		if (isGenerated && parentId.isEmpty() && container.getContainingMod().isPresent()) {
 			ModContainer inside = container.getContainingMod().get();
-			parentId = Optional.of(inside.getMetadata().getId());
+			parentId = Optional.of(inside.getMetadata().getId().replace("-", "_"));
 		}
 		this.modMenuData = new ModMenuData(parentId, parentData, id);
 
@@ -212,7 +212,6 @@ public class FabricMod implements Mod {
 
 		var authors = this.getAuthors();
 		var contributors = this.getContributors();
-
 		for (var author : authors) {
 			contributors.put(author, List.of("Author"));
 		}

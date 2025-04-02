@@ -1,7 +1,9 @@
 package com.terraformersmc.modmenu.util.mod.neoforge;
 
 import com.mojang.blaze3d.platform.NativeImage;
+import com.terraformersmc.modmenu.ModMenu;
 import net.minecraft.client.renderer.texture.DynamicTexture;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Tuple;
 import net.neoforged.fml.ModContainer;
 import org.slf4j.Logger;
@@ -29,13 +31,16 @@ public class NeoforgeIconHandler implements Closeable {
 			if (cachedIcon != null) {
 				return cachedIcon;
 			}
+
 			cachedIcon = getCachedModIcon(path);
 			if (cachedIcon != null) {
 				return cachedIcon;
 			}
+
 			try (InputStream inputStream = Files.newInputStream(path)) {
 				NativeImage image = NativeImage.read(Objects.requireNonNull(inputStream));
-				Tuple<DynamicTexture, Dimension> tex = new Tuple<>(new DynamicTexture(image),
+				Tuple<DynamicTexture, Dimension> tex = new Tuple<>(new DynamicTexture(() ->
+						ResourceLocation.fromNamespaceAndPath(ModMenu.MOD_ID, path.toString()).toString(), image),
 						new Dimension(image.getWidth(), image.getHeight())) ;
 				cacheModIcon(path, tex);
 				return tex;

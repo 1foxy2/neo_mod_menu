@@ -1,6 +1,7 @@
 package com.terraformersmc.modmenu.gui;
 
 import com.google.common.base.Joiner;
+import com.mojang.blaze3d.opengl.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.terraformersmc.modmenu.ModMenu;
 import com.terraformersmc.modmenu.gui.widget.DescriptionListWidget;
@@ -13,7 +14,6 @@ import com.terraformersmc.modmenu.util.TranslationUtil;
 import com.terraformersmc.modmenu.util.mod.Mod;
 import com.terraformersmc.modmenu.util.mod.ModBadge;
 import com.terraformersmc.modmenu.util.mod.ModBadgeRenderer;
-import net.minecraft.ChatFormatting;
 import net.minecraft.SharedConstants;
 import net.minecraft.Util;
 import net.minecraft.client.gui.GuiGraphics;
@@ -60,7 +60,7 @@ public class ModsScreen extends Screen {
 			"textures/gui/badge_button.png"
 	);
 
-	private static final Logger LOGGER = LoggerFactory.getLogger("Mod Menu | ModsScreen");
+	private static final Logger LOGGER = LoggerFactory.getLogger("Better ModList | ModsScreen");
 	private final Screen previousScreen;
 	private ModListEntry selected;
 	private ModBadgeRenderer modBadgeRenderer;
@@ -106,6 +106,7 @@ public class ModsScreen extends Screen {
 		if (modList.isMouseOver(mouseX, mouseY)) {
 			return this.modList.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
 		}
+
 		if (descriptionListWidget.isMouseOver(mouseX, mouseY)) {
 			return this.descriptionListWidget.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
 		}
@@ -136,7 +137,6 @@ public class ModsScreen extends Screen {
 		int searchBoxWidth = ModMenu.getConfig().CONFIG_MODE.get() ? Math.min(200, searchWidthMax) : searchWidthMax;
 
 		this.searchBoxX = this.paneWidth / 2 - searchBoxWidth / 2 - filtersButtonSize / 2;
-
 		this.searchBox = new EditBox(this.font,
 			this.searchBoxX,
 			22,
@@ -222,11 +222,9 @@ public class ModsScreen extends Screen {
 		// Website button
 		int urlButtonWidths = this.paneWidth / 2 - 2;
 		int cappedButtonWidth = Math.min(urlButtonWidths, 200);
-
 		this.websiteButton = Button.builder(ModMenuScreenTexts.WEBSITE, button -> {
 				final Mod mod = Objects.requireNonNull(selected).getMod();
 				boolean isMinecraft = selected.getMod().getId().equals("minecraft");
-
 				if (isMinecraft) {
 					var url = SharedConstants.getCurrentVersion().isStable() ? CommonLinks.RELEASE_FEEDBACK : CommonLinks.SNAPSHOT_FEEDBACK;
 					ConfirmLinkScreen.confirmLinkNow(this, url, true);
@@ -243,7 +241,6 @@ public class ModsScreen extends Screen {
 		this.issuesButton = Button.builder(ModMenuScreenTexts.ISSUES, button -> {
 				final Mod mod = Objects.requireNonNull(selected).getMod();
 				boolean isMinecraft = selected.getMod().getId().equals("minecraft");
-
 				if (isMinecraft) {
 					ConfirmLinkScreen.confirmLinkNow(this, CommonLinks.SNAPSHOT_BUGS_FEEDBACK, true);
 				} else {
@@ -251,14 +248,16 @@ public class ModsScreen extends Screen {
 					ConfirmLinkScreen.confirmLinkNow(this, url, false);
 				}
 			})
-			.pos(this.rightPaneX + urlButtonWidths + 4 + (urlButtonWidths / 2) - (cappedButtonWidth / 2),
-				RIGHT_PANE_Y + 36
+			.pos(
+					this.rightPaneX + urlButtonWidths + 4 + (urlButtonWidths / 2) - (cappedButtonWidth / 2),
+					RIGHT_PANE_Y + 36
 			)
 			.size(Math.min(urlButtonWidths, 200), 20)
 			.build();
 
 		// Description list
-		this.descriptionListWidget = new DescriptionListWidget(this.minecraft,
+		this.descriptionListWidget = new DescriptionListWidget(
+			this.minecraft,
 			this.paneWidth,
 			this.height - RIGHT_PANE_Y - 96,
 			RIGHT_PANE_Y + 60,
@@ -285,7 +284,6 @@ public class ModsScreen extends Screen {
 		// Add children
 		this.addWidget(this.searchBox);
 		this.setInitialFocus(this.searchBox);
-
 		if (this.filtersButton != null) {
 			this.addRenderableWidget(this.filtersButton);
 		}
@@ -293,7 +291,6 @@ public class ModsScreen extends Screen {
 		this.addRenderableWidget(this.sortingButton);
 		this.addRenderableWidget(this.librariesButton);
 		this.addWidget(this.modList);
-
 		if (this.configureButton != null) {
 			this.addRenderableWidget(this.configureButton);
 		}
@@ -329,24 +326,30 @@ public class ModsScreen extends Screen {
 		if (selectedEntry != null) {
 			this.descriptionListWidget.render(guiGraphics, mouseX, mouseY, delta);
 		}
+
 		this.modList.render(guiGraphics, mouseX, mouseY, delta);
 		this.searchBox.render(guiGraphics, mouseX, mouseY, delta);
-		RenderSystem.disableBlend();
+		GlStateManager._disableBlend();
 		guiGraphics.drawCenteredString(this.font, this.title, this.modList.getWidth() / 2, 8, 16777215);
+		assert minecraft != null;
+		int grayColor = 11184810;
 		if (!ModMenu.getConfig().DISABLE_DRAG_AND_DROP.get()) {
-			guiGraphics.drawCenteredString(this.font,
+			guiGraphics.drawCenteredString(
+				this.font,
 				ModMenuScreenTexts.DROP_INFO_LINE_1,
 				this.width - this.modList.getWidth() / 2,
 				RIGHT_PANE_Y / 2 - minecraft.font.lineHeight - 1,
-				ChatFormatting.GRAY.getColor()
+				grayColor
 			);
-			guiGraphics.drawCenteredString(this.font,
+			guiGraphics.drawCenteredString(
+				this.font,
 				ModMenuScreenTexts.DROP_INFO_LINE_2,
 				this.width - this.modList.getWidth() / 2,
 				RIGHT_PANE_Y / 2 + 1,
-				ChatFormatting.GRAY.getColor()
+				grayColor
 			);
 		}
+
 		if (!ModMenu.getConfig().CONFIG_MODE.get()) {
 			Component fullModCount = this.computeModCountText(true, false);
 			if (!ModMenu.getConfig().CONFIG_MODE.get() && this.updateFiltersX(false)) {
@@ -405,14 +408,16 @@ public class ModsScreen extends Screen {
 				}
 			}
 		}
+
 		if (selectedEntry != null) {
 			Mod mod = selectedEntry.getMod();
 			int x = this.rightPaneX;
 			if ("java".equals(mod.getId())) {
 				DrawingUtil.drawRandomVersionBackground(mod, guiGraphics, x, RIGHT_PANE_Y, 32, 32);
 			}
+
 			RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-			RenderSystem.enableBlend();
+			GlStateManager._enableBlend();
 			Tuple<ResourceLocation, Dimension> iconProperties = selectedEntry.getIconTexture();
 
 			int imageOffset = iconProperties.getB().width;
@@ -423,7 +428,7 @@ public class ModsScreen extends Screen {
 
 			imageOffset += 4;
 
-			RenderSystem.disableBlend();
+			GlStateManager._enableBlend();
 			int lineSpacing = font.lineHeight + 1;
 			Component name = Component.literal(mod.getTranslatedName());
 			FormattedText trimmedName = name;
@@ -434,6 +439,7 @@ public class ModsScreen extends Screen {
 					maxNameWidth - font.width(ellipsis)
 				), ellipsis);
 			}
+
 			guiGraphics.drawString(font,
 				Language.getInstance().getVisualOrder(trimmedName),
 				x + imageOffset,
@@ -441,11 +447,13 @@ public class ModsScreen extends Screen {
 				0xFFFFFF,
 				true
 			);
+
 			if (mouseX > x + imageOffset && mouseY > RIGHT_PANE_Y + 1 &&
 				mouseY < RIGHT_PANE_Y + 1 + font.lineHeight &&
 				mouseX < x + imageOffset + font.width(trimmedName)) {
 				this.setTooltipForNextRenderPass(ModMenuScreenTexts.modIdTooltip(mod.getId()));
 			}
+
 			if (this.init || modBadgeRenderer == null || modBadgeRenderer.getMod() != mod) {
 				modBadgeRenderer = new ModBadgeRenderer(
 					x + imageOffset + this.minecraft.font.width(trimmedName) + 2,
@@ -456,9 +464,11 @@ public class ModsScreen extends Screen {
 				);
 				this.init = false;
 			}
+
 			if (!ModMenu.getConfig().HIDE_BADGES.get()) {
 				modBadgeRenderer.draw(guiGraphics);
 			}
+
 			if (mod.isReal()) {
 				guiGraphics.drawString(font,
 					mod.getPrefixedVersion(),
@@ -468,16 +478,17 @@ public class ModsScreen extends Screen {
 					true
 				);
 			}
+
 			String authors;
 			List<String> names = mod.getAuthors();
-
 			if (!names.isEmpty()) {
 				if (names.size() > 1) {
 					authors = Joiner.on(", ").join(names);
 				} else {
-					authors = names.get(0);
+					authors = names.getFirst();
 				}
-				DrawingUtil.drawWrappedString(guiGraphics,
+				DrawingUtil.drawWrappedString(
+					guiGraphics,
 					I18n.get("modmenu.authorPrefix", authors),
 					x + imageOffset,
 					RIGHT_PANE_Y + 2 + lineSpacing * 2,
@@ -495,7 +506,6 @@ public class ModsScreen extends Screen {
 			.filter(mod -> !mod.isHidden() && !mod.getBadges().contains(ModBadge.LIBRARY))
 			.map(Mod::getId)
 			.collect(Collectors.toSet()), onInit);
-
 		if (includeLibs && ModMenu.getConfig().SHOW_LIBRARIES.get() && !onInit) {
 			int[] rootLibs = formatModCount(ModMenu.ROOT_MODS.values()
 				.stream()
@@ -517,7 +527,7 @@ public class ModsScreen extends Screen {
 				.collect(Collectors.toSet()), false);
 			return TranslationUtil.translateNumeric("modmenu.showingLibraries", rootLibs);
 		} else {
-			return Component.literal(null);
+			return Component.empty();
 		}
 	}
 
@@ -538,7 +548,6 @@ public class ModsScreen extends Screen {
 
 	private void setFilterOptionsShown(boolean filterOptionsShown) {
 		this.filterOptionsShown = filterOptionsShown;
-
 		this.sortingButton.visible = filterOptionsShown;
 		this.librariesButton.visible = filterOptionsShown;
 	}
@@ -612,14 +621,13 @@ public class ModsScreen extends Screen {
 		Path modsDirectory = FMLPaths.MODSDIR.get();
 
 		// Filter out none mods
-		List<Path> mods = paths.stream().filter(ModsScreen::isMod).collect(Collectors.toList());
+		List<Path> mods = paths.stream().filter(ModsScreen::isValidMod).toList();
 
 		if (mods.isEmpty()) {
 			return;
 		}
 
 		String modList = mods.stream().map(Path::getFileName).map(Path::toString).collect(Collectors.joining(", "));
-
 		this.minecraft.setScreen(new ConfirmScreen((value) -> {
 			if (value) {
 				boolean allSuccessful = true;
@@ -658,7 +666,7 @@ public class ModsScreen extends Screen {
 		}
     }
 
-	private static boolean isMod(Path mod) {
+	private static boolean isValidMod(Path mod) {
 		return isFabricMod(mod) || isNeoforgeMod(mod);
 	}
 
@@ -670,10 +678,10 @@ public class ModsScreen extends Screen {
 		}
     }
 
-	public boolean getModHasConfigScreen(Optional<ModContainer> optionalModContainer) {
-		if (optionalModContainer.isEmpty()) return false;
+	public boolean getModHasConfigScreen(Optional<ModContainer> containerOptional) {
+		if (containerOptional.isEmpty()) return false;
 
-		ModContainer container = optionalModContainer.get();
+		ModContainer container = containerOptional.get();
 
 		if (this.modScreenErrors.containsKey(container.getModId())) {
 			return false;
@@ -685,6 +693,7 @@ public class ModsScreen extends Screen {
 	public void safelyOpenConfigScreen(ModContainer modId) {
 		try {
 			Screen screen = ModMenu.getConfigScreen(modId, this);
+
 			if (screen != null) {
 				this.minecraft.setScreen(screen);
 			}

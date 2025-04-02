@@ -269,6 +269,8 @@ public class BetterModListConfig {
     }
 
     public enum GameMenuButtonStyle {
-        @SerializedName(value = "replace", alternate = { "replace_bugs" }) REPLACE, @SerializedName(value = "insert", alternate = { "below_bugs" }) INSERT, ICON
+        @SerializedName(value = "replace", alternate = { "replace_bugs" }) REPLACE,
+        @SerializedName(value = "insert", alternate = { "below_bugs"}) INSERT,
+        ICON
     }
 }
