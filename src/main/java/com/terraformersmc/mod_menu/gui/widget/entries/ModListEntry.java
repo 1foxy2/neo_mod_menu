@@ -142,7 +142,7 @@ public class ModListEntry extends ObjectSelectionList.Entry<ModListEntry> {
 			);
 		}
 
-		if (!(this instanceof ParentEntry) && ModMenu.getConfig().QUICK_CONFIGURE.get() && (this.list.getParent()
+		if (!(this instanceof ParentEntry) && !(this instanceof ChildParentEntry) && ModMenu.getConfig().QUICK_CONFIGURE.get() && (this.list.getParent()
 				.getModHasConfigScreen(mod.getContainer()) || this.list.getParent().modScreenErrors.containsKey(modId))) {
 			final int textureSize = ModMenu.getConfig().COMPACT_LIST.get() ?
 				(int) (256 / (FULL_ICON_SIZE / (double) COMPACT_ICON_SIZE)) :
@@ -260,5 +260,10 @@ public class ModListEntry extends ObjectSelectionList.Entry<ModListEntry> {
 
 	public int getXOffset() {
 		return 0;
+	}
+
+	@Override
+	public String toString() {
+		return "ModListEntry{mod_id=\"" + getMod().getId() + "\"}";
 	}
 }

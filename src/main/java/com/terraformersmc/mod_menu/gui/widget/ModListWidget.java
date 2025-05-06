@@ -4,10 +4,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 import com.terraformersmc.mod_menu.ModMenu;
 import com.terraformersmc.mod_menu.gui.ModsScreen;
-import com.terraformersmc.mod_menu.gui.widget.entries.ChildEntry;
-import com.terraformersmc.mod_menu.gui.widget.entries.IndependentEntry;
-import com.terraformersmc.mod_menu.gui.widget.entries.ModListEntry;
-import com.terraformersmc.mod_menu.gui.widget.entries.ParentEntry;
+import com.terraformersmc.mod_menu.gui.widget.entries.*;
 import com.terraformersmc.mod_menu.util.mod.Mod;
 import com.terraformersmc.mod_menu.util.mod.ModBadge;
 import com.terraformersmc.mod_menu.util.mod.ModSearch;
@@ -18,6 +15,7 @@ import net.minecraft.client.gui.components.ObjectSelectionList;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
+import net.neoforged.fml.loading.FMLConfig;
 import org.joml.Matrix4f;
 import org.lwjgl.glfw.GLFW;
 
@@ -185,11 +183,7 @@ public class ModListWidget extends ObjectSelectionList<ModListEntry> implements 
 					if (this.parent.showModChildren.contains(modId)) {
 						List<Mod> validChildren = ModSearch.search(this.parent, searchTerm, children);
 						for (Mod child : validChildren) {
-							this.addEntry(new ChildEntry(child,
-								parent,
-								this,
-								validChildren.indexOf(child) == validChildren.size() - 1
-							));
+							addChildMod(child, validChildren, parent, searchTerm, 1);
 						}
 					}
 				} else {
@@ -214,6 +208,36 @@ public class ModListWidget extends ObjectSelectionList<ModListEntry> implements 
 
 		if (getScrollAmount() > Math.max(0, this.getMaxPosition() - (this.getBottom() - this.getY() - 4))) {
 			setScrollAmount(Math.max(0, this.getMaxPosition() - (this.getBottom() - this.getY() - 4)));
+		}
+	}
+
+	public void addChildMod(Mod child, List<Mod> validChildren, ParentEntry parent, String searchTerm, int parentCount) {
+		if (ModMenu.PARENT_MAP.keySet().contains(child) && hasVisibleChildMods(child)) {
+			//Add parent mods when not searching
+			List<Mod> childChildren = ModMenu.PARENT_MAP.get(child);
+			childChildren.sort(ModMenu.getConfig().SORTING.get().getComparator());
+			this.addEntry(new ChildParentEntry(
+					child,
+					parent,
+					childChildren,
+					this,
+					validChildren.indexOf(child) == validChildren.size() - 1,
+					parentCount
+			));
+			//Add children if they are meant to be shown
+			if (this.parent.showModChildren.contains(child.getId())) {
+				List<Mod> validChildChildren = ModSearch.search(this.parent, searchTerm, childChildren);
+				for (Mod childChild : validChildChildren) {
+					addChildMod(childChild, validChildChildren, parent, searchTerm, parentCount + 1);
+				}
+			}
+		} else {
+			this.addEntry(new ChildEntry(child,
+					parent,
+					this,
+					validChildren.indexOf(child) == validChildren.size() - 1,
+					parentCount
+			));
 		}
 	}
 
