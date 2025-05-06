@@ -33,7 +33,20 @@ public class ChildEntry extends ModListEntry {
 		super.render(guiGraphics, index, y, x, rowWidth, rowHeight, mouseX, mouseY, isSelected, delta);
 		x += 4 + getXOffset() - 13;
 		int color = 0xFFA0A0A0;
-		guiGraphics.fill(x, y - 2, x + 1, y + (bottomChild ? rowHeight / 2 : rowHeight + 2), color);
+		int previousIndex = index - 1;
+		int minYOffset = 0;
+		while (previousIndex > 0) {
+			int entryXOffset = list.getEntry(previousIndex).getXOffset();
+			if (entryXOffset == getXOffset()) {
+				minYOffset = y - list.getRowBottom(previousIndex);
+				break;
+			}
+			if (entryXOffset == 0) {
+				break;
+			}
+			previousIndex--;
+		}
+		guiGraphics.fill(x, y - 2 - minYOffset, x + 1, y + (bottomChild ? rowHeight / 2 : rowHeight + 2), color);
 		guiGraphics.fill(x, y + rowHeight / 2, x + 7, y + rowHeight / 2 + 1, color);
 	}
 

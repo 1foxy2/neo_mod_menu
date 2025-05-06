@@ -409,4 +409,14 @@ public class ModListWidget extends ObjectSelectionList<ModListEntry> implements 
 	public NeoforgeIconHandler getNeoforgeIconHandler() {
 		return iconHandler;
 	}
+
+	@Override
+	public int getRowBottom(int index) {
+		return super.getRowBottom(index);
+	}
+
+	@Override
+	public ModListEntry getEntry(int index) {
+		return super.getEntry(index);
+	}
 }

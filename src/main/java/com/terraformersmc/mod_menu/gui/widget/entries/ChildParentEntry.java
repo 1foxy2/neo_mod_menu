@@ -129,7 +129,16 @@ public class ChildParentEntry extends ModListEntry {
 		}
 		x -= 9;
 		int color = 0xFFA0A0A0;
-		guiGraphics.fill(x, y - 2, x + 1, y + (bottomChild ? rowHeight / 2 : rowHeight + 2), color);
+		int previousIndex = index - 1;
+		int minYOffset = 0;
+		while (previousIndex > 0) {
+			if (list.getEntry(previousIndex).getXOffset() == getXOffset()) {
+				minYOffset = y - list.getRowBottom(previousIndex);
+				break;
+			}
+			previousIndex--;
+		}
+		guiGraphics.fill(x, y - 2 - minYOffset, x + 1, y + (bottomChild ? rowHeight / 2 : rowHeight + 2), color);
 		guiGraphics.fill(x, y + rowHeight / 2, x + 7, y + rowHeight / 2 + 1, color);
 	}
 
