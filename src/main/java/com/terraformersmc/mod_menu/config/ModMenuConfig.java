@@ -161,51 +161,64 @@ public class ModMenuConfig {
 
         // Initialize parent map
         HashSet<String> modParentSet = new HashSet<>();
+        HashSet<String> fakeModToRecalculate = new HashSet<>();
         this.MOD_PARENTS.get().forEach(parentToMods -> {
-            if (parentToMods.isEmpty())
-                return;
-
-            String[] parentToMod = parentToMods.split("=");
-            List<String> modIds = Arrays.stream(parentToMod[1].split(", ")).toList();
-            for (String id : modIds) {
-                Mod mod = ModMenu.MODS.get(id);
-
-                if (mod == null)
-                    continue;
-
-                String parentId = parentToMod[0];
-
-                Mod parent;
-                modParentSet.clear();
-                while (true) {
-                    parent = ModMenu.MODS.getOrDefault(parentId, dummyParents.get(parentId));
-                    if (parent == null) {
-                        parent = new NeoforgeDummyParentMod(mod, parentId);
-                        dummyParents.put(parentId, parent);
-                    }
-
-                    parentId = parent != null ? parent.getParent() : null;
-                    if (parentId == null) {
-                        // It will most likely end here in the first iteration
-                        break;
-                    }
-
-                    if (modParentSet.contains(parentId)) {
-                        ModMenu.LOGGER.warn("Mods contain each other as parents: {}", modParentSet);
-                        parent = null;
-                        break;
-                    }
-                    modParentSet.add(parentId);
-                }
-
-                if (parent == null) {
-                    continue;
-                }
-                ModMenu.ROOT_MODS.remove(mod.getId(), mod);
-                ModMenu.PARENT_MAP.put(parent, mod);
-            }
+            this.calculateParent(parentToMods, dummyParents, fakeModToRecalculate, modParentSet, true);
+        });
+        fakeModToRecalculate.forEach(parentToMods -> {
+            this.calculateParent(parentToMods, dummyParents, fakeModToRecalculate, modParentSet, false);
         });
         ModMenu.MODS.putAll(dummyParents);
+    }
+
+    public void calculateParent(String parentToMods, Map<String, Mod> dummyParents,
+                                HashSet<String> fakeModToRecalculate, HashSet<String> modParentSet, boolean saveFakeParents) {
+        if (parentToMods.isEmpty())
+            return;
+
+        String[] parentToMod = parentToMods.split("=");
+        List<String> modIds = Arrays.stream(parentToMod[1].split(", ")).toList();
+        for (String id : modIds) {
+            Mod mod = ModMenu.MODS.getOrDefault(id, dummyParents.get(id));
+
+            if (mod == null) {
+                if (saveFakeParents) {
+                    fakeModToRecalculate.add(parentToMods);
+                }
+                continue;
+            }
+
+            String parentId = parentToMod[0];
+
+            Mod parent;
+            modParentSet.clear();
+            while (true) {
+                parent = ModMenu.MODS.getOrDefault(parentId, dummyParents.get(parentId));
+                if (parent == null) {
+                    parent = new NeoforgeDummyParentMod(mod, parentId);
+                    dummyParents.put(parentId, parent);
+                }
+
+                parentId = parent != null ? parent.getParent() : null;
+                if (parentId == null) {
+                    // It will most likely end here in the first iteration
+                    break;
+                }
+
+                if (modParentSet.contains(parentId)) {
+                    ModMenu.LOGGER.warn("Mods contain each other as parents: {}", modParentSet);
+                    parent = null;
+                    break;
+                }
+                modParentSet.add(parentId);
+            }
+
+            if (parent == null) {
+                continue;
+            }
+            ModMenu.ROOT_MODS.remove(mod.getId(), mod);
+            ModMenu.PARENT_MAP.put(parent, mod);
+        }
     }
 
     public void save() {
