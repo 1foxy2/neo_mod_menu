@@ -41,7 +41,7 @@ public class ChildEntry extends ModListEntry {
 				minYOffset = y - list.getRowBottom(previousIndex);
 				break;
 			}
-			if (entryXOffset == 0) {
+			if (entryXOffset < getXOffset()) {
 				break;
 			}
 			previousIndex--;

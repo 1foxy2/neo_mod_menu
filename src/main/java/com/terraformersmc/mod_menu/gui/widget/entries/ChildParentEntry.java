@@ -131,9 +131,13 @@ public class ChildParentEntry extends ModListEntry {
 		int color = 0xFFA0A0A0;
 		int previousIndex = index - 1;
 		int minYOffset = 0;
-		while (previousIndex > 0) {
-			if (list.getEntry(previousIndex).getXOffset() == getXOffset()) {
+		while (0 < previousIndex) {
+			int entryXOffset = list.getEntry(previousIndex).getXOffset();
+			if (entryXOffset == getXOffset()) {
 				minYOffset = y - list.getRowBottom(previousIndex);
+				break;
+			}
+			if (entryXOffset < getXOffset()) {
 				break;
 			}
 			previousIndex--;
