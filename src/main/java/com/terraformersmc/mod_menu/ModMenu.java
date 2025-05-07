@@ -171,10 +171,11 @@ public class ModMenu {
 			PARENT_MAP.put(parent, mod);
 		}
 
+		MODS.putAll(dummyParents);
+
 		Mod java = new JavaDummyMod();
 		MODS.put("java", java);
 		ROOT_MODS.put("java", java);
-		MODS.putAll(dummyParents);
 	}
 
 	public void onClientSetup(FMLClientSetupEvent event) {

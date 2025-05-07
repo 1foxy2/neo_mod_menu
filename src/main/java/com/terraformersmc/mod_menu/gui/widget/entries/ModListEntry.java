@@ -187,7 +187,7 @@ public class ModListEntry extends ObjectSelectionList.Entry<ModListEntry> {
 		list.select(this);
 		if (ModMenu.getConfig().QUICK_CONFIGURE.get() && this.list.getParent().getModHasConfigScreen(this.mod.getContainer())) {
 			int iconSize = ModMenu.getConfig().COMPACT_LIST.get() ? COMPACT_ICON_SIZE : FULL_ICON_SIZE;
-			if (mouseX - list.getRowLeft() <= iconSize) {
+			if (mouseX - list.getRowLeft() <= iconSize + getXOffset()) {
 				this.openConfig();
 			} else if (Util.getMillis() - this.sinceLastClick < 250) {
 				this.openConfig();

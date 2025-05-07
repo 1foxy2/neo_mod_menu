@@ -17,22 +17,16 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
-public class ChildParentEntry extends ModListEntry {
+public class ChildParentEntry extends ChildEntry {
 	private static final ResourceLocation PARENT_MOD_TEXTURE = ResourceLocation.fromNamespaceAndPath(ModMenu.MOD_ID, "textures/gui/parent_mod.png");
 	protected List<Mod> children;
 	protected ModListWidget list;
 	protected boolean hoveringIcon = false;
-	private final boolean bottomChild;
-	private final ParentEntry parent;
-	private final int parentCount;
 
-	public ChildParentEntry(Mod mod, ParentEntry parent, List<Mod> children, ModListWidget list, boolean bottomChild, int parentCount) {
-		super(mod, list);
+	public ChildParentEntry(Mod mod, ParentEntry parent, List<ModListEntry> parents, List<Mod> children, ModListWidget list, boolean bottomChild) {
+		super(mod, parent, parents, list, bottomChild);
 		this.children = children;
 		this.list = list;
-		this.parent = parent;
-		this.bottomChild = bottomChild;
-		this.parentCount = parentCount;
 	}
 
 	@Override
@@ -127,23 +121,6 @@ public class ChildParentEntry extends ModListEntry {
 					256
 			);
 		}
-		x -= 9;
-		int color = 0xFFA0A0A0;
-		int previousIndex = index - 1;
-		int minYOffset = 0;
-		while (0 < previousIndex) {
-			int entryXOffset = list.getEntry(previousIndex).getXOffset();
-			if (entryXOffset == getXOffset()) {
-				minYOffset = y - list.getRowBottom(previousIndex);
-				break;
-			}
-			if (entryXOffset < getXOffset()) {
-				break;
-			}
-			previousIndex--;
-		}
-		guiGraphics.fill(x, y - 2 - minYOffset, x + 1, y + (bottomChild ? rowHeight / 2 : rowHeight + 2), color);
-		guiGraphics.fill(x, y + rowHeight / 2, x + 7, y + rowHeight / 2 + 1, color);
 	}
 
 	@Override
@@ -183,8 +160,6 @@ public class ChildParentEntry extends ModListEntry {
 			list.filter(list.getParent().getSearchInput(), false);
 			return true;
 		} else if (keyCode == GLFW.GLFW_KEY_LEFT) {
-			list.setSelected(parent);
-			list.ensureVisible(parent);
 			if (list.getParent().showModChildren.contains(modId)) {
 				list.getParent().showModChildren.remove(modId);
 				list.filter(list.getParent().getSearchInput(), false);
@@ -221,10 +196,5 @@ public class ChildParentEntry extends ModListEntry {
 	@Override
 	public boolean isMouseOver(double double_1, double double_2) {
 		return Objects.equals(this.list.getEntryAtPos(double_1, double_2), this);
-	}
-
-	@Override
-	public int getXOffset() {
-		return 13 * parentCount;
 	}
 }

@@ -183,7 +183,7 @@ public class ModListWidget extends ObjectSelectionList<ModListEntry> implements 
 					if (this.parent.showModChildren.contains(modId)) {
 						List<Mod> validChildren = ModSearch.search(this.parent, searchTerm, children);
 						for (Mod child : validChildren) {
-							addChildMod(child, validChildren, parent, searchTerm, 1);
+							addChildMod(child, validChildren, parent, List.of(parent), searchTerm, 1);
 						}
 					}
 				} else {
@@ -211,32 +211,36 @@ public class ModListWidget extends ObjectSelectionList<ModListEntry> implements 
 		}
 	}
 
-	public void addChildMod(Mod child, List<Mod> validChildren, ParentEntry parent, String searchTerm, int parentCount) {
+	public void addChildMod(Mod child, List<Mod> validChildren, ParentEntry parent, List<ModListEntry> parents, String searchTerm, int parentCount) {
 		if (ModMenu.PARENT_MAP.keySet().contains(child) && hasVisibleChildMods(child)) {
 			//Add parent mods when not searching
 			List<Mod> childChildren = ModMenu.PARENT_MAP.get(child);
 			childChildren.sort(ModMenu.getConfig().SORTING.get().getComparator());
-			this.addEntry(new ChildParentEntry(
+			ChildParentEntry childParentEntry = new ChildParentEntry(
 					child,
 					parent,
+					parents,
 					childChildren,
 					this,
-					validChildren.indexOf(child) == validChildren.size() - 1,
-					parentCount
-			));
+					validChildren.indexOf(child) == validChildren.size() - 1
+			);
+			this.addEntry(childParentEntry);
 			//Add children if they are meant to be shown
 			if (this.parent.showModChildren.contains(child.getId())) {
 				List<Mod> validChildChildren = ModSearch.search(this.parent, searchTerm, childChildren);
 				for (Mod childChild : validChildChildren) {
-					addChildMod(childChild, validChildChildren, parent, searchTerm, parentCount + 1);
+					List<ModListEntry> childParents = new ArrayList<>(parents);
+					childParents.add(childParentEntry);
+					addChildMod(childChild, validChildChildren, parent, childParents, searchTerm, parentCount + 1);
 				}
 			}
 		} else {
-			this.addEntry(new ChildEntry(child,
+			this.addEntry(new ChildEntry(
+					child,
 					parent,
+					parents,
 					this,
-					validChildren.indexOf(child) == validChildren.size() - 1,
-					parentCount
+					validChildren.indexOf(child) == validChildren.size() - 1
 			));
 		}
 	}
