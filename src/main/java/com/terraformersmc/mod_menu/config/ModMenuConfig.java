@@ -174,7 +174,7 @@ public class ModMenuConfig {
                 Mod mod = ModMenu.MODS.getOrDefault(id, dummyParents.get(id));
 
                 if (mod == null) {
-                    Mod fakeModHost = ModMenu.MODS.get(modParents.get(id).getFirst());
+                    Mod fakeModHost = getModHost(modParents, dummyParents, id);
                     if (fakeModHost == null) {
                         continue;
                     }
@@ -215,6 +215,28 @@ public class ModMenuConfig {
             }
         });
         ModMenu.MODS.putAll(dummyParents);
+    }
+
+    private Mod getModHost(Map<String, List<String>> modParents, Map<String, Mod> dummyParents, String id) {
+        if (!modParents.containsKey(id)) {
+            return null;
+        }
+        String hostId = modParents.get(id).getFirst();
+        if (hostId == null) {
+            return null;
+        }
+        Mod host = ModMenu.MODS.get(hostId);
+        if (host == null) {
+            host = getModHost(modParents, dummyParents, hostId);
+            if (host == null) {
+                return null;
+            }
+
+            host = new NeoforgeDummyParentMod(host, hostId);
+            dummyParents.put(id, host);
+        }
+
+        return host;
     }
 
     public void save() {
