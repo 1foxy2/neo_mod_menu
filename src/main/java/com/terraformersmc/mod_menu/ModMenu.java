@@ -42,7 +42,6 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nullable;
 import java.awt.*;
 import java.io.InputStreamReader;
-import java.nio.file.Path;
 import java.text.NumberFormat;
 import java.util.HashMap;
 import java.util.HashSet;

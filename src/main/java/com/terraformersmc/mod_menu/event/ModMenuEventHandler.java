@@ -43,7 +43,7 @@ public class ModMenuEventHandler {
 	@SubscribeEvent
 	public static void onScreenInit(ScreenEvent.Init.Post event) {
 		Screen screen = event.getScreen();
-		if (ModMenu.getConfig().MODIFY_TITLE_SCREEN.get() && screen instanceof TitleScreen) {
+		if (screen instanceof TitleScreen && ModMenu.getConfig().MODIFY_TITLE_SCREEN.get()) {
 			removeModsButton(screen);
 			afterTitleScreenInit(screen);
 		}
