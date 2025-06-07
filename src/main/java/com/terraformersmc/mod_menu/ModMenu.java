@@ -214,7 +214,8 @@ public class ModMenu {
 			titleStyle == ModMenuConfig.TitleMenuButtonStyle.ICON :
 			gameMenuStyle == ModMenuConfig.GameMenuButtonStyle.ICON;
 		var isShort = title ?
-			titleStyle == ModMenuConfig.TitleMenuButtonStyle.SHRINK :
+			titleStyle == ModMenuConfig.TitleMenuButtonStyle.SHRINK ||
+					titleStyle == ModMenuConfig.TitleMenuButtonStyle.SHRINK_LEFT :
 			gameMenuStyle == ModMenuConfig.GameMenuButtonStyle.REPLACE;
 		MutableComponent modsText = ModMenuScreenTexts.TITLE.copy();
 		if (ModMenu.getConfig().MOD_COUNT_LOCATION.get().isOnModsButton() && !isIcon) {

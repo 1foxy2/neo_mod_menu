@@ -1,6 +1,7 @@
 package com.terraformersmc.mod_menu.event;
 
 import com.mojang.blaze3d.platform.InputConstants;
+import com.mojang.logging.LogUtils;
 import com.terraformersmc.mod_menu.ModMenu;
 import com.terraformersmc.mod_menu.config.ModMenuConfig;
 import com.terraformersmc.mod_menu.gui.ModsScreen;
@@ -50,9 +51,12 @@ public class ModMenuEventHandler {
 	}
 
 	private static void removeModsButton(Screen screen) {
-		screen.renderables.removeIf(button -> buttonHasText((LayoutElement) button, "fml.menu.mods"));
-		screen.narratables.removeIf(button -> buttonHasText((LayoutElement) button, "fml.menu.mods"));
-		screen.children.removeIf(button -> buttonHasText((LayoutElement) button, "fml.menu.mods"));
+		screen.renderables.forEach(renderable -> {
+			if (buttonHasText((LayoutElement) renderable, "fml.menu.mods") && renderable instanceof Button button) {
+				button.visible = false;
+				button.active = false;
+			}
+		});
 	}
 
 	private static void afterTitleScreenInit(Screen screen) {
@@ -95,11 +99,22 @@ public class ModMenuEventHandler {
 								ModMenuConfig.TitleMenuButtonStyle.SHRINK) {
 							button.setWidth(98);
 						}
+						if (ModMenu.getConfig().MODS_BUTTON_STYLE.get() ==
+								ModMenuConfig.TitleMenuButtonStyle.SHRINK_LEFT) {
+							button.setWidth(98);
+							button.setX(screen.width / 2 + 2);
+						}
 						modsButtonIndex = i + 1;
 						if (button.visible) {
 							buttonsY = button.getY();
 						}
 					}
+				}
+				if (modsButtonIndex == -1 && buttonHasText(button, "fml.menu.mods")) {
+					if (ModMenu.getConfig().MODS_BUTTON_STYLE.get() != ModMenuConfig.TitleMenuButtonStyle.CLASSIC) {
+						buttonsY = button.getY();
+					}
+					modsButtonIndex = i;
 				}
 			}
 
@@ -116,6 +131,16 @@ public class ModMenuEventHandler {
 			} else if (ModMenu.getConfig().MODS_BUTTON_STYLE.get() == ModMenuConfig.TitleMenuButtonStyle.SHRINK) {
 				add(screen, modsButtonIndex,
 						new ModMenuButtonWidget(screen.width / 2 + 2,
+								buttonsY,
+								98,
+								20,
+								ModMenu.createModsButtonText(true),
+								screen
+						)
+				);
+			} else if (ModMenu.getConfig().MODS_BUTTON_STYLE.get() == ModMenuConfig.TitleMenuButtonStyle.SHRINK_LEFT) {
+				add(screen, modsButtonIndex,
+						new ModMenuButtonWidget(screen.width / 2 - 100,
 								buttonsY,
 								98,
 								20,

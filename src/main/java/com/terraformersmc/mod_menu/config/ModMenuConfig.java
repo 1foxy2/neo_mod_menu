@@ -311,7 +311,7 @@ public class ModMenuConfig {
     }
 
     public enum TitleMenuButtonStyle {
-        CLASSIC(), REPLACE_REALMS(), SHRINK(), ICON()
+        CLASSIC(), REPLACE_REALMS(), SHRINK(), SHRINK_LEFT(), ICON()
     }
 
     public enum GameMenuButtonStyle {

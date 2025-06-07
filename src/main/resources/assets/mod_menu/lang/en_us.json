@@ -160,6 +160,7 @@
   "mod_menu.configuration.mods_button_style.classic": "Below Realms",
   "mod_menu.configuration.mods_button_style.replace_realms": "Replace Realms",
   "mod_menu.configuration.mods_button_style.shrink": "Adjacent",
+  "mod_menu.configuration.mods_button_style.shrink_left": "Adjacent on left",
   "mod_menu.configuration.mods_button_style.icon": "Icon",
   "mod_menu.configuration.game_menu_button_style": "Game Menu",
   "mod_menu.configuration.game_menu_button_style.insert": "Insert",
