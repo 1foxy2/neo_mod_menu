@@ -116,18 +116,27 @@ public class ModsScreen extends Screen {
 
 	@Override
 	protected void init() {
-		int paneY = ModMenu.getConfig().CONFIG_MODE.get() ? 48 : 48 + 19;
+		boolean hideTop = ModMenu.getConfig().HIDE_SCREEN_TOP.get();
+		int paneY;
+		int rightPaneY;
+		if (hideTop) {
+			paneY = 30;
+			rightPaneY = 5;
+		} else {
+			paneY = ModMenu.getConfig().CONFIG_MODE.get() ? 48 : 48 + 19;
+			rightPaneY = RIGHT_PANE_Y;
+		}
 		this.paneWidth = this.width / 2 - 8;
 		this.rightPaneX = this.width - this.paneWidth;
 
 		// Mod list (initialized early for updateFiltersX)
 		this.modList = new ModListWidget(this.minecraft,
-			this.paneWidth,
-			this.height - paneY - 36,
-			paneY,
+				this.paneWidth,
+				this.height - paneY - 36,
+				paneY,
 				ModMenu.getConfig().COMPACT_LIST.get() ? 23 : 36,
-			this.modList,
-			this
+				this.modList,
+				this
 		);
 		this.modList.setX(0);
 
@@ -145,6 +154,10 @@ public class ModsScreen extends Screen {
 			this.searchBox,
 			ModMenuScreenTexts.SEARCH
 		);
+		if (ModMenu.getConfig().HIDE_SCREEN_TOP.get()) {
+			searchBox.visible = false;
+			searchBox.active = false;
+		}
 		this.searchBox.setResponder(text -> {
 			this.modList.filter(text, false);
 		});
@@ -174,6 +187,10 @@ public class ModsScreen extends Screen {
 				.build();
 
 			this.filtersButton.setTooltip(Tooltip.create(ModMenuScreenTexts.TOGGLE_FILTER_OPTIONS));
+			if (ModMenu.getConfig().HIDE_SCREEN_TOP.get()) {
+				filtersButton.visible = false;
+				filtersButton.active = false;
+			}
 		}
 
 		// Sorting button
@@ -202,7 +219,7 @@ public class ModsScreen extends Screen {
 						button.active = false;
 					}
 				})
-				.position(width - 24, RIGHT_PANE_Y)
+				.position(width - 24, rightPaneY)
 				.size(20, 20)
 				.uv(0, 0, 20)
 				.texture(CONFIGURE_BUTTON_LOCATION, 32, 64)
@@ -233,7 +250,7 @@ public class ModsScreen extends Screen {
 					ConfirmLinkScreen.confirmLinkNow(this, url, false);
 				}
 			})
-			.pos(this.rightPaneX + (urlButtonWidths / 2) - (cappedButtonWidth / 2), RIGHT_PANE_Y + 36)
+			.pos(this.rightPaneX + (urlButtonWidths / 2) - (cappedButtonWidth / 2), rightPaneY + 36)
 			.size(Math.min(urlButtonWidths, 200), 20)
 			.build();
 
@@ -250,7 +267,7 @@ public class ModsScreen extends Screen {
 			})
 			.pos(
 					this.rightPaneX + urlButtonWidths + 4 + (urlButtonWidths / 2) - (cappedButtonWidth / 2),
-					RIGHT_PANE_Y + 36
+					rightPaneY + 36
 			)
 			.size(Math.min(urlButtonWidths, 200), 20)
 			.build();
@@ -259,8 +276,8 @@ public class ModsScreen extends Screen {
 		this.descriptionListWidget = new DescriptionListWidget(
 			this.minecraft,
 			this.paneWidth,
-			this.height - RIGHT_PANE_Y - 96,
-			RIGHT_PANE_Y + 60,
+			this.height - rightPaneY - 96,
+				rightPaneY + 60,
 			font.lineHeight + 1,
 			this.descriptionListWidget,
 			this
@@ -322,6 +339,8 @@ public class ModsScreen extends Screen {
 	@Override
 	public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
 		super.render(guiGraphics, mouseX, mouseY, delta);
+		boolean hideTop = ModMenu.getConfig().HIDE_SCREEN_TOP.get();
+		int rightPaneY = hideTop ? 5 : RIGHT_PANE_Y;
 		ModListEntry selectedEntry = selected;
 		if (selectedEntry != null) {
 			this.descriptionListWidget.render(guiGraphics, mouseX, mouseY, delta);
@@ -330,10 +349,12 @@ public class ModsScreen extends Screen {
 		this.modList.render(guiGraphics, mouseX, mouseY, delta);
 		this.searchBox.render(guiGraphics, mouseX, mouseY, delta);
 		GlStateManager._disableBlend();
-		guiGraphics.drawCenteredString(this.font, this.title, this.modList.getWidth() / 2, 8, 16777215);
+		if (!hideTop) {
+			guiGraphics.drawCenteredString(this.font, this.title, this.modList.getWidth() / 2, 8, 16777215);
+		}
 		assert minecraft != null;
 		int grayColor = 11184810;
-		if (!ModMenu.getConfig().DISABLE_DRAG_AND_DROP.get()) {
+		if (!(ModMenu.getConfig().DISABLE_DRAG_AND_DROP.get() || hideTop)) {
 			guiGraphics.drawCenteredString(
 				this.font,
 				ModMenuScreenTexts.DROP_INFO_LINE_1,
@@ -353,58 +374,36 @@ public class ModsScreen extends Screen {
 		if (!ModMenu.getConfig().CONFIG_MODE.get()) {
 			Component fullModCount = this.computeModCountText(true, false);
 			if (!ModMenu.getConfig().CONFIG_MODE.get() && this.updateFiltersX(false)) {
-				if (this.filterOptionsShown) {
-					if (!ModMenu.getConfig().SHOW_LIBRARIES.get() ||
-						font.width(fullModCount) <= this.filtersX - 5) {
-						guiGraphics.drawString(font,
-							fullModCount.getVisualOrderText(),
-							this.searchBoxX,
-							52,
-							0xFFFFFF,
-							true
-						);
-					} else {
-						guiGraphics.drawString(font,
-							computeModCountText(false, false).getVisualOrderText(),
-							this.searchBoxX,
-							46,
-							0xFFFFFF,
-							true
-						);
-						guiGraphics.drawString(font,
-							computeLibraryCountText(false).getVisualOrderText(),
-							this.searchBoxX,
-							57,
-							0xFFFFFF,
-							true
-						);
-					}
+				int showingModTextY;
+				if (hideTop) {
+					showingModTextY = 6;
 				} else {
-					if (!ModMenu.getConfig().SHOW_LIBRARIES.get() ||
-						font.width(fullModCount) <= modList.getWidth() - 5) {
-						guiGraphics.drawString(font,
+					showingModTextY = 46;
+				}
+				if (!ModMenu.getConfig().SHOW_LIBRARIES.get() ||
+						font.width(fullModCount) <= (this.filterOptionsShown ? this.filtersX : modList.getWidth()) - 5) {
+					guiGraphics.drawString(font,
 							fullModCount.getVisualOrderText(),
 							this.searchBoxX,
-							52,
+							showingModTextY + 6,
 							0xFFFFFF,
 							true
-						);
-					} else {
-						guiGraphics.drawString(font,
+					);
+				} else {
+					guiGraphics.drawString(font,
 							computeModCountText(false, false).getVisualOrderText(),
 							this.searchBoxX,
-							46,
+							showingModTextY,
 							0xFFFFFF,
 							true
-						);
-						guiGraphics.drawString(font,
+					);
+					guiGraphics.drawString(font,
 							computeLibraryCountText(false).getVisualOrderText(),
 							this.searchBoxX,
-							57,
+							showingModTextY + 11,
 							0xFFFFFF,
 							true
-						);
-					}
+					);
 				}
 			}
 		}
@@ -413,7 +412,7 @@ public class ModsScreen extends Screen {
 			Mod mod = selectedEntry.getMod();
 			int x = this.rightPaneX;
 			if ("java".equals(mod.getId())) {
-				DrawingUtil.drawRandomVersionBackground(mod, guiGraphics, x, RIGHT_PANE_Y, 32, 32);
+				DrawingUtil.drawRandomVersionBackground(mod, guiGraphics, x, rightPaneY, 32, 32);
 			}
 
 			RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
@@ -422,7 +421,7 @@ public class ModsScreen extends Screen {
 
 			int imageOffset = iconProperties.getB().width;
 			int imageHeight = iconProperties.getB().height;
-			guiGraphics.blit(RenderType::guiTextured, iconProperties.getA(), x, RIGHT_PANE_Y, 0.0F, 0.0F,
+			guiGraphics.blit(RenderType::guiTextured, iconProperties.getA(), x, rightPaneY, 0.0F, 0.0F,
 					imageOffset, imageHeight,
 					imageOffset, imageHeight);
 
@@ -443,13 +442,13 @@ public class ModsScreen extends Screen {
 			guiGraphics.drawString(font,
 				Language.getInstance().getVisualOrder(trimmedName),
 				x + imageOffset,
-				RIGHT_PANE_Y + 1,
+				rightPaneY + 1,
 				0xFFFFFF,
 				true
 			);
 
-			if (mouseX > x + imageOffset && mouseY > RIGHT_PANE_Y + 1 &&
-				mouseY < RIGHT_PANE_Y + 1 + font.lineHeight &&
+			if (mouseX > x + imageOffset && mouseY > rightPaneY + 1 &&
+				mouseY < rightPaneY + 1 + font.lineHeight &&
 				mouseX < x + imageOffset + font.width(trimmedName)) {
 				this.setTooltipForNextRenderPass(ModMenuScreenTexts.modIdTooltip(mod.getId()));
 			}
@@ -457,7 +456,7 @@ public class ModsScreen extends Screen {
 			if (this.init || modBadgeRenderer == null || modBadgeRenderer.getMod() != mod) {
 				modBadgeRenderer = new ModBadgeRenderer(
 					x + imageOffset + this.minecraft.font.width(trimmedName) + 2,
-					RIGHT_PANE_Y,
+					rightPaneY,
 					width - 28,
 					selectedEntry.mod,
 					this
@@ -473,7 +472,7 @@ public class ModsScreen extends Screen {
 				guiGraphics.drawString(font,
 					mod.getPrefixedVersion(),
 					x + imageOffset,
-					RIGHT_PANE_Y + 2 + lineSpacing,
+					rightPaneY + 2 + lineSpacing,
 					0x808080,
 					true
 				);
@@ -491,7 +490,7 @@ public class ModsScreen extends Screen {
 					guiGraphics,
 					I18n.get("modmenu.authorPrefix", authors),
 					x + imageOffset,
-					RIGHT_PANE_Y + 2 + lineSpacing * 2,
+					rightPaneY + 2 + lineSpacing * 2,
 					this.paneWidth - imageOffset - 4,
 					1,
 					0x808080

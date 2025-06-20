@@ -35,6 +35,7 @@ public class BetterModListConfig {
     public final ModConfigSpec.BooleanValue MODIFY_GAME_MENU;
     public final ModConfigSpec.BooleanValue HIDE_CONFIG_BUTTONS;
     public final ModConfigSpec.BooleanValue HIDE_BADGE_BUTTONS;
+    public final ModConfigSpec.BooleanValue HIDE_SCREEN_TOP;
     public final ModConfigSpec.BooleanValue CONFIG_MODE;
     public final ModConfigSpec.BooleanValue DISABLE_DRAG_AND_DROP;
     public final ModConfigSpec.ConfigValue<List<? extends String>> HIDDEN_MODS;
@@ -96,6 +97,8 @@ public class BetterModListConfig {
                 .define("hide_config_buttons", false);
         HIDE_BADGE_BUTTONS = builder.comment("hides button which allows changing mod's badge")
                 .define("hide_badge_buttons", true);
+        HIDE_SCREEN_TOP = builder.comment("Hides search bar and drag and drop text, also moves mod's icon up")
+                .define("hide_screen_top", false);
         HIDDEN_MODS = builder.comment("Add modid of the mod to hide it from the modlist")
                 .defineList("hidden_mods", ArrayList::new, String::new, object -> object instanceof String);
         HIDDEN_CONFIGS = builder.comment("Add modid of the mod to hide its config")
