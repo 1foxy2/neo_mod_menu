@@ -17,8 +17,16 @@ jobs:
         with:
           java-version: '21'
           distribution: 'temurin'
+          cache: "gradle"
 
       - name: Build with Gradle
         uses: gradle/actions/setup-gradle@v3
         with:
           arguments: build
+
+      - name: Upload Build Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: better-modlist-dev
+          path: |
+            build/libs/*.jar

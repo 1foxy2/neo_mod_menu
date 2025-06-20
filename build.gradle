@@ -12,26 +12,10 @@ version = mod_version
 group = mod_group_id
 
 base {
-    archivesName = mod_id
+    archivesName = "better_modlist"
 }
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(21)
-
-repositories {
-    mavenLocal()
-    maven {
-        url "https://maven.su5ed.dev/releases"
-    }
-    maven { url 'https://jitpack.io' }
-}
-
-dependencies {
-    // Add FFAPI dependency
-    compileOnly "org.sinytra.forgified-fabric-api:forgified-fabric-api:0.102.0+2.0.12+1.21.1"
-    //runtimeOnly "org.sinytra.forgified-fabric-api:forgified-fabric-api:0.102.0+2.0.12+1.21.1"
-    compileOnly "org.sinytra:connector:2.0.0-beta.3+1.21.1"
-    jarJar(implementation 'com.github.1foxy2:TextPlaceholderAPI-neoforge:443152240f')
-}
 
 neoForge {
     version = project.neo_version
@@ -61,6 +45,11 @@ neoForge {
             systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
         }
 
+        data {
+            data()
+            programArguments.addAll '--mod', project.mod_id, '--all', '--output', file('src/generated/resources/').getAbsolutePath(), '--existing', file('src/main/resources/').getAbsolutePath()
+        }
+
         configureEach {
             systemProperty 'forge.logging.markers', 'REGISTRIES'
 
@@ -75,12 +64,34 @@ neoForge {
     }
 }
 
+sourceSets.main.resources { srcDir 'src/generated/resources' }
+
 configurations {
     runtimeClasspath.extendsFrom localRuntime
 }
 
+repositories {
+    mavenLocal()
+    maven {
+        url "https://maven.su5ed.dev/releases"
+    }
+    maven { url 'https://jitpack.io' }
+    maven {
+        url "https://cursemaven.com"
+    }
+}
 
-processResources {
+dependencies {
+    // Add FFAPI dependency
+    compileOnly "org.sinytra.forgified-fabric-api:forgified-fabric-api:0.102.0+2.0.12+1.21.1"
+    //runtimeOnly "org.sinytra.forgified-fabric-api:forgified-fabric-api:0.102.0+2.0.12+1.21.1"
+    compileOnly "org.sinytra:connector:2.0.0-beta.3+1.21.1"
+    jarJar(implementation('com.github.1foxy2:TextPlaceholderAPI-neoforge:e1a427d5b9'))
+    runtimeOnly "curse.maven:packmenu-358191:6489669"
+    runtimeOnly "curse.maven:placebo-283644:6446766"
+}
+
+var generateModMetadata = tasks.register("generateModMetadata", ProcessResources) {
     var replaceProperties = [
             minecraft_version      : minecraft_version,
             minecraft_version_range: minecraft_version_range,
@@ -94,12 +105,17 @@ processResources {
             mod_authors            : mod_authors,
             mod_description        : mod_description
     ]
-    filesMatching(['META-INF/neoforge.mods.toml', '*.mixins.json']) {
-        expand replaceProperties
-    }
     inputs.properties replaceProperties
+    expand replaceProperties
+    from "src/main/metadata"
+    into "build/generated/sources/modMetadata"
 }
+
+sourceSets.main.resources.srcDir generateModMetadata
+
+neoForge.ideSyncTask generateModMetadata
 
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8' // Use the UTF-8 charset for Java compilation
 }
+
