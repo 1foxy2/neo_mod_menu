@@ -25,6 +25,7 @@ import net.minecraft.client.gui.components.toasts.SystemToast;
 import net.minecraft.client.gui.screens.ConfirmLinkScreen;
 import net.minecraft.client.gui.screens.ConfirmScreen;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.locale.Language;
@@ -243,7 +244,7 @@ public class ModsScreen extends Screen {
 				final Mod mod = Objects.requireNonNull(selected).getMod();
 				boolean isMinecraft = selected.getMod().getId().equals("minecraft");
 				if (isMinecraft) {
-					var url = SharedConstants.getCurrentVersion().isStable() ? CommonLinks.RELEASE_FEEDBACK : CommonLinks.SNAPSHOT_FEEDBACK;
+					var url = SharedConstants.getCurrentVersion().stable() ? CommonLinks.RELEASE_FEEDBACK : CommonLinks.SNAPSHOT_FEEDBACK;
 					ConfirmLinkScreen.confirmLinkNow(this, url, true);
 				} else {
 					var url = mod.getWebsite();
@@ -348,12 +349,11 @@ public class ModsScreen extends Screen {
 
 		this.modList.render(guiGraphics, mouseX, mouseY, delta);
 		this.searchBox.render(guiGraphics, mouseX, mouseY, delta);
-		GlStateManager._disableBlend();
 		if (!hideTop) {
 			guiGraphics.drawCenteredString(this.font, this.title, this.modList.getWidth() / 2, 8, 16777215);
 		}
 		assert minecraft != null;
-		int grayColor = 11184810;
+		int grayColor = 0xFFAAAAAA;
 		if (!(ModMenu.getConfig().DISABLE_DRAG_AND_DROP.get() || hideTop)) {
 			guiGraphics.drawCenteredString(
 				this.font,
@@ -386,7 +386,7 @@ public class ModsScreen extends Screen {
 							fullModCount.getVisualOrderText(),
 							this.searchBoxX,
 							showingModTextY + 6,
-							0xFFFFFF,
+							0xFFFFFFFF,
 							true
 					);
 				} else {
@@ -394,14 +394,14 @@ public class ModsScreen extends Screen {
 							computeModCountText(false, false).getVisualOrderText(),
 							this.searchBoxX,
 							showingModTextY,
-							0xFFFFFF,
+							0xFFFFFFFF,
 							true
 					);
 					guiGraphics.drawString(font,
 							computeLibraryCountText(false).getVisualOrderText(),
 							this.searchBoxX,
 							showingModTextY + 11,
-							0xFFFFFF,
+							0xFFFFFFFF,
 							true
 					);
 				}
@@ -415,19 +415,16 @@ public class ModsScreen extends Screen {
 				DrawingUtil.drawRandomVersionBackground(mod, guiGraphics, x, rightPaneY, 32, 32);
 			}
 
-			RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-			GlStateManager._enableBlend();
 			Tuple<ResourceLocation, Dimension> iconProperties = selectedEntry.getIconTexture();
 
 			int imageOffset = iconProperties.getB().width;
 			int imageHeight = iconProperties.getB().height;
-			guiGraphics.blit(RenderType::guiTextured, iconProperties.getA(), x, rightPaneY, 0.0F, 0.0F,
+			guiGraphics.blit(RenderPipelines.GUI_TEXTURED, iconProperties.getA(), x, rightPaneY, 0.0F, 0.0F,
 					imageOffset, imageHeight,
 					imageOffset, imageHeight);
 
 			imageOffset += 4;
 
-			GlStateManager._enableBlend();
 			int lineSpacing = font.lineHeight + 1;
 			Component name = Component.literal(mod.getTranslatedName());
 			FormattedText trimmedName = name;
@@ -443,14 +440,14 @@ public class ModsScreen extends Screen {
 				Language.getInstance().getVisualOrder(trimmedName),
 				x + imageOffset,
 				rightPaneY + 1,
-				0xFFFFFF,
+					0xFFFFFFFF,
 				true
 			);
 
 			if (mouseX > x + imageOffset && mouseY > rightPaneY + 1 &&
 				mouseY < rightPaneY + 1 + font.lineHeight &&
 				mouseX < x + imageOffset + font.width(trimmedName)) {
-				this.setTooltipForNextRenderPass(ModMenuScreenTexts.modIdTooltip(mod.getId()));
+				guiGraphics.setTooltipForNextFrame(ModMenuScreenTexts.modIdTooltip(mod.getId()), mouseX, mouseY);
 			}
 
 			if (this.init || modBadgeRenderer == null || modBadgeRenderer.getMod() != mod) {
@@ -473,7 +470,7 @@ public class ModsScreen extends Screen {
 					mod.getPrefixedVersion(),
 					x + imageOffset,
 					rightPaneY + 2 + lineSpacing,
-					0x808080,
+					0xFFAAAAAA,
 					true
 				);
 			}

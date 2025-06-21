@@ -1,13 +1,5 @@
 package com.terraformersmc.modmenu.gui.widget;
 
-import com.mojang.blaze3d.buffers.BufferType;
-import com.mojang.blaze3d.buffers.BufferUsage;
-import com.mojang.blaze3d.buffers.GpuBuffer;
-import com.mojang.blaze3d.pipeline.RenderPipeline;
-import com.mojang.blaze3d.pipeline.RenderTarget;
-import com.mojang.blaze3d.systems.RenderPass;
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.*;
 import com.terraformersmc.modmenu.ModMenu;
 import com.terraformersmc.modmenu.gui.ModsScreen;
 import com.terraformersmc.modmenu.util.mod.Mod;
@@ -24,13 +16,13 @@ import net.minecraft.client.gui.narration.NarratedElementType;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.ConfirmLinkScreen;
 import net.minecraft.client.gui.screens.CreditsAndAttributionScreen;
-import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
-import net.minecraft.util.ARGB;
 import net.minecraft.util.FormattedCharSequence;
-import net.minecraft.util.Mth;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class DescriptionListWidget extends AbstractSelectionList<DescriptionListWidget.DescriptionEntry> {
 
@@ -67,12 +59,12 @@ public class DescriptionListWidget extends AbstractSelectionList<DescriptionList
 		this.parent = parent;
 		this.textRenderer = client.font;
 
-		if(copyFrom != null) {
+		if (copyFrom != null) {
 			updateSelectedModIfRequired(copyFrom.selectedMod);
 			setScrollAmount(copyFrom.scrollAmount());
 		}
 
-		if(parent.getSelectedEntry() != null) {
+		if (parent.getSelectedEntry() != null) {
 			updateSelectedModIfRequired(parent.getSelectedEntry().getMod());
 		}
 	}
@@ -94,7 +86,7 @@ public class DescriptionListWidget extends AbstractSelectionList<DescriptionList
 
 	@Override
 	public void updateWidgetNarration(NarrationElementOutput builder) {
-		if(selectedMod != null) {
+		if (selectedMod != null) {
 			builder.add(
 					NarratedElementType.TITLE,
 					selectedMod.getTranslatedName() + " " + selectedMod.getPrefixedVersion());
@@ -227,73 +219,6 @@ public class DescriptionListWidget extends AbstractSelectionList<DescriptionList
 		this.enableScissor(guiGraphics);
 		super.renderListItems(guiGraphics, mouseX, mouseY, delta);
 		guiGraphics.disableScissor();
-
-		RenderPipeline pipeline = RenderPipelines.GUI;
-		try (ByteBufferBuilder byteBufferBuilder = new ByteBufferBuilder(pipeline.getVertexFormat().getVertexSize() * 4)) {
-			BufferBuilder bufferBuilder = new BufferBuilder(byteBufferBuilder,
-					pipeline.getVertexFormatMode(), pipeline.getVertexFormat());
-			final int black = ARGB.opaque(0);
-			bufferBuilder.addVertex(this.getX(), (this.getY() + 4), 0.0F).setColor(0);
-			bufferBuilder.addVertex(this.getRight(), (this.getY() + 4), 0.0F).setColor(0);
-			bufferBuilder.addVertex(this.getRight(), this.getY(), 0.0F).setColor(black);
-			bufferBuilder.addVertex(this.getX(), this.getY(), 0.0F).setColor(black);
-			bufferBuilder.addVertex(this.getX(), this.getBottom(), 0.0F).setColor(black);
-			bufferBuilder.addVertex(this.getRight(), this.getBottom(), 0.0F).setColor(black);
-			bufferBuilder.addVertex(this.getRight(), (this.getBottom() - 4), 0.0F).setColor(0);
-			bufferBuilder.addVertex(this.getX(), (this.getBottom() - 4), 0.0F).setColor(0);
-			this.renderScrollBar(bufferBuilder);
-			try (MeshData builtBuffer = bufferBuilder.build()) {
-				if (builtBuffer == null) {
-					byteBufferBuilder.close();
-					return;
-				}
-				RenderTarget framebuffer = Minecraft.getInstance().getMainRenderTarget();
-				RenderSystem.AutoStorageIndexBuffer autoStorageIndexBuffer = RenderSystem.getSequentialBuffer(pipeline.getVertexFormatMode());
-				VertexFormat.IndexType indexType = autoStorageIndexBuffer.type();
-				GpuBuffer vertexBuffer = RenderSystem.getDevice().createBuffer(() -> "Description List",
-						BufferType.VERTICES, BufferUsage.DYNAMIC_WRITE, builtBuffer.vertexBuffer().remaining());
-				GpuBuffer indexBuffer = autoStorageIndexBuffer.getBuffer(builtBuffer.drawState().indexCount());
-				RenderSystem.getDevice().createCommandEncoder().writeToBuffer(vertexBuffer, builtBuffer.vertexBuffer(), 0);
-				try (RenderPass renderPass = RenderSystem.getDevice().createCommandEncoder().createRenderPass(
-						framebuffer.getColorTexture(), OptionalInt.empty(),
-						framebuffer.getDepthTexture(), OptionalDouble.empty())) {
-					renderPass.setPipeline(pipeline);
-					renderPass.setVertexBuffer(0, vertexBuffer);
-					renderPass.setIndexBuffer(indexBuffer, indexType);
-					renderPass.drawIndexed(0, builtBuffer.drawState().indexCount());
-				}
-			}
-		}
-	}
-
-	public void renderScrollBar(BufferBuilder bufferBuilder) {
-		int scrollbarStartX = this.scrollBarX();
-		int scrollbarEndX = scrollbarStartX + 6;
-		int maxScroll = this.maxScrollAmount();
-		if (maxScroll > 0) {
-			int p = (int) ((float) ((this.getBottom() - this.getY()) * (this.getBottom() - this.getY())) / (float) this.contentHeight());
-			p = Mth.clamp(p, 32, this.getBottom() - this.getY() - 8);
-			int q = (int) this.scrollAmount() * (this.getBottom() - this.getY() - p) / maxScroll + this.getY();
-			if (q < this.getY()) {
-				q = this.getY();
-			}
-
-			final int black = ARGB.opaque(0);
-			final int firstColor = ARGB.colorFromFloat(255, 128, 128, 128);
-			final int lastColor = ARGB.colorFromFloat(255, 192, 192, 192);
-			bufferBuilder.addVertex(scrollbarStartX, this.getBottom(), 0.0F).setColor(black);
-			bufferBuilder.addVertex(scrollbarEndX, this.getBottom(), 0.0F).setColor(black);
-			bufferBuilder.addVertex(scrollbarEndX, this.getY(), 0.0F).setColor(black);
-			bufferBuilder.addVertex(scrollbarStartX, this.getY(), 0.0F).setColor(black);
-			bufferBuilder.addVertex(scrollbarStartX, q + p, 0.0F).setColor(firstColor);
-			bufferBuilder.addVertex(scrollbarEndX, q + p, 0.0F).setColor(firstColor);
-			bufferBuilder.addVertex(scrollbarEndX, q, 0.0F).setColor(firstColor);
-			bufferBuilder.addVertex(scrollbarStartX, q, 0.0F).setColor(firstColor);
-			bufferBuilder.addVertex(scrollbarStartX, q + p - 1, 0.0F).setColor(lastColor);
-			bufferBuilder.addVertex(scrollbarEndX - 1, q + p - 1, 0.0F).setColor(lastColor);
-			bufferBuilder.addVertex(scrollbarEndX - 1, q, 0.0F).setColor(lastColor);
-			bufferBuilder.addVertex(scrollbarStartX, q, 0.0F).setColor(lastColor);
-		}
 	}
 
 	private Component creditsRoleText(String roleName) {
@@ -345,7 +270,7 @@ public class DescriptionListWidget extends AbstractSelectionList<DescriptionList
 				UpdateAvailableBadge.renderBadge(guiGraphics, x + indent, y);
 				x += 11;
 			}
-			guiGraphics.drawString(textRenderer, text, x + indent, y, 0xAAAAAA);
+			guiGraphics.drawString(textRenderer, text, x + indent, y, 0xFFAAAAAA);
 		}
 
 		@Override

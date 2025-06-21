@@ -1,6 +1,5 @@
 package com.terraformersmc.modmenu.gui.widget.entries;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.terraformersmc.modmenu.ModMenu;
 import com.terraformersmc.modmenu.gui.widget.ModListWidget;
 import com.terraformersmc.modmenu.util.mod.Mod;
@@ -9,7 +8,7 @@ import com.terraformersmc.modmenu.util.mod.ModSearch;
 import net.minecraft.Util;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import org.lwjgl.glfw.GLFW;
@@ -64,69 +63,69 @@ public class ParentEntry extends ModListEntry {
 		int childrenOutlineColor = 0xff107454;
 		int childrenFillColor = 0xff093929;
 		guiGraphics.fill(
-			childrenBadgeX + 1,
-			childrenBadgeY,
-			childrenBadgeX + childrenBadgeWidth - 1,
-			childrenBadgeY + 1,
-			childrenOutlineColor
+				childrenBadgeX + 1,
+				childrenBadgeY,
+				childrenBadgeX + childrenBadgeWidth - 1,
+				childrenBadgeY + 1,
+				childrenOutlineColor
 		);
 		guiGraphics.fill(
-			childrenBadgeX,
-			childrenBadgeY + 1,
-			childrenBadgeX + 1,
-			childrenBadgeY + childrenBadgeHeight - 1,
-			childrenOutlineColor
+				childrenBadgeX,
+				childrenBadgeY + 1,
+				childrenBadgeX + 1,
+				childrenBadgeY + childrenBadgeHeight - 1,
+				childrenOutlineColor
 		);
 		guiGraphics.fill(
-			childrenBadgeX + childrenBadgeWidth - 1,
-			childrenBadgeY + 1,
-			childrenBadgeX + childrenBadgeWidth,
-			childrenBadgeY + childrenBadgeHeight - 1,
-			childrenOutlineColor
+				childrenBadgeX + childrenBadgeWidth - 1,
+				childrenBadgeY + 1,
+				childrenBadgeX + childrenBadgeWidth,
+				childrenBadgeY + childrenBadgeHeight - 1,
+				childrenOutlineColor
 		);
 		guiGraphics.fill(
-			childrenBadgeX + 1,
-			childrenBadgeY + 1,
-			childrenBadgeX + childrenBadgeWidth - 1,
-			childrenBadgeY + childrenBadgeHeight - 1,
-			childrenFillColor
+				childrenBadgeX + 1,
+				childrenBadgeY + 1,
+				childrenBadgeX + childrenBadgeWidth - 1,
+				childrenBadgeY + childrenBadgeHeight - 1,
+				childrenFillColor
 		);
 		guiGraphics.fill(
-			childrenBadgeX + 1,
-			childrenBadgeY + childrenBadgeHeight - 1,
-			childrenBadgeX + childrenBadgeWidth - 1,
-			childrenBadgeY + childrenBadgeHeight,
-			childrenOutlineColor
+				childrenBadgeX + 1,
+				childrenBadgeY + childrenBadgeHeight - 1,
+				childrenBadgeX + childrenBadgeWidth - 1,
+				childrenBadgeY + childrenBadgeHeight,
+				childrenOutlineColor
 		);
 		guiGraphics.drawString(
-			font,
-			str.getVisualOrderText(),
-			(int) (childrenBadgeX + (float) childrenBadgeWidth / 2 - (float) childrenWidth / 2),
-			childrenBadgeY + 1,
-			0xCACACA,
-			false
+				font,
+				str.getVisualOrderText(),
+				(int) (childrenBadgeX + (float) childrenBadgeWidth / 2 - (float) childrenWidth / 2),
+				childrenBadgeY + 1,
+				0xFFCACACA,
+				false
 		);
 		this.hoveringIcon = mouseX >= x - 1 && mouseX <= x - 1 + iconSize && mouseY >= y - 1 && mouseY <= y - 1 + iconSize;
 		if (isMouseOver(mouseX, mouseY)) {
 			guiGraphics.fill(x, y, x + iconSize, y + iconSize, 0xA0909090);
 			int xOffset = list.getParent().showModChildren.contains(getMod().getId()) ? iconSize : 0;
 			int yOffset = hoveringIcon ? iconSize : 0;
-			RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 			guiGraphics.blit(
-				RenderType::guiTextured,
-				PARENT_MOD_TEXTURE,
-				x,
-				y,
-				xOffset,
-				yOffset,
-				iconSize + xOffset,
-				iconSize + yOffset,
+					RenderPipelines.GUI_TEXTURED,
+					PARENT_MOD_TEXTURE,
+					x,
+					y,
+					xOffset,
+					yOffset,
+					iconSize + xOffset,
+					iconSize + yOffset,
 					ModMenu.getConfig().COMPACT_LIST.get() ?
-					(int) (256 / (FULL_ICON_SIZE / (double) COMPACT_ICON_SIZE)) :
-					256,
+							(int) (256 / (FULL_ICON_SIZE / (double) COMPACT_ICON_SIZE)) :
+							256,
 					ModMenu.getConfig().COMPACT_LIST.get() ?
-					(int) (256 / (FULL_ICON_SIZE / (double) COMPACT_ICON_SIZE)) :
-					256
+							(int) (256 / (FULL_ICON_SIZE / (double) COMPACT_ICON_SIZE)) :
+							256,
+					0xFFFFFFFF
 			);
 		}
 	}

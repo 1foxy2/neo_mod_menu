@@ -9,6 +9,7 @@ import com.terraformersmc.modmenu.util.mod.ModSearch;
 import net.minecraft.Util;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -98,7 +99,7 @@ public class ChildParentEntry extends ChildEntry {
 			str.getVisualOrderText(),
 			(int) (childrenBadgeX + (float) childrenBadgeWidth / 2 - (float) childrenWidth / 2),
 			childrenBadgeY + 1,
-			0xCACACA,
+			0xFFCACACA,
 			false
 		);
 		this.hoveringIcon = mouseX >= x - 1 && mouseX <= x - 1 + iconSize && mouseY >= y - 1 && mouseY <= y - 1 + iconSize;
@@ -106,8 +107,7 @@ public class ChildParentEntry extends ChildEntry {
 			guiGraphics.fill(x, y, x + iconSize, y + iconSize, 0xA0909090);
 			int xOffset = list.getParent().showModChildren.contains(getMod().getId()) ? iconSize : 0;
 			int yOffset = hoveringIcon ? iconSize : 0;
-			RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-			guiGraphics.blit(RenderType::guiTextured,
+			guiGraphics.blit(RenderPipelines.GUI_TEXTURED,
 					PARENT_MOD_TEXTURE,
 					x,
 					y,
@@ -120,7 +120,8 @@ public class ChildParentEntry extends ChildEntry {
 							256,
 					ModMenu.getConfig().COMPACT_LIST.get() ?
 							(int) (256 / (FULL_ICON_SIZE / (double) COMPACT_ICON_SIZE)) :
-							256
+							256,
+					0xFFFFFFFF
 			);
 		}
 	}

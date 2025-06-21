@@ -239,7 +239,7 @@ public class ModMenuEventHandler {
 		throw new IndexOutOfBoundsException(String.format("Index: %d, Size: %d", index, index - remaining));
 	}
 
-	@EventBusSubscriber(modid = ModMenu.MOD_ID, bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
+	@EventBusSubscriber(modid = ModMenu.MOD_ID, value = Dist.CLIENT)
 	public static class modBusEvents {
 		@SubscribeEvent
 		public static void registerKeyMapping(RegisterKeyMappingsEvent event) {

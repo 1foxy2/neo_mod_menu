@@ -12,21 +12,21 @@ public class ModBadge {
     private final int fillColor;
     private final int outlineColor;
     private final int textColor;
-    public static ModBadge LIBRARY = new ModBadge("library", "modmenu.badge.library", 0xff107454, 0xff093929);
+    public static ModBadge LIBRARY = new ModBadge("library", "modmenu.badge.library", 0xFF107454, 0xFF093929);
     public static Map<String, ModBadge> DEFAULT_BADGES = Map.of(
             "library", LIBRARY,
-            "client", new ModBadge("client", "modmenu.badge.clientsideOnly", 0xff2b4b7c, 0xff0e2a55),
-            "deprecated", new ModBadge("deprecated", "modmenu.badge.deprecated", 0xff841426, 0xff530C17),
-            "sinytra_fabric", new ModBadge("sinytra_fabric", "modmenu.badge.fabric", 0xffc7b48b, 0xff786d58),
-            "sinytra_neoforge", new ModBadge("sinytra_neoforge", "modmenu.badge.neoforge", 0xffe68c37, 0xffa44e37),
-            "modpack", new ModBadge("modpack", "modmenu.badge.modpack", 0xff7a2b7c, 0xff510d54),
-            "minecraft", new ModBadge("minecraft", "modmenu.badge.minecraft", 0xff6f6c6a, 0xff31302f)
+            "client", new ModBadge("client", "modmenu.badge.clientsideOnly", 0xFF2b4b7c, 0xFF0e2a55),
+            "deprecated", new ModBadge("deprecated", "modmenu.badge.deprecated", 0xFF841426, 0xFF530C17),
+            "sinytra_fabric", new ModBadge("sinytra_fabric", "modmenu.badge.fabric", 0xFFc7b48b, 0xFF786d58),
+            "sinytra_neoforge", new ModBadge("sinytra_neoforge", "modmenu.badge.neoforge", 0xFFe68c37, 0xFFa44e37),
+            "modpack", new ModBadge("modpack", "modmenu.badge.modpack", 0xFF7a2b7c, 0xFF510d54),
+            "minecraft", new ModBadge("minecraft", "modmenu.badge.minecraft", 0xFF6f6c6a, 0xFF31302f)
     );
     public static Map<String, ModBadge> CUSTOM_BADGES = new LinkedHashMap<>();
     public static List<Map<String, ModBadge>> BADGES = List.of(DEFAULT_BADGES, CUSTOM_BADGES);
 
     public ModBadge(String id, String displayName, int outlineColor, int fillColor) {
-        this(id, displayName, outlineColor, fillColor, 0xCACACA);
+        this(id, displayName, outlineColor, fillColor, 0xFFCACACA);
     }
 
     public ModBadge(String id, String displayName, int outlineColor, int fillColor, int textColor) {
