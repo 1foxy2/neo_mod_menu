@@ -43,7 +43,7 @@ public class ModMenuEventHandler {
 			InputConstants.Type.KEYSYM,
 			GLFW.GLFW_KEY_UNKNOWN,
 			"key.categories.misc"
-	));;
+	));
 
 	@SubscribeEvent
 	public static void onScreenInit(ScreenEvent.Init.Post event) {
@@ -67,11 +67,11 @@ public class ModMenuEventHandler {
 		boolean replacedRealmButton = false;
 		boolean isRealmsButton;
 		Button modsButton = null;
-        for (Renderable renderable : buttons) {
+		for (Renderable renderable : buttons) {
 			if (renderable instanceof ModsButton button) {
 				modsButton = button;
 			}
-        }
+		}
 
 		for (int i = 0; i < buttons.size(); i++) {
 			Renderable widget = buttons.get(i);
@@ -170,7 +170,7 @@ public class ModMenuEventHandler {
 			ComponentContents textContent = component.getContents();
 
 			return textContent instanceof TranslatableContents && Arrays.stream(translationKeys)
-				.anyMatch(s -> ((TranslatableContents) textContent).getKey().equals(s));
+					.anyMatch(s -> ((TranslatableContents) textContent).getKey().equals(s));
 		}
 		return false;
 	}
@@ -179,7 +179,7 @@ public class ModMenuEventHandler {
 		if (shiftUp) {
 			element.setY(element.getY() - spacing / 2);
 		} else if (!(element instanceof AbstractWidget button &&
-			button.getMessage().equals(Component.translatable("title.credits"))
+				button.getMessage().equals(Component.translatable("title.credits"))
 		)) {
 			element.setY(element.getY() + spacing / 2);
 		}
@@ -239,17 +239,14 @@ public class ModMenuEventHandler {
 		throw new IndexOutOfBoundsException(String.format("Index: %d, Size: %d", index, index - remaining));
 	}
 
-	@EventBusSubscriber(modid = ModMenu.MOD_ID, value = Dist.CLIENT)
-	public static class modBusEvents {
-		@SubscribeEvent
-		public static void registerKeyMapping(RegisterKeyMappingsEvent event) {
-			event.register(ModMenuEventHandler.MENU_KEY_BIND.get());
-		}
+	@SubscribeEvent
+	public static void registerKeyMapping(RegisterKeyMappingsEvent event) {
+		event.register(ModMenuEventHandler.MENU_KEY_BIND.get());
+	}
 
-		@SubscribeEvent
-		public static void registerReloadManager(AddClientReloadListenersEvent event) {
-			event.addListener(ResourceLocation.fromNamespaceAndPath(ModMenu.MOD_ID, "create_badges_and_icons"),
-					(ResourceManagerReloadListener) manager -> ModMenu.createBadgesAndIcons());
-		}
+	@SubscribeEvent
+	public static void registerReloadManager(AddClientReloadListenersEvent event) {
+		event.addListener(ResourceLocation.fromNamespaceAndPath(ModMenu.MOD_ID, "create_badges_and_icons"),
+				(ResourceManagerReloadListener) manager -> ModMenu.createBadgesAndIcons());
 	}
 }
