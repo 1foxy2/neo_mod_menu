@@ -5,9 +5,9 @@
   "compatibilityLevel": "JAVA_21",
   "client": [
     "AccessorGridLayout",
+    "MixinBrandingControl",
     "MixinPauseScreen",
-    "MixinTitleScreen",
-    "MixinBrandingControl"
+    "MixinTitleScreen"
   ],
   "injectors": {
     "defaultRequire": 1

@@ -82,6 +82,8 @@ dependencies {
     jarJar(implementation('com.github.1foxy2:TextPlaceholderAPI-neoforge:e1a427d5b9'))
     runtimeOnly "curse.maven:packmenu-358191:6489669"
     runtimeOnly "curse.maven:placebo-283644:6446766"
+    compileOnly "curse.maven:aether-255308:7043502"
+    implementation "curse.maven:cumulus-915473:6888301"
 }
 
 var generateModMetadata = tasks.register("generateModMetadata", ProcessResources) {

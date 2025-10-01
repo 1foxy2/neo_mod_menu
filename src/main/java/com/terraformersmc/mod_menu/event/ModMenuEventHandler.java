@@ -6,6 +6,7 @@ import com.terraformersmc.mod_menu.config.ModMenuConfig;
 import com.terraformersmc.mod_menu.gui.ModsScreen;
 import com.terraformersmc.mod_menu.gui.widget.ModMenuButtonWidget;
 import com.terraformersmc.mod_menu.gui.widget.UpdateCheckerTexturedButtonWidget;
+import com.terraformersmc.mod_menu.util.CompatUtils;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.AbstractWidget;
@@ -43,7 +44,7 @@ public class ModMenuEventHandler {
 	@SubscribeEvent
 	public static void onScreenInit(ScreenEvent.Init.Post event) {
 		Screen screen = event.getScreen();
-		if (screen instanceof TitleScreen && ModMenu.getConfig().MODIFY_TITLE_SCREEN.get()) {
+		if (screen instanceof TitleScreen && ModMenu.getConfig().MODIFY_TITLE_SCREEN.get() && !CompatUtils.isCustomMenu()) {
 			removeModsButton(screen);
 			afterTitleScreenInit(screen);
 		}
