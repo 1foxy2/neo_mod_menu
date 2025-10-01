@@ -36,6 +36,10 @@ public class BadgeScreen extends Screen {
     }
 
     @Override
+    protected void renderBlurredBackground(GuiGraphics p_420069_) {
+    }
+
+    @Override
     protected void init() {
         this.badgeButton = LegacyTexturedButtonWidget.legacyTexturedBuilder(CommonComponents.EMPTY, button ->
                         this.onClose())
