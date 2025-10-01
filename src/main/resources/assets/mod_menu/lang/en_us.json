@@ -20,7 +20,7 @@
   "mod_menu.searchTerms.modpack": "modpack pack",
   "mod_menu.searchTerms.deprecated": "deprecated outdated old",
   "mod_menu.searchTerms.clientside": "clientside gameside",
-  "mod_menu.searchTerms.forge": "forge",
+  "mod_menu.searchTerms.neoforge": "neoforge",
   "mod_menu.searchTerms.configurable": "configurations configs configures configurable options settings",
   "mod_menu.searchTerms.hasUpdate": "updates version",
   
@@ -38,7 +38,7 @@
   "mod_menu.badge.clientsideOnly": "Client",
   "mod_menu.badge.deprecated": "Deprecated",
   "mod_menu.badge.fabric": "Fabric",
-  "mod_menu.badge.forge": "Forge",
+  "mod_menu.badge.neoforge": "NeoForge",
   "mod_menu.badge.modpack": "Modpack",
   "mod_menu.badge.minecraft": "Minecraft",
   
@@ -118,10 +118,14 @@
   "mod_menu.configuration.hide_config_buttons": "Config Buttons",
   "mod_menu.configuration.hide_config_buttons.true": "Hidden",
   "mod_menu.configuration.hide_config_buttons.false": "Shown",
+  "mod_menu.configuration.hide_screen_top": "Screen's top",
+  "mod_menu.configuration.hide_screen_top.true": "Hidden",
+  "mod_menu.configuration.hide_screen_top.false": "Shown",
   "mod_menu.configuration.hide_badge_buttons": "Badge Buttons",
   "mod_menu.configuration.hide_badge_buttons.true": "Hidden",
   "mod_menu.configuration.hide_badge_buttons.false": "Shown",
   "mod_menu.configuration.hide_badges": "Mod Badges",
+  "mod_menu.configuration.hide_badge": "Badge",
   "mod_menu.configuration.hide_badges.true": "Hidden",
   "mod_menu.configuration.hide_badges.false": "Shown",
   "mod_menu.configuration.compact_list": "List",
@@ -159,6 +163,7 @@
   "mod_menu.configuration.mods_button_style.classic": "Below Realms",
   "mod_menu.configuration.mods_button_style.replace_realms": "Replace Realms",
   "mod_menu.configuration.mods_button_style.shrink": "Adjacent",
+  "mod_menu.configuration.mods_button_style.shrink_left": "Adjacent on left",
   "mod_menu.configuration.mods_button_style.icon": "Icon",
   "mod_menu.configuration.game_menu_button_style": "Game Menu",
   "mod_menu.configuration.game_menu_button_style.insert": "Insert",
@@ -199,6 +204,10 @@
   "mod_menu.configuration.modify_game_menu": "Modify Game Menu",
   "mod_menu.configuration.modify_title_screen": "Modify Title Screen",
   "mod_menu.configuration.library_list": "List of libraries",
-  "mod_menu.configuration.disable_default_badges": "Disable default badges",
-  "mod_menu.configuration.disable_default_badges.tooltip": "Prevents mods from adding their default badges in case you want to disable it"
+  "mod_menu.configuration.disable_default_badges": "For Specific Mods",
+  "mod_menu.configuration.disable_default_badges.tooltip": "Prevents specified mods from adding their default badges in case you want to disable it.",
+  "mod_menu.configuration.disable_default_badges_all": "For All Mods",
+  "mod_menu.configuration.disable_default_badges_all.true": "On",
+  "mod_menu.configuration.disable_default_badges_all.false": "Off",
+  "mod_menu.configuration.disable_default_badges_all.tooltip": "Prevents all mods from adding their default badges in case you want to disable it."
 }

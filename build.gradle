@@ -100,6 +100,9 @@ repositories {
         url "https://maven.su5ed.dev/releases"
     }
     maven { url 'https://jitpack.io' }
+    maven {
+        url "https://cursemaven.com"
+    }
 }
 
 jarJar.enable()
@@ -116,6 +119,11 @@ dependencies {
     compileOnly("org.sinytra:Connector:1.0.0-beta.46+1.20.1")
     implementation fg.deobf('com.github.1foxy2:TextPlaceholderAPI-neoforge:2c9c884ab1')
     jarJar('com.github.1foxy2:TextPlaceholderAPI-neoforge:[2.0,3.0)')
+    implementation fg.deobf("curse.maven:cumulus-915473:5748437")
+    compileOnly(annotationProcessor("io.github.llamalad7:mixinextras-common:0.5.0"))
+    implementation(jarJar("io.github.llamalad7:mixinextras-forge:0.5.0")) {
+        jarJar.ranged(it, "[0.5.0,)")
+    }
 }
 
 // This block of code expands all declared replace properties in the specified resource targets.

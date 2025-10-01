@@ -3,6 +3,7 @@ package com.terraformersmc.mod_menu.mixin;
 import com.google.common.collect.Lists;
 import com.terraformersmc.mod_menu.ModMenu;
 import net.minecraft.client.resources.language.I18n;
+import net.minecraftforge.fml.ModList;
 import net.minecraftforge.internal.BrandingControl;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -29,6 +30,7 @@ public abstract class MixinBrandingControl {
     private static void replaceBranding(boolean includeMC, boolean reverse, BiConsumer<Integer, String> lineConsumer, CallbackInfo ci) {
         if (ModMenu.getConfig().MODIFY_TITLE_SCREEN.get()) {
             final List<String> brandings = forge_mod_menu$getBrandings(includeMC, reverse);
+            String forge = brandings.get(0);
             if (ModMenu.getConfig().MOD_COUNT_LOCATION.get().isOnTitleScreen()) {
                 String count = ModMenu.getDisplayedModCount();
                 String specificKey = "mod_menu.mods." + count;
@@ -36,12 +38,14 @@ public abstract class MixinBrandingControl {
                 if (ModMenu.getConfig().EASTER_EGGS.get() && I18n.exists(specificKey + ".secret")) {
                     replacementKey = specificKey + ".secret";
                 }
-                I18n.get("menu.modded");
-                String[] neoForge = brandings.get(0).split(" ");
-                String second = neoForge.length == 1 ? "" : neoForge[1];
-                lineConsumer.accept(0, neoForge[0] + " " + second + I18n.get(replacementKey, count));
-                lineConsumer.accept(1, brandings.get(1));
-            } else lineConsumer.accept(0, brandings.get(1));
+                forge = forge.replace(I18n.get("fml.menu.branding", "", ModList.get().size()),
+                        I18n.get(replacementKey, count));
+            } else {
+                forge = forge.replace(I18n.get("fml.menu.branding", "", ModList.get().size()),
+                        I18n.get("menu.modded"));
+            }
+            lineConsumer.accept(0, forge);
+            lineConsumer.accept(1, brandings.get(1));
             ci.cancel();
         }
     }

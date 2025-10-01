@@ -11,6 +11,7 @@ import net.minecraft.util.Tuple;
 import net.minecraftforge.fml.ModContainer;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.loading.moddiscovery.ModFileInfo;
+import net.minecraftforge.fml.loading.moddiscovery.ModInfo;
 import net.minecraftforge.forgespi.language.IModInfo;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -114,8 +115,10 @@ public class NeoforgeMod implements Mod {
 		}
 
 		for (String string : modInfo.getConfig().getConfigElement("authors").orElse("").toString().split(", ")) {
+            if (string.isEmpty()) {
+                continue;
+            }
 			if (string.contains(",")) authors.addAll(Arrays.stream(string.split(",")).toList());
-
 			authors.add(string);
 		}
 
@@ -162,7 +165,15 @@ public class NeoforgeMod implements Mod {
 
 		String iconPath = modInfo.getLogoFile().orElse("assets/" + getId() + "/icon.png");
 
-		if (isSmall) iconPath = iconPath.replace(".png", "_small.png");
+        if (isSmall) {
+            String catalogueIcon;
+            if (ModMenu.getConfig().USE_CATALOGUE_ICON.get() && (catalogueIcon = ((ModInfo) modInfo).<String>getConfigElement("catalogueImageIcon").orElse(null)) != null) {
+                iconPath = catalogueIcon;
+            } else {
+                iconPath = iconPath.replace(".png", "_small.png");
+            }
+        }
+
 		if ("minecraft".equals(getId())) {
 			iconSourceId = ModMenu.MOD_ID;
 			iconPath = "assets/" + ModMenu.MOD_ID + "/minecraft_icon.png";

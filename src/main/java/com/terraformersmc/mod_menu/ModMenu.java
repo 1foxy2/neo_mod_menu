@@ -205,7 +205,8 @@ public class ModMenu {
 			titleStyle == ModMenuConfig.TitleMenuButtonStyle.ICON :
 			gameMenuStyle == ModMenuConfig.GameMenuButtonStyle.ICON;
 		var isShort = title ?
-			titleStyle == ModMenuConfig.TitleMenuButtonStyle.SHRINK :
+			titleStyle == ModMenuConfig.TitleMenuButtonStyle.SHRINK ||
+                    titleStyle == ModMenuConfig.TitleMenuButtonStyle.SHRINK_LEFT :
 			gameMenuStyle == ModMenuConfig.GameMenuButtonStyle.REPLACE;
 		MutableComponent modsText = ModMenuScreenTexts.TITLE.copy();
 		if (ModMenu.getConfig().MOD_COUNT_LOCATION.get().isOnModsButton() && !isIcon) {
@@ -250,7 +251,7 @@ public class ModMenu {
 							ModBadge badge = new ModBadge(jsonObject.get("name").getAsString(),
 									new Color(outlineColor.get(0).getAsInt(), outlineColor.get(1).getAsInt(), outlineColor.get(2).getAsInt()).getRGB(),
 									new Color(fillColor.get(0).getAsInt(), fillColor.get(1).getAsInt(), fillColor.get(2).getAsInt()).getRGB(),
-									textColor == null ? 0xCACACA : new Color(textColor.get(0).getAsInt(), textColor.get(1).getAsInt(), textColor.get(2).getAsInt()).getRGB());
+									textColor == null ? 0xFFCACACA : new Color(textColor.get(0).getAsInt(), textColor.get(1).getAsInt(), textColor.get(2).getAsInt()).getRGB());
 
 							ModBadge.CUSTOM_BADGES.put(id, badge);
 						} catch (Exception e) {

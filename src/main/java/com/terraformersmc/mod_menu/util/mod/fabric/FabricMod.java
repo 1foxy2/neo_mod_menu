@@ -93,6 +93,14 @@ public class FabricMod implements Mod {
 			});
 			allowsUpdateChecks = CustomValueUtil.getBoolean("update_checker", modMenuObject).orElse(true);
 		}
+
+        boolean isGenerated = CustomValueUtil.getBoolean("fabric-loom:generated", metadata).orElse(false);
+
+        /* Automatically set the mod containing a Loom-generated library as its parent */
+        if (isGenerated && parentId.isEmpty() && container.getContainingMod().isPresent()) {
+            ModContainer inside = container.getContainingMod().get();
+            parentId = Optional.of(inside.getMetadata().getId());
+        }
 		this.modMenuData = new ModMenuData(parentId, parentData, id);
 
 		/* Hardcode parents and badges for Kotlin */
@@ -108,10 +116,9 @@ public class FabricMod implements Mod {
 
 		/* Add additional badges */
 		this.badges = modMenuData.getBadges();
-		CustomValueUtil.getBoolean(
-				"fabric-loom:generated",
-				metadata
-		).ifPresent(value -> badgeNames.add("library"));
+        if (isGenerated) {
+            badgeNames.add("library");
+        }
 
 		if (this.metadata.getEnvironment() == ModEnvironment.CLIENT) {
 			badgeNames.add("client");
@@ -136,7 +143,7 @@ public class FabricMod implements Mod {
 
 	@Override
 	public @NotNull Tuple<DynamicTexture, Dimension> getIcon(NeoforgeIconHandler iconHandler, int i, boolean isSmall) {
-		String iconSourceId = getId();
+		final String iconSourceId = getId();
 
 		String iconResourceId = iconSourceId  + (isSmall ? "_small" : "");
 		if (NeoforgeIconHandler.modResourceIconCache.containsKey(iconResourceId))
@@ -144,11 +151,10 @@ public class FabricMod implements Mod {
 
 		String iconPath = metadata.getIconPath(i).orElse("assets/" + getId() + "/icon.png");
 
-		final String finalIconSourceId = iconSourceId;
 		if (isSmall) iconPath = iconPath.replace(".png", "_small.png");
 		net.minecraftforge.fml.ModContainer iconSource = ModList.get()
 				.getModContainerById(iconSourceId)
-			.orElseThrow(() -> new RuntimeException("Cannot get ModContainer for Fabric mod with id " + finalIconSourceId));
+			.orElseThrow(() -> new RuntimeException("Cannot get ModContainer for Fabric mod with id " + iconSourceId));
 		Tuple<DynamicTexture, Dimension> icon = iconHandler.createIcon(iconSource, iconPath);
 		if (icon == null && !isSmall) {
 			if (defaultIconWarning) {

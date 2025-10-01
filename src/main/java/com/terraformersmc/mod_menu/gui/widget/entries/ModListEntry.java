@@ -100,7 +100,7 @@ public class ModListEntry extends ObjectSelectionList.Entry<ModListEntry> {
 			DrawingUtil.drawWrappedString(guiGraphics, mod.getPrefixedVersion(), (x + iconSize + 3), (y + client.font.lineHeight + 2), rowWidth - iconSize - 7, 2, 0x808080);
 		}
 
-		if (!(this instanceof ParentEntry) && ModMenu.getConfig().QUICK_CONFIGURE.get() &&
+		if (!(this instanceof ParentEntry) && !(this instanceof ChildParentEntry) && ModMenu.getConfig().QUICK_CONFIGURE.get() &&
 				(this.list.getParent().getModHasConfigScreen(mod.getContainer())
 						|| this.list.getParent().modScreenErrors.containsKey(modId))) {
 			final int textureSize = ModMenu.getConfig().COMPACT_LIST.get() ? (int) (256 / (FULL_ICON_SIZE / (double) COMPACT_ICON_SIZE)) : 256;
@@ -127,7 +127,7 @@ public class ModListEntry extends ObjectSelectionList.Entry<ModListEntry> {
 		if (ModMenu.getConfig().QUICK_CONFIGURE.get() &&
 				this.list.getParent().getModHasConfigScreen(this.mod.getContainer())) {
 			int iconSize = ModMenu.getConfig().COMPACT_LIST.get() ? COMPACT_ICON_SIZE : FULL_ICON_SIZE;
-			if (mouseX - list.getRowLeft() <= iconSize) {
+			if (mouseX - list.getRowLeft() <= iconSize + getXOffset()) {
 				this.openConfig();
 			} else if (Util.getMillis() - this.sinceLastClick < 250) {
 				this.openConfig();
@@ -200,4 +200,9 @@ public class ModListEntry extends ObjectSelectionList.Entry<ModListEntry> {
 	public int getXOffset() {
 		return 0;
 	}
+
+    @Override
+    public String toString() {
+        return "ModListEntry{mod_id=\"" + getMod().getId() + "\"}";
+    }
 }

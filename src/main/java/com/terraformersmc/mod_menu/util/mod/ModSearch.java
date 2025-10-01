@@ -59,7 +59,6 @@ public class ModSearch {
 		String clientside = I18n.get("mod_menu.searchTerms.clientside");
 		String neoforge = I18n.get("mod_menu.searchTerms.forge");
 		String configurable = I18n.get("mod_menu.searchTerms.configurable");
-		String hasUpdate = I18n.get("mod_menu.searchTerms.hasUpdate");
 
 		// Libraries are currently hidden, ignore them entirely
 		if (mod.isHidden() || !ModMenu.getConfig().SHOW_LIBRARIES.get() && mod.getBadges().contains(ModBadge.LIBRARY)) {

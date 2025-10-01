@@ -7,10 +7,7 @@ import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import com.terraformersmc.mod_menu.ModMenu;
 import com.terraformersmc.mod_menu.gui.ModsScreen;
-import com.terraformersmc.mod_menu.gui.widget.entries.ChildEntry;
-import com.terraformersmc.mod_menu.gui.widget.entries.IndependentEntry;
-import com.terraformersmc.mod_menu.gui.widget.entries.ModListEntry;
-import com.terraformersmc.mod_menu.gui.widget.entries.ParentEntry;
+import com.terraformersmc.mod_menu.gui.widget.entries.*;
 import com.terraformersmc.mod_menu.util.mod.Mod;
 import com.terraformersmc.mod_menu.util.mod.ModBadge;
 import com.terraformersmc.mod_menu.util.mod.ModSearch;
@@ -35,15 +32,15 @@ public class ModListWidget extends ObjectSelectionList<ModListEntry> implements 
 	private String selectedModId = null;
 	private boolean scrolling;
 	private final NeoforgeIconHandler iconHandler = new NeoforgeIconHandler();
+    private Double restoreScrollY = null;
 
 	public ModListWidget(Minecraft client, int width, int height, int y1, int y2, int entryHeight, String searchTerm, ModListWidget list, ModsScreen parent) {
 		super(client, width, height, y1, y2, entryHeight);
 		this.parent = parent;
 		if (list != null) {
 			this.mods = list.mods;
+            this.restoreScrollY = list.getScrollAmount();
 		}
-		this.filter(searchTerm, false);
-		setScrollAmount(parent.getScrollPercent() * Math.max(0, this.getMaxPosition() - (this.getBottom() - this.getTop() - 4)));
 	}
 
 	@Override
@@ -108,6 +105,14 @@ public class ModListWidget extends ObjectSelectionList<ModListEntry> implements 
 		return super.remove(index);
 	}
 
+    public void finalizeInit() {
+        reloadFilters();
+        if(restoreScrollY != null) {
+            setScrollAmount(restoreScrollY);
+            restoreScrollY = null;
+        }
+    }
+
 	public void reloadFilters() {
 		filter(parent.getSearchInput(), true, false);
 	}
@@ -167,7 +172,7 @@ public class ModListWidget extends ObjectSelectionList<ModListEntry> implements 
 					if (this.parent.showModChildren.contains(modId)) {
 						List<Mod> validChildren = ModSearch.search(this.parent, searchTerm, children);
 						for (Mod child : validChildren) {
-							this.addEntry(new ChildEntry(child, parent, this, validChildren.indexOf(child) == validChildren.size() - 1));
+                            addChildMod(child, validChildren, parent, List.of(parent), searchTerm, 1);
 						}
 					}
 				} else {
@@ -194,6 +199,39 @@ public class ModListWidget extends ObjectSelectionList<ModListEntry> implements 
 		}
 	}
 
+    public void addChildMod(Mod child, List<Mod> validChildren, ParentEntry parent, List<ModListEntry> parents, String searchTerm, int parentCount) {
+        if (ModMenu.PARENT_MAP.keySet().contains(child) && hasVisibleChildMods(child)) {
+            //Add parent mods when not searching
+            List<Mod> childChildren = ModMenu.PARENT_MAP.get(child);
+            childChildren.sort(ModMenu.getConfig().SORTING.get().getComparator());
+            ChildParentEntry childParentEntry = new ChildParentEntry(
+                    child,
+                    parent,
+                    parents,
+                    childChildren,
+                    this,
+                    validChildren.indexOf(child) == validChildren.size() - 1
+            );
+            this.addEntry(childParentEntry);
+            //Add children if they are meant to be shown
+            if (this.parent.showModChildren.contains(child.getId())) {
+                List<Mod> validChildChildren = ModSearch.search(this.parent, searchTerm, childChildren);
+                for (Mod childChild : validChildChildren) {
+                    List<ModListEntry> childParents = new ArrayList<>(parents);
+                    childParents.add(childParentEntry);
+                    addChildMod(childChild, validChildChildren, parent, childParents, searchTerm, parentCount + 1);
+                }
+            }
+        } else {
+            this.addEntry(new ChildEntry(
+                    child,
+                    parent,
+                    parents,
+                    this,
+                    validChildren.indexOf(child) == validChildren.size() - 1
+            ));
+        }
+    }
 
 	@Override
 	protected void renderList(GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
@@ -332,4 +370,14 @@ public class ModListWidget extends ObjectSelectionList<ModListEntry> implements 
 	public NeoforgeIconHandler getNeoforgeIconHandler() {
 		return iconHandler;
 	}
+
+    @Override
+    public int getRowBottom(int index) {
+        return super.getRowBottom(index);
+    }
+
+    @Override
+    public ModListEntry getEntry(int index) {
+        return super.getEntry(index);
+    }
 }
