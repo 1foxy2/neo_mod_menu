@@ -141,19 +141,20 @@ public class FabricMod implements Mod {
 
 	@Override
 	public @NotNull Tuple<DynamicTexture, Dimension> getIcon(NeoforgeIconHandler iconHandler, int i, boolean isSmall) {
-		String iconSourceId = getId();
+		final String iconSourceId = getId();
 
-		String iconResourceId = iconSourceId  + (isSmall ? "_small" : "");
+		String iconResourceId = iconSourceId + (isSmall ? "_small" : "");
 		if (NeoforgeIconHandler.modResourceIconCache.containsKey(iconResourceId))
 			return NeoforgeIconHandler.modResourceIconCache.get(iconResourceId);
 
 		String iconPath = metadata.getIconPath(i).orElse("assets/" + getId() + "/icon.png");
 
-		final String finalIconSourceId = iconSourceId;
-		if (isSmall) iconPath = iconPath.replace(".png", "_small.png");
+		if (isSmall) {
+            iconPath = iconPath.replace(".png", "_small.png");
+        }
 		net.neoforged.fml.ModContainer iconSource = ModList.get()
 				.getModContainerById(iconSourceId)
-			.orElseThrow(() -> new RuntimeException("Cannot get ModContainer for Fabric mod with id " + finalIconSourceId));
+			.orElseThrow(() -> new RuntimeException("Cannot get ModContainer for Fabric mod with id " + iconSourceId));
 		Tuple<DynamicTexture, Dimension> icon = iconHandler.createIcon(iconSource, iconPath);
 		if (icon == null && !isSmall) {
 			if (defaultIconWarning) {

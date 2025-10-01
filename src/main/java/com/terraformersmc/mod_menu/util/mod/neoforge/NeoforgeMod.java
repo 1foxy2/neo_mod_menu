@@ -13,6 +13,7 @@ import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.ModList;
 import net.neoforged.fml.javafmlmod.AutomaticEventSubscriber;
 import net.neoforged.fml.loading.moddiscovery.ModFileInfo;
+import net.neoforged.fml.loading.moddiscovery.ModInfo;
 import net.neoforged.neoforgespi.language.IModInfo;
 import net.neoforged.neoforgespi.language.ModFileScanData;
 import net.neoforged.neoforgespi.locating.IModFile;
@@ -23,6 +24,7 @@ import org.slf4j.LoggerFactory;
 
 import java.awt.*;
 import java.lang.annotation.ElementType;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.*;
 
@@ -188,7 +190,14 @@ public class NeoforgeMod implements Mod {
 
 		String iconPath = modInfo.getLogoFile().orElse("assets/" + getId() + "/icon.png");
 
-		if (isSmall) iconPath = iconPath.replace(".png", "_small.png");
+		if (isSmall) {
+            String catalogueIcon;
+            if (ModMenu.getConfig().USE_CATALOGUE_ICON.get() && (catalogueIcon = ((ModInfo) modInfo).<String>getConfigElement("catalogueImageIcon").orElse(null)) != null) {
+                iconPath = catalogueIcon;
+            } else {
+                iconPath = iconPath.replace(".png", "_small.png");
+            }
+        }
 		if ("minecraft".equals(getId())) {
 			iconSourceId = ModMenu.MOD_ID;
 			iconPath = "assets/" + ModMenu.MOD_ID + "/minecraft_icon.png";
