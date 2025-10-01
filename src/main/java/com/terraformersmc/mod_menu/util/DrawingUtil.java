@@ -35,7 +35,7 @@ public class DrawingUtil {
 		if (!ModMenu.getConfig().RANDOM_JAVA_COLORS.get()) {
 			color = 0xFFDD5656;
 		}
-
+		RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
 		guiGraphics.fill(x, y, x + width, y + height, color);
 	}
 
@@ -67,7 +67,7 @@ public class DrawingUtil {
 				int width = CLIENT.font.width(line);
 				x1 += (float) (wrapWidth - width);
 			}
-			guiGraphics.drawString(CLIENT.font, line, x1, y + i * CLIENT.font.lineHeight, color);
+			guiGraphics.drawString(CLIENT.font, line, x1, y + i * CLIENT.font.lineHeight, color, true);
 		}
 	}
 
