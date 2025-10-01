@@ -207,5 +207,9 @@
   "option.modmenu.disable_default_badges_all": "For All Mods",
   "option.modmenu.disable_default_badges_all.true": "On",
   "option.modmenu.disable_default_badges_all.false": "Off",
-  "option.modmenu.disable_default_badges_all.tooltip": "Prevents all mods from adding their default badges in case you want to disable it."
+  "option.modmenu.disable_default_badges_all.tooltip": "Prevents all mods from adding their default badges in case you want to disable it.",
+  "option.modmenu.use_catalogue_icon": "Use Catalogue's icon",
+  "option.modmenu.use_catalogue_icon.true": "On",
+  "option.modmenu.use_catalogue_icon.false": "Off",
+  "option.modmenu.use_catalogue_icon.tooltip": "will use catalogue's icon for mods if present"
 }

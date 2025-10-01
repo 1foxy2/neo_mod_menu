@@ -30,6 +30,7 @@ public class BetterModListConfig {
   //  public static final ModConfigSpec.BooleanValue BUTTON_UPDATE_BADGE;
 //    public static final ModConfigSpec.BooleanValue UPDATE_CHANNEL;
     public final ModConfigSpec.BooleanValue QUICK_CONFIGURE;
+    public final ModConfigSpec.BooleanValue USE_CATALOGUE_ICON;
 
     public final ModConfigSpec.BooleanValue MODIFY_TITLE_SCREEN;
     public final ModConfigSpec.BooleanValue MODIFY_GAME_MENU;
@@ -78,6 +79,8 @@ public class BetterModListConfig {
                 .define("config_mode", false);
         DISABLE_DRAG_AND_DROP = builder.comment("Disables drag and drop mods adding")
                 .define("disable_drag_and_drop", false);
+        USE_CATALOGUE_ICON = builder.comment("Will use catalogue's icon if present")
+                .define("use_catalogue_icon", true);
         builder.pop();
 
         builder.push("hide");
