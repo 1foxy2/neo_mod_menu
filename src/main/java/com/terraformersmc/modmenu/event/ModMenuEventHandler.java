@@ -42,7 +42,7 @@ public class ModMenuEventHandler {
 			KeyConflictContext.IN_GAME,
 			InputConstants.Type.KEYSYM,
 			GLFW.GLFW_KEY_UNKNOWN,
-			"key.categories.misc"
+			KeyMapping.Category.MISC
 	));
 
 	@SubscribeEvent

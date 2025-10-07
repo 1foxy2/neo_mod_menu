@@ -16,6 +16,7 @@ import net.minecraft.client.gui.narration.NarratedElementType;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.ConfirmLinkScreen;
 import net.minecraft.client.gui.screens.CreditsAndAttributionScreen;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.FormattedCharSequence;
 
@@ -60,12 +61,12 @@ public class DescriptionListWidget extends AbstractSelectionList<DescriptionList
 		this.textRenderer = client.font;
 
 		if (copyFrom != null) {
-			updateSelectedModIfRequired(copyFrom.selectedMod);
+			updateSelectedMod(copyFrom.selectedMod);
 			setScrollAmount(copyFrom.scrollAmount());
 		}
 
 		if (parent.getSelectedEntry() != null) {
-			updateSelectedModIfRequired(parent.getSelectedEntry().getMod());
+			updateSelectedMod(parent.getSelectedEntry().getMod());
 		}
 	}
 
@@ -104,23 +105,23 @@ public class DescriptionListWidget extends AbstractSelectionList<DescriptionList
 		Component description = mod.getFormattedDescription();
 		if (!description.getString().isEmpty()) {
 			for (FormattedCharSequence line : textRenderer.split(description, wrapWidth)) {
-				children().add(new DescriptionEntry(line));
+				this.addEntry(new DescriptionEntry(line));
 			}
 		}
 
 		Map<String, String> links = mod.getLinks();
 		String sourceLink = mod.getSource();
 		if ((!links.isEmpty() || sourceLink != null) && !ModMenu.getConfig().HIDE_MOD_LINKS.get()) {
-			children().add(emptyEntry);
+			this.addEntry(emptyEntry);
 
 			for (FormattedCharSequence line : textRenderer.split(LINKS_TEXT, wrapWidth)) {
-				children().add(new DescriptionEntry(line));
+				this.addEntry(new DescriptionEntry(line));
 			}
 
 			if (sourceLink != null) {
 				int indent = 8;
 				for (FormattedCharSequence line : textRenderer.split(SOURCE_TEXT, wrapWidth - 16)) {
-					children().add(new LinkEntry(line, sourceLink, indent));
+					this.addEntry(new LinkEntry(line, sourceLink, indent));
 					indent = 16;
 				}
 			}
@@ -132,7 +133,7 @@ public class DescriptionListWidget extends AbstractSelectionList<DescriptionList
 								.withStyle(ChatFormatting.UNDERLINE),
 						wrapWidth - 16
 				)) {
-					children().add(new LinkEntry(line, value, indent));
+					this.addEntry(new LinkEntry(line, value, indent));
 					indent = 16;
 				}
 			});
@@ -140,16 +141,16 @@ public class DescriptionListWidget extends AbstractSelectionList<DescriptionList
 
 		Set<String> licenses = mod.getLicense();
 		if (!ModMenu.getConfig().HIDE_MOD_LICENSE.get() && !licenses.isEmpty()) {
-			children().add(emptyEntry);
+			this.addEntry(emptyEntry);
 
 			for (FormattedCharSequence line : textRenderer.split(LICENSE_TEXT, wrapWidth)) {
-				children().add(new DescriptionEntry(line));
+				this.addEntry(new DescriptionEntry(line));
 			}
 
 			for (String license : licenses) {
 				int indent = 8;
 				for (FormattedCharSequence line : textRenderer.split(Component.literal(license), wrapWidth - 16)) {
-					children().add(new DescriptionEntry(line, indent));
+					this.addEntry(new DescriptionEntry(line, indent));
 					indent = 16;
 				}
 			}
@@ -157,19 +158,19 @@ public class DescriptionListWidget extends AbstractSelectionList<DescriptionList
 
 		if (!ModMenu.getConfig().HIDE_MOD_CREDITS.get()) {
 			if ("minecraft".equals(mod.getId())) {
-				children().add(emptyEntry);
+				this.addEntry(emptyEntry);
 
 				for (FormattedCharSequence line : textRenderer.split(VIEW_CREDITS_TEXT, wrapWidth)) {
-					children().add(new MojangCreditsEntry(line));
+					this.addEntry(new MojangCreditsEntry(line));
 				}
 			} else if (!"java".equals(mod.getId())) {
 				var credits = mod.getCredits();
 
 				if (!credits.isEmpty()) {
-					children().add(emptyEntry);
+					this.addEntry(emptyEntry);
 
 					for (FormattedCharSequence line : textRenderer.split(CREDITS_TEXT, wrapWidth)) {
-						children().add(new DescriptionEntry(line));
+						this.addEntry(new DescriptionEntry(line));
 					}
 
 					var iterator = credits.entrySet().iterator();
@@ -183,7 +184,7 @@ public class DescriptionListWidget extends AbstractSelectionList<DescriptionList
 						for (var line : textRenderer.split(this.creditsRoleText(roleName),
 								wrapWidth - 16
 						)) {
-							children().add(new DescriptionEntry(line, indent));
+							this.addEntry(new DescriptionEntry(line, indent));
 							indent = 16;
 						}
 
@@ -191,13 +192,13 @@ public class DescriptionListWidget extends AbstractSelectionList<DescriptionList
 							indent = 16;
 
 							for (var line : textRenderer.split(Component.literal(contributor), wrapWidth - 24)) {
-								children().add(new DescriptionEntry(line, indent));
+								this.addEntry(new DescriptionEntry(line, indent));
 								indent = 24;
 							}
 						}
 
 						if (iterator.hasNext()) {
-							children().add(emptyEntry);
+							this.addEntry(emptyEntry);
 						}
 					}
 				}
@@ -205,14 +206,12 @@ public class DescriptionListWidget extends AbstractSelectionList<DescriptionList
 		}
 	}
 
-	public void updateSelectedModIfRequired(Mod mod) {
-		if (mod != selectedMod) {
-			selectedMod = mod;
-			clearEntries();
-			setScrollAmount(-Double.MAX_VALUE);
-			rebuildUI();
-		}
-	}
+	public void updateSelectedMod(Mod mod) {
+        selectedMod = mod;
+        clearEntries();
+        setScrollAmount(-Double.MAX_VALUE);
+        rebuildUI();
+    }
 
 	@Override
 	public void renderListItems(GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
@@ -254,24 +253,38 @@ public class DescriptionListWidget extends AbstractSelectionList<DescriptionList
 		}
 
 		@Override
-		public void render(
+		public void renderContent(
 			GuiGraphics guiGraphics,
-			int index,
-			int y,
-			int x,
-			int itemWidth,
-			int itemHeight,
 			int mouseX,
 			int mouseY,
 			boolean isSelected,
 			float delta
 		) {
+            int x = this.getX();
+            int y = this.getContentY();
 			if (updateTextEntry) {
 				UpdateAvailableBadge.renderBadge(guiGraphics, x + indent, y);
 				x += 11;
 			}
 			guiGraphics.drawString(textRenderer, text, x + indent, y, 0xFFAAAAAA);
 		}
+
+        @Override
+        public boolean isMouseOver(double mouseX, double mouseY) {
+            if (!super.isMouseOver(mouseX, mouseY)) {
+                return false;
+            }
+
+            int width = DescriptionListWidget.this.textRenderer.width(text);
+
+            if (updateTextEntry) {
+                width += 11;
+            }
+
+            double relativeX = mouseX - DescriptionListWidget.this.getRowLeft() - indent;
+
+            return relativeX >= 0 && relativeX < width;
+        }
 
 		@Override
 		public List<? extends GuiEventListener> children() {
@@ -289,13 +302,13 @@ public class DescriptionListWidget extends AbstractSelectionList<DescriptionList
 			super(text);
 		}
 
-		@Override
-		public boolean mouseClicked(double mouseX, double mouseY, int button) {
-			if (isMouseOver(mouseX, mouseY)) {
+        @Override
+        public boolean mouseClicked(MouseButtonEvent event, boolean isDoubleClick) {
+			if (isMouseOver(event.x(), event.y())) {
 				minecraft.setScreen(new MinecraftCredits());
 			}
 
-			return super.mouseClicked(mouseX, mouseY, button);
+			return super.mouseClicked(event, isDoubleClick);
 		}
 
 		class MinecraftCredits extends CreditsAndAttributionScreen {
@@ -317,9 +330,9 @@ public class DescriptionListWidget extends AbstractSelectionList<DescriptionList
 			this(text, link, 0);
 		}
 
-		@Override
-		public boolean mouseClicked(double mouseX, double mouseY, int button) {
-			if (isMouseOver(mouseX, mouseY)) {
+        @Override
+        public boolean mouseClicked(MouseButtonEvent event, boolean isDoubleClick) {
+			if (isMouseOver(event.x(), event.y())) {
 				minecraft.setScreen(new ConfirmLinkScreen((open) -> {
 					if (open) {
 						Util.getPlatform().openUri(link);
@@ -328,7 +341,7 @@ public class DescriptionListWidget extends AbstractSelectionList<DescriptionList
 				}, link, false));
 			}
 
-			return super.mouseClicked(mouseX, mouseY, button);
+			return super.mouseClicked(event, isDoubleClick);
 		}
 	}
 

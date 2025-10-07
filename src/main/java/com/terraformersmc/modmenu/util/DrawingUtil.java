@@ -17,7 +17,6 @@ import net.neoforged.api.distmarker.OnlyIn;
 import java.util.List;
 import java.util.Random;
 
-@OnlyIn(Dist.CLIENT)
 public class DrawingUtil {
 	private static final Minecraft CLIENT = Minecraft.getInstance();
 

@@ -25,6 +25,8 @@ import net.minecraft.client.gui.components.toasts.SystemToast;
 import net.minecraft.client.gui.screens.ConfirmLinkScreen;
 import net.minecraft.client.gui.screens.ConfirmScreen;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.input.CharacterEvent;
+import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.resources.language.I18n;
@@ -248,7 +250,9 @@ public class ModsScreen extends Screen {
 					ConfirmLinkScreen.confirmLinkNow(this, url, true);
 				} else {
 					var url = mod.getWebsite();
-					ConfirmLinkScreen.confirmLinkNow(this, url, false);
+                    if (url != null) {
+                        ConfirmLinkScreen.confirmLinkNow(this, url, false);
+                    }
 				}
 			})
 			.pos(this.rightPaneX + (urlButtonWidths / 2) - (cappedButtonWidth / 2), rightPaneY + 36)
@@ -263,7 +267,9 @@ public class ModsScreen extends Screen {
 					ConfirmLinkScreen.confirmLinkNow(this, CommonLinks.SNAPSHOT_BUGS_FEEDBACK, true);
 				} else {
 					var url = mod.getIssueTracker();
-					ConfirmLinkScreen.confirmLinkNow(this, url, false);
+                    if (url != null) {
+                        ConfirmLinkScreen.confirmLinkNow(this, url, false);
+                    }
 				}
 			})
 			.pos(
@@ -326,15 +332,14 @@ public class ModsScreen extends Screen {
 		this.keepFilterOptionsShown = true;
 	}
 
-	@Override
-	public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-		return super.keyPressed(keyCode, scanCode, modifiers) ||
-			this.searchBox.keyPressed(keyCode, scanCode, modifiers);
+    @Override
+    public boolean keyPressed(KeyEvent event) {
+		return super.keyPressed(event) || this.searchBox.keyPressed(event);
 	}
 
 	@Override
-	public boolean charTyped(char chr, int keyCode) {
-		return this.searchBox.charTyped(chr, keyCode);
+	public boolean charTyped(CharacterEvent event) {
+		return this.searchBox.charTyped(event);
 	}
 
 	@Override
@@ -560,7 +565,7 @@ public class ModsScreen extends Screen {
 		this.selected = entry;
 		String modId = selected.getMod().getId();
 
-		this.descriptionListWidget.updateSelectedModIfRequired(selected.getMod());
+		this.descriptionListWidget.updateSelectedMod(selected.getMod());
 
 		if (this.configureButton != null) {
 

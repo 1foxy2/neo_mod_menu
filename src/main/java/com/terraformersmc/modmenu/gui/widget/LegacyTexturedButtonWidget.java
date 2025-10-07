@@ -1,5 +1,6 @@
 package com.terraformersmc.modmenu.gui.widget;
 
+import com.mojang.blaze3d.platform.cursor.CursorTypes;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.ImageButton;
@@ -65,6 +66,9 @@ public class LegacyTexturedButtonWidget extends ImageButton {
 			this.textureWidth,
 			this.textureHeight
 		);
+        if (this.isHovered()) {
+            guiGraphics.requestCursor(this.isActive() ? CursorTypes.POINTING_HAND : CursorTypes.NOT_ALLOWED);
+        }
 	}
 
 	public static Builder legacyTexturedBuilder(Component message, Button.OnPress onPress) {

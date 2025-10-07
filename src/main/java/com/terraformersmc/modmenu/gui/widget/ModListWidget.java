@@ -9,10 +9,13 @@ import com.terraformersmc.modmenu.util.mod.ModSearch;
 import com.terraformersmc.modmenu.util.mod.neoforge.NeoforgeIconHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.AbstractSelectionList;
 import net.minecraft.client.gui.components.ObjectSelectionList;
+import net.minecraft.client.input.KeyEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.CommonColors;
 import net.minecraft.util.Mth;
+import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.*;
@@ -85,10 +88,10 @@ public class ModListWidget extends ObjectSelectionList<ModListEntry> implements 
 		parent.updateSelectedEntry(getSelected());
 	}
 
-	@Override
 	protected boolean isSelectedItem(int index) {
 		ModListEntry selected = getSelected();
-		return selected != null && selected.getMod().getId().equals(getEntry(index).getMod().getId());
+        ModListEntry entry = this.getEntry(index);
+        return selected != null && entry != null && selected.getMod().getId().equals(entry.getMod().getId());
 	}
 
 	@Override
@@ -106,16 +109,32 @@ public class ModListWidget extends ObjectSelectionList<ModListEntry> implements 
 		return i;
 	}
 
-	@Override
-	protected boolean removeEntry(ModListEntry entry) {
-		addedMods.remove(entry.mod);
-		return super.removeEntry(entry);
-	}
+    @Nullable
+    public ModListEntry getEntry(int index) {
+        if (this.children().size() > index) {
+            return this.children().get(index);
+        }
+
+        return null;
+    }
 
 	@Override
-	protected ModListEntry remove(int index) {
-		addedMods.remove(getEntry(index).mod);
-		return super.remove(index);
+	protected void removeEntry(ModListEntry entry) {
+		addedMods.remove(entry.mod);
+        super.removeEntry(entry);
+	}
+
+    @Override
+    public void clearEntries() {
+        this.setSelected(null);
+        addedMods.clear();
+        super.clearEntries();
+    }
+
+	protected void remove(int index) {
+        ModListEntry entry = this.children().get(index);
+        addedMods.remove(entry.mod);
+        super.removeEntry(entry);
 	}
 
 	public void finalizeInit() {
@@ -248,33 +267,32 @@ public class ModListWidget extends ObjectSelectionList<ModListEntry> implements 
 	protected void renderListItems(GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
 		int entryLeft = this.getRowLeft();
 		int entryWidth = this.getRowWidth();
-		int entryHeight = this.itemHeight - 4;
+		int entryHeight = this.defaultEntryHeight - 4;
+        int x = this.getX();
+        int y = this.getY();
+        int yOffset = 2;
 		int entryCount = this.getItemCount();
 		for (int index = 0; index < entryCount; ++index) {
 			int entryTop = this.getRowTop(index) + 2;
 			int entryBottom = this.getRowBottom(index);
-			if (entryBottom >= this.getY() && entryTop <= this.getBottom()) {
+			if (entryBottom >= y && entryTop <= this.getBottom()) {
 				ModListEntry entry = this.getEntry(index);
+                if (entry == null) continue;
 				if (this.isSelectedItem(index)) {
 					int entryContentLeft = entryLeft + entry.getXOffset() - 2;
 					int entryContentWidth = entryWidth - entry.getXOffset() + 4;
 					this.renderSelection(
 							guiGraphics,
 							entryContentLeft,
-							entryTop,
+							entryTop + yOffset,
 							entryContentWidth,
 							entryHeight,
 							this.isFocused() ? CommonColors.WHITE : CommonColors.GRAY, CommonColors.BLACK
 					);
 				}
-				entryLeft = this.getRowLeft();
-				entry.render(
+                entry.setYOffset(yOffset);
+				entry.renderContent(
 					guiGraphics,
-					index,
-					entryTop,
-					entryLeft,
-					entryWidth,
-					entryHeight,
 					mouseX,
 					mouseY,
 					this.isMouseOver(mouseX, mouseY) && Objects.equals(this.getEntryAtPos(mouseX, mouseY), entry),
@@ -285,32 +303,41 @@ public class ModListWidget extends ObjectSelectionList<ModListEntry> implements 
 	}
 
 	/**
-	 * Version of {@link #renderSelection(GuiGraphics, int, int, int, int, int)} with unconstrained positioning and sizing.
+	 * Version of {@link #renderSelection(GuiGraphics, AbstractSelectionList.Entry, int)} with unconstrained positioning and sizing.
 	 */
 	protected void renderSelection(GuiGraphics context, int x, int y, int width, int height, int borderColor, int fillColor) {
 		context.fill(x, y - 2, x + width, y + height + 2, borderColor);
 		context.fill(x + 1, y - 1, x + width - 1, y + height + 1, fillColor);
 	}
 
-	public void ensureVisible(ModListEntry entry) {
-		super.ensureVisible(entry);
-	}
+    public void ensureVisible(ModListEntry entry) {
+        int i = this.getRowTop(this.children().indexOf(entry));
+        int j = i - this.getY() - 4 - this.defaultEntryHeight;
+        if (j < 0) {
+            this.setScrollAmount(this.scrollAmount() + j);
+        }
 
-	public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-		if (keyCode == GLFW.GLFW_KEY_UP || keyCode == GLFW.GLFW_KEY_DOWN) {
-			return super.keyPressed(keyCode, scanCode, modifiers);
+        int k = this.getBottom() - i - (this.defaultEntryHeight * 2);
+        if (k < 0) {
+            this.setScrollAmount(this.scrollAmount() - k);
+        }
+    }
+
+	public boolean keyPressed(KeyEvent event) {
+		if (event.isUp() || event.isDown()) {
+			return super.keyPressed(event);
 		}
 
 		if (getSelected() != null) {
-			return getSelected().keyPressed(keyCode, scanCode, modifiers);
+			return getSelected().keyPressed(event);
 		}
 
 		return false;
 	}
 
 	public final ModListEntry getEntryAtPos(double x, double y) {
-		int int_5 = Mth.floor(y - (double) this.getY()) - this.headerHeight + (int) this.scrollAmount() - 4;
-		int index = int_5 / this.itemHeight;
+		int int_5 = Mth.floor(y - (double) this.getY()) + (int) this.scrollAmount() - 4;
+		int index = int_5 / this.defaultEntryHeight;
 		return x < (double) this.scrollBarX() && x >= (double) getRowLeft() && x <= (double) (getRowLeft() + getRowWidth()) && index >= 0 && int_5 >= 0 && index < this.getItemCount() ?
 			this.children().get(index) :
 			null;

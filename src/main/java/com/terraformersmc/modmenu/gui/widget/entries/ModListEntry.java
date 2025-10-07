@@ -1,5 +1,6 @@
 package com.terraformersmc.modmenu.gui.widget.entries;
 
+import com.mojang.blaze3d.platform.cursor.CursorTypes;
 import com.terraformersmc.modmenu.ModMenu;
 import com.terraformersmc.modmenu.gui.widget.ModListWidget;
 import com.terraformersmc.modmenu.util.DrawingUtil;
@@ -11,6 +12,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.ObjectSelectionList;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.locale.Language;
@@ -38,6 +40,7 @@ public class ModListEntry extends ObjectSelectionList.Entry<ModListEntry> {
 	public static final int FULL_ICON_SIZE = 32;
 	public static final int COMPACT_ICON_SIZE = 19;
 	protected long sinceLastClick;
+    protected int yOffset = 0;
 
 	public ModListEntry(Mod mod, ModListWidget list) {
 		this.mod = mod;
@@ -51,19 +54,16 @@ public class ModListEntry extends ObjectSelectionList.Entry<ModListEntry> {
 	}
 
 	@Override
-	public void render(
+	public void renderContent(
 		GuiGraphics guiGraphics,
-		int index,
-		int y,
-		int x,
-		int rowWidth,
-		int rowHeight,
 		int mouseX,
 		int mouseY,
 		boolean hovered,
 		float delta
 	) {
-		x += getXOffset();
+        int x = this.getX() + this.getXOffset();
+        int y = this.getContentY() + this.getYOffset();
+        int rowWidth = this.getContentWidth();
 		rowWidth -= getXOffset();
 		int iconSize = ModMenu.getConfig().COMPACT_LIST.get() ? COMPACT_ICON_SIZE : FULL_ICON_SIZE;
 		String modId = mod.getId();
@@ -186,16 +186,19 @@ public class ModListEntry extends ObjectSelectionList.Entry<ModListEntry> {
 						ARGB.white(1.0F)
 					);
 				}
+                if (hoveringIcon) {
+                    guiGraphics.requestCursor(this.shouldTakeFocusAfterInteraction() ? CursorTypes.POINTING_HAND : CursorTypes.NOT_ALLOWED);
+                }
 			}
 		}
 	}
 
-	@Override
-	public boolean mouseClicked(double mouseX, double mouseY, int delta) {
+    @Override
+	public boolean mouseClicked(MouseButtonEvent click, boolean doubleClick) {
 		list.select(this);
 		if (ModMenu.getConfig().QUICK_CONFIGURE.get() && this.list.getParent().getModHasConfigScreen(this.mod.getContainer())) {
 			int iconSize = ModMenu.getConfig().COMPACT_LIST.get() ? COMPACT_ICON_SIZE : FULL_ICON_SIZE;
-			if (mouseX - list.getRowLeft() <= iconSize + getXOffset()) {
+			if (click.x() - list.getRowLeft() <= iconSize + getXOffset()) {
 				this.openConfig();
 			} else if (Util.getMillis() - this.sinceLastClick < 250) {
 				this.openConfig();
@@ -227,6 +230,7 @@ public class ModListEntry extends ObjectSelectionList.Entry<ModListEntry> {
 			this.iconLocation = new Tuple<>(ResourceLocation.fromNamespaceAndPath(ModMenu.NAMESPACE, mod.getId() + "_icon"), new Dimension());
 			Tuple<DynamicTexture, Dimension> icon = mod.getIcon(list.getNeoforgeIconHandler(),
 					64 * this.client.options.guiScale().get(), false);
+
 			icon.getA().setFilter(false, false);
 
 			float multiplier = 32f / icon.getB().height;
@@ -272,4 +276,12 @@ public class ModListEntry extends ObjectSelectionList.Entry<ModListEntry> {
 	public String toString() {
 		return "ModListEntry{mod_id=\"" + getMod().getId() + "\"}";
 	}
+
+    public void setYOffset(int offset) {
+        this.yOffset = offset;
+    }
+
+    public int getYOffset() {
+        return this.yOffset;
+    }
 }

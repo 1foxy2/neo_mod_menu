@@ -9,7 +9,7 @@ jobs:
   Publish:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
@@ -26,7 +26,8 @@ jobs:
           github-files: build/libs/*.jar
           version-type: beta
           game-versions: |
-            1.21.6
+            1.21.9
+            1.21.10
           game-version-filter: releases
           dependencies: |
             better_mods_button(incompatible){modrinth:KUZAAwdD}{curseforge:541584}#(ignore:github)

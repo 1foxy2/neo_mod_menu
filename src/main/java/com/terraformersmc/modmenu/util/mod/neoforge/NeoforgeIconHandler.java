@@ -1,6 +1,7 @@
 package com.terraformersmc.modmenu.util.mod.neoforge;
 
 import com.mojang.blaze3d.platform.NativeImage;
+import com.mojang.logging.LogUtils;
 import com.terraformersmc.modmenu.ModMenu;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.resources.ResourceLocation;
@@ -21,28 +22,22 @@ import java.util.Objects;
 public class NeoforgeIconHandler implements Closeable {
 	private static final Logger LOGGER = LoggerFactory.getLogger("Mod Menu | NeoforgeIconHandler");
 
-	private final Map<Path, Tuple<DynamicTexture, Dimension>> modIconCache = new HashMap<>();
+	private final Map<ResourceLocation, Tuple<DynamicTexture, Dimension>> modIconCache = new HashMap<>();
 	public static final Map<String, Tuple<DynamicTexture, Dimension>> modResourceIconCache = new HashMap<>();
 
 	public Tuple<DynamicTexture, Dimension> createIcon(ModContainer iconSource, String iconPath) {
 		try {
-			Path path = iconSource.getModInfo().getOwningFile().getFile().findResource(iconPath);
-			Tuple<DynamicTexture, Dimension> cachedIcon = getCachedModIcon(path);
+			Tuple<DynamicTexture, Dimension> cachedIcon = getCachedModIcon(ResourceLocation.fromNamespaceAndPath(iconSource.getModId(), iconPath));
 			if (cachedIcon != null) {
 				return cachedIcon;
 			}
 
-			cachedIcon = getCachedModIcon(path);
-			if (cachedIcon != null) {
-				return cachedIcon;
-			}
-
-			try (InputStream inputStream = Files.newInputStream(path)) {
+			try (InputStream inputStream = iconSource.getModInfo().getOwningFile().getFile().getContents().openFile(iconPath)) {
 				NativeImage image = NativeImage.read(Objects.requireNonNull(inputStream));
 				Tuple<DynamicTexture, Dimension> tex = new Tuple<>(new DynamicTexture(() ->
-						ResourceLocation.fromNamespaceAndPath(ModMenu.MOD_ID, path.toString()).toString(), image),
+						ResourceLocation.fromNamespaceAndPath(ModMenu.MOD_ID, iconPath).toString(), image),
 						new Dimension(image.getWidth(), image.getHeight())) ;
-				cacheModIcon(path, tex);
+				cacheModIcon(ResourceLocation.fromNamespaceAndPath(iconSource.getModId(), iconPath), tex);
 				return tex;
 			}
 		} catch (IllegalStateException e) {
@@ -62,11 +57,11 @@ public class NeoforgeIconHandler implements Closeable {
 		}
 	}
 
-	Tuple<DynamicTexture, Dimension> getCachedModIcon(Path path) {
+	Tuple<DynamicTexture, Dimension> getCachedModIcon(ResourceLocation path) {
 		return modIconCache.get(path);
 	}
 
-	void cacheModIcon(Path path, Tuple<DynamicTexture, Dimension> tex) {
+	void cacheModIcon(ResourceLocation path, Tuple<DynamicTexture, Dimension> tex) {
 		modIconCache.put(path, tex);
 	}
 }
