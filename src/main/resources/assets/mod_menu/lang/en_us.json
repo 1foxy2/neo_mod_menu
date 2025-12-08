@@ -38,6 +38,7 @@
   "mod_menu.badge.clientsideOnly": "Client",
   "mod_menu.badge.deprecated": "Deprecated",
   "mod_menu.badge.fabric": "Fabric",
+  "mod_menu.badge.forge": "Forge",
   "mod_menu.badge.neoforge": "NeoForge",
   "mod_menu.badge.modpack": "Modpack",
   "mod_menu.badge.minecraft": "Minecraft",
