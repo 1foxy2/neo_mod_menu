@@ -17,7 +17,10 @@ description='''${mod_description}'''
 
 [modproperties.modmenu]
 badges=["client"]
-links=["mod_menu.original=https://modrinth.com/mod/modmenu"]
+links=[
+    "mod_menu.original=https://modrinth.com/mod/modmenu",
+    "mod_menu.discord=https://discord.gg/GTYvTWfzxt"
+]
 contributors=[
     "shedaniel",
     "Draylar",
