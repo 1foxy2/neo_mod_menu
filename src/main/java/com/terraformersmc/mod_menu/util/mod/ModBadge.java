@@ -70,4 +70,9 @@ public class ModBadge {
             return null;
         }).filter(Objects::nonNull).collect(Collectors.toCollection(LinkedHashSet::new));
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        return obj == this || obj instanceof ModBadge badge && badge.id.equals(this.id);
+    }
 }

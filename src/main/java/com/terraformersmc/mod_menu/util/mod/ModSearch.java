@@ -1,8 +1,10 @@
 package com.terraformersmc.mod_menu.util.mod;
 
+import com.mojang.logging.LogUtils;
 import com.terraformersmc.mod_menu.ModMenu;
 import com.terraformersmc.mod_menu.gui.ModsScreen;
 import net.minecraft.client.resources.language.I18n;
+import net.minecraft.data.DataProvider;
 import net.minecraft.util.Tuple;
 
 import java.util.List;
@@ -39,19 +41,6 @@ public class ModSearch {
 		String modDescription = mod.getDescription();
 		String modSummary = mod.getSummary();
 
-		boolean hasCustomBadge = false;
-		for (Map.Entry<String, ModBadge> badgeEntry : ModBadge.CUSTOM_BADGES.entrySet()) {
-			String searchTerms = badgeEntry.getValue().getComponent().getString();
-
-			if (I18n.exists("mod_menu.searchTerms." + badgeEntry.getKey()))
-				searchTerms = I18n.get("mod_menu.searchTerms." + badgeEntry.getKey());
-
-			if (searchTerms.contains(query) && mod.getBadges().contains(badgeEntry.getValue())) {
-				hasCustomBadge = true;
-				break;
-			}
-		}
-
 		String library = I18n.get("mod_menu.searchTerms.library");
 		String sinytra = I18n.get("mod_menu.searchTerms.sinytra");
 		String modpack = I18n.get("mod_menu.searchTerms.modpack");
@@ -73,6 +62,19 @@ public class ModSearch {
 		) {
 			return query.length() >= 3 ? 2 : 1;
 		}
+
+        boolean hasCustomBadge = false;
+        for (Map.Entry<String, ModBadge> badgeEntry : ModBadge.CUSTOM_BADGES.entrySet()) {
+            String searchTerms = badgeEntry.getValue().getComponent().getString();
+
+            if (I18n.exists("mod_menu.searchTerms." + badgeEntry.getKey()))
+                searchTerms = I18n.get("mod_menu.searchTerms." + badgeEntry.getKey());
+
+            if (searchTerms.toLowerCase().contains(query) && mod.getBadges().contains(badgeEntry.getValue())) {
+                hasCustomBadge = true;
+                break;
+            }
+        }
 
 		if (modDescription.toLowerCase(Locale.ROOT).contains(query) // Search default mod description
 			|| modSummary.toLowerCase(Locale.ROOT).contains(query) // Search mod summary
