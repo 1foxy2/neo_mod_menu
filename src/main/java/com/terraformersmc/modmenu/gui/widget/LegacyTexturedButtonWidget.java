@@ -6,14 +6,14 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.ImageButton;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 public class LegacyTexturedButtonWidget extends ImageButton {
 	protected final int u;
 	protected final int v;
 	protected final int hoveredVOffset;
 
-	protected final ResourceLocation texture;
+	protected final Identifier texture;
 
 	protected final int textureWidth;
 	protected final int textureHeight;
@@ -26,7 +26,7 @@ public class LegacyTexturedButtonWidget extends ImageButton {
 		int u,
 		int v,
 		int hoveredVOffset,
-		ResourceLocation texture,
+		Identifier texture,
 		int textureWidth,
 		int textureHeight,
 		Button.OnPress pressAction,
@@ -45,7 +45,7 @@ public class LegacyTexturedButtonWidget extends ImageButton {
 	}
 
 	@Override
-	public void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
+	public void renderContents(GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
 		int v = this.v;
 
 		if (!this.isActive()) {
@@ -89,7 +89,7 @@ public class LegacyTexturedButtonWidget extends ImageButton {
 		private int v;
 		private int hoveredVOffset;
 
-		private ResourceLocation texture;
+		private Identifier texture;
 
 		private int textureWidth;
 		private int textureHeight;
@@ -122,7 +122,7 @@ public class LegacyTexturedButtonWidget extends ImageButton {
 			return this;
 		}
 
-		public Builder texture(ResourceLocation texture, int textureWidth, int textureHeight) {
+		public Builder texture(Identifier texture, int textureWidth, int textureHeight) {
 			this.texture = texture;
 
 			this.textureWidth = textureWidth;

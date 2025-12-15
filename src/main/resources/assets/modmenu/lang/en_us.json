@@ -67,7 +67,8 @@
   "modmenu.updateText": "v%s on %s",
   "modmenu.install_version": "Install version %s",
   "modmenu.downloadLink": "Download",
-  
+
+  "modmenu.bluesky": "Bluesky",
   "modmenu.buymeacoffee": "Buy Me a Coffee",
   "modmenu.coindrop": "Coindrop",
   "modmenu.crowdin": "Crowdin",

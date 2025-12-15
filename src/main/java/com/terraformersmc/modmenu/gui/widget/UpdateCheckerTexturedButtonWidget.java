@@ -3,7 +3,7 @@ package com.terraformersmc.modmenu.gui.widget;
 
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 public class UpdateCheckerTexturedButtonWidget extends LegacyTexturedButtonWidget {
 	public UpdateCheckerTexturedButtonWidget(
@@ -14,7 +14,7 @@ public class UpdateCheckerTexturedButtonWidget extends LegacyTexturedButtonWidge
 		int u,
 		int v,
 		int hoveredVOffset,
-		ResourceLocation texture,
+		Identifier texture,
 		int textureWidth,
 		int textureHeight,
 		Button.OnPress pressAction,

@@ -5,14 +5,14 @@ import com.terraformersmc.modmenu.gui.widget.ModListWidget;
 import com.terraformersmc.modmenu.util.mod.Mod;
 import com.terraformersmc.modmenu.util.mod.ModBadge;
 import com.terraformersmc.modmenu.util.mod.ModSearch;
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.Arrays;
@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Objects;
 
 public class ParentEntry extends ModListEntry {
-	private static final ResourceLocation PARENT_MOD_TEXTURE = ResourceLocation.fromNamespaceAndPath(ModMenu.NAMESPACE, "textures/gui/parent_mod.png");
+	private static final Identifier PARENT_MOD_TEXTURE = Identifier.fromNamespaceAndPath(ModMenu.NAMESPACE, "textures/gui/parent_mod.png");
 	protected List<Mod> children;
 	protected ModListWidget list;
 	protected boolean hoveringIcon = false;

@@ -15,7 +15,7 @@ import com.terraformersmc.modmenu.util.mod.Mod;
 import com.terraformersmc.modmenu.util.mod.ModBadge;
 import com.terraformersmc.modmenu.util.mod.ModBadgeRenderer;
 import net.minecraft.SharedConstants;
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
@@ -28,13 +28,12 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.CharacterEvent;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.renderer.RenderPipelines;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.locale.Language;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.CommonLinks;
 import net.minecraft.util.Tuple;
 import net.neoforged.fml.ModContainer;
@@ -53,13 +52,13 @@ import java.util.jar.JarFile;
 import java.util.stream.Collectors;
 
 public class ModsScreen extends Screen {
-	private static final ResourceLocation FILTERS_BUTTON_LOCATION = ResourceLocation.fromNamespaceAndPath(ModMenu.NAMESPACE,
+	private static final Identifier FILTERS_BUTTON_LOCATION = Identifier.fromNamespaceAndPath(ModMenu.NAMESPACE,
 		"textures/gui/filters_button.png"
 	);
-	private static final ResourceLocation CONFIGURE_BUTTON_LOCATION = ResourceLocation.fromNamespaceAndPath(ModMenu.NAMESPACE,
+	private static final Identifier CONFIGURE_BUTTON_LOCATION = Identifier.fromNamespaceAndPath(ModMenu.NAMESPACE,
 		"textures/gui/configure_button.png"
 	);
-	public static final ResourceLocation BADGE_BUTTON_LOCATION = ResourceLocation.fromNamespaceAndPath(ModMenu.NAMESPACE,
+	public static final Identifier BADGE_BUTTON_LOCATION = Identifier.fromNamespaceAndPath(ModMenu.NAMESPACE,
 			"textures/gui/badge_button.png"
 	);
 
@@ -102,19 +101,6 @@ public class ModsScreen extends Screen {
 	public ModsScreen(Screen previousScreen) {
 		super(ModMenuScreenTexts.TITLE);
 		this.previousScreen = previousScreen;
-	}
-
-	@Override
-	public boolean mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
-		if (modList.isMouseOver(mouseX, mouseY)) {
-			return this.modList.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
-		}
-
-		if (descriptionListWidget.isMouseOver(mouseX, mouseY)) {
-			return this.descriptionListWidget.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
-		}
-
-		return false;
 	}
 
 	@Override
@@ -420,7 +406,7 @@ public class ModsScreen extends Screen {
 				DrawingUtil.drawRandomVersionBackground(mod, guiGraphics, x, rightPaneY, 32, 32);
 			}
 
-			Tuple<ResourceLocation, Dimension> iconProperties = selectedEntry.getIconTexture();
+			Tuple<Identifier, Dimension> iconProperties = selectedEntry.getIconTexture();
 
 			int imageOffset = iconProperties.getB().width;
 			int imageHeight = iconProperties.getB().height;

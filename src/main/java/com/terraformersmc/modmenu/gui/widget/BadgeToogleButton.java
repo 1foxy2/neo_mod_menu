@@ -3,13 +3,12 @@ package com.terraformersmc.modmenu.gui.widget;
 import com.terraformersmc.modmenu.ModMenu;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.RenderPipelines;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 public class BadgeToogleButton extends LegacyTexturedButtonWidget {
-	private static final ResourceLocation BADGE_TOGGLE_TEXTURE =
-			ResourceLocation.fromNamespaceAndPath(ModMenu.NAMESPACE, "textures/gui/badge_toggle_button.png");
+	private static final Identifier BADGE_TOGGLE_TEXTURE =
+			Identifier.fromNamespaceAndPath(ModMenu.NAMESPACE, "textures/gui/badge_toggle_button.png");
 	private boolean hasBadge;
 
 	public BadgeToogleButton(
@@ -30,7 +29,7 @@ public class BadgeToogleButton extends LegacyTexturedButtonWidget {
 	}
 
 	@Override
-	public void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
+	public void renderContents(GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
 		int v = this.v;
 		int u = this.u;
 

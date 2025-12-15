@@ -17,7 +17,7 @@ import net.minecraft.client.gui.screens.TitleScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.ComponentContents;
 import net.minecraft.network.chat.contents.TranslatableContents;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -36,7 +36,7 @@ import java.util.List;
 
 @EventBusSubscriber(modid = ModMenu.MOD_ID, value = Dist.CLIENT)
 public class ModMenuEventHandler {
-	public static final ResourceLocation MODS_BUTTON_TEXTURE = ResourceLocation.fromNamespaceAndPath(ModMenu.NAMESPACE, "textures/gui/mods_button.png");
+	public static final Identifier MODS_BUTTON_TEXTURE = Identifier.fromNamespaceAndPath(ModMenu.NAMESPACE, "textures/gui/mods_button.png");
 	private static final Lazy<KeyMapping> MENU_KEY_BIND = Lazy.of(() -> new KeyMapping(
 			"key.modmenu.open_menu",
 			KeyConflictContext.IN_GAME,
@@ -246,7 +246,7 @@ public class ModMenuEventHandler {
 
 	@SubscribeEvent
 	public static void registerReloadManager(AddClientReloadListenersEvent event) {
-		event.addListener(ResourceLocation.fromNamespaceAndPath(ModMenu.MOD_ID, "create_badges_and_icons"),
+		event.addListener(Identifier.fromNamespaceAndPath(ModMenu.MOD_ID, "create_badges_and_icons"),
 				(ResourceManagerReloadListener) manager -> ModMenu.createBadgesAndIcons());
 	}
 }

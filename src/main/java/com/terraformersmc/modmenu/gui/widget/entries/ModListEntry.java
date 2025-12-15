@@ -7,7 +7,7 @@ import com.terraformersmc.modmenu.util.DrawingUtil;
 import com.terraformersmc.modmenu.util.ModMenuScreenTexts;
 import com.terraformersmc.modmenu.util.mod.Mod;
 import com.terraformersmc.modmenu.util.mod.ModBadgeRenderer;
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
@@ -18,25 +18,25 @@ import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.locale.Language;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.ARGB;
 import net.minecraft.util.Tuple;
 
 import java.awt.*;
 
 public class ModListEntry extends ObjectSelectionList.Entry<ModListEntry> {
-	public static final ResourceLocation UNKNOWN_ICON = ResourceLocation.withDefaultNamespace("textures/misc/unknown_pack.png");
-	private static final ResourceLocation MOD_CONFIGURATION_ICON = ResourceLocation.fromNamespaceAndPath(ModMenu.NAMESPACE,
+	public static final Identifier UNKNOWN_ICON = Identifier.withDefaultNamespace("textures/misc/unknown_pack.png");
+	private static final Identifier MOD_CONFIGURATION_ICON = Identifier.fromNamespaceAndPath(ModMenu.NAMESPACE,
 		"textures/gui/mod_configuration.png"
 	);
-	private static final ResourceLocation ERROR_ICON = ResourceLocation.withDefaultNamespace("world_list/error");
-	private static final ResourceLocation ERROR_HIGHLIGHTED_ICON = ResourceLocation.withDefaultNamespace("world_list/error_highlighted");
+	private static final Identifier ERROR_ICON = Identifier.withDefaultNamespace("world_list/error");
+	private static final Identifier ERROR_HIGHLIGHTED_ICON = Identifier.withDefaultNamespace("world_list/error_highlighted");
 
 	protected final Minecraft client;
 	public final Mod mod;
 	protected final ModListWidget list;
-	protected Tuple<ResourceLocation, Dimension> iconLocation;
-	protected Tuple<ResourceLocation, Dimension> smallIconLocation;
+	protected Tuple<Identifier, Dimension> iconLocation;
+	protected Tuple<Identifier, Dimension> smallIconLocation;
 	public static final int FULL_ICON_SIZE = 32;
 	public static final int COMPACT_ICON_SIZE = 19;
 	protected long sinceLastClick;
@@ -219,7 +219,7 @@ public class ModListEntry extends ObjectSelectionList.Entry<ModListEntry> {
 		return mod;
 	}
 
-	public Tuple<ResourceLocation, Dimension> getIconTexture() {
+	public Tuple<Identifier, Dimension> getIconTexture() {
 		if (ModMenu.shouldResetCache) {
 			this.smallIconLocation = null;
 			this.iconLocation = null;
@@ -227,11 +227,9 @@ public class ModListEntry extends ObjectSelectionList.Entry<ModListEntry> {
 		}
 
 		if (this.iconLocation == null) {
-			this.iconLocation = new Tuple<>(ResourceLocation.fromNamespaceAndPath(ModMenu.NAMESPACE, mod.getId() + "_icon"), new Dimension());
+			this.iconLocation = new Tuple<>(Identifier.fromNamespaceAndPath(ModMenu.NAMESPACE, mod.getId() + "_icon"), new Dimension());
 			Tuple<DynamicTexture, Dimension> icon = mod.getIcon(list.getNeoforgeIconHandler(),
 					64 * this.client.options.guiScale().get(), false);
-
-			icon.getA().setFilter(false, false);
 
 			float multiplier = 32f / icon.getB().height;
 			this.iconLocation.setB(new Dimension(
@@ -243,8 +241,8 @@ public class ModListEntry extends ObjectSelectionList.Entry<ModListEntry> {
 		return iconLocation;
 	}
 
-	public Tuple<ResourceLocation, Dimension> getSquaredIconTexture() {
-		Tuple<ResourceLocation, Dimension> icon = new Tuple<>(getIconTexture().getA(), iconLocation.getB().getSize()) ;
+	public Tuple<Identifier, Dimension> getSquaredIconTexture() {
+		Tuple<Identifier, Dimension> icon = new Tuple<>(getIconTexture().getA(), iconLocation.getB().getSize()) ;
 		float iconSize = ModMenu.getConfig().COMPACT_LIST.get() ? ModListEntry.COMPACT_ICON_SIZE : ModListEntry.FULL_ICON_SIZE;
 		float biggerValue = Math.max(icon.getB().width, icon.getB().height);
 		icon.getB().setSize(icon.getB().width / biggerValue * iconSize, icon.getB().height / biggerValue * iconSize);
@@ -252,13 +250,12 @@ public class ModListEntry extends ObjectSelectionList.Entry<ModListEntry> {
 	}
 
 
-	public Tuple<ResourceLocation, Dimension> getSquareIconTexture() {
+	public Tuple<Identifier, Dimension> getSquareIconTexture() {
 		if (this.smallIconLocation == null) {
-			this.smallIconLocation = new Tuple<>(ResourceLocation.fromNamespaceAndPath(ModMenu.NAMESPACE, mod.getId() + "_icon_small"), new Dimension());
+			this.smallIconLocation = new Tuple<>(Identifier.fromNamespaceAndPath(ModMenu.NAMESPACE, mod.getId() + "_icon_small"), new Dimension());
 			Tuple<DynamicTexture, Dimension> icon = mod.getIcon(list.getNeoforgeIconHandler(),
 				64 * this.client.options.guiScale().get(), true);
 			if (icon != null) {
-				icon.getA().setFilter(false, false);
 				this.smallIconLocation.setB(new Dimension());
 				this.client.getTextureManager().register(this.smallIconLocation.getA(), icon.getA());
 			} else {
