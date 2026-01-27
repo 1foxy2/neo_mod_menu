@@ -7,6 +7,8 @@ import com.terraformersmc.mod_menu.ModMenu;
 import com.terraformersmc.mod_menu.gui.ModsScreen;
 import com.terraformersmc.mod_menu.gui.widget.entries.ModListEntry;
 import com.terraformersmc.mod_menu.util.mod.Mod;
+import com.terraformersmc.mod_menu.util.mod.fabric.FabricMod;
+import net.fabricmc.loader.api.metadata.ContactInformation;
 import net.minecraft.ChatFormatting;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
@@ -197,7 +199,16 @@ public class DescriptionListWidget extends AbstractSelectionList<DescriptionList
 							indent = 16;
 
 							for (var line : textRenderer.split(Component.literal(contributor), wrapWidth - 24)) {
-								children().add(new DescriptionEntry(line, indent));
+                                if (mod instanceof FabricMod fabricMod) {
+                                    ContactInformation contact = fabricMod.getContact(contributor);
+                                    if (contact != null && contact.get("email").isPresent()) {
+                                        this.addEntry(new MailableContactEntry(line, contact.get("email").get(), indent));
+                                    } else {
+                                        this.addEntry(new DescriptionEntry(line, indent));
+                                    }
+                                } else {
+                                    this.addEntry(new DescriptionEntry(line, indent));
+                                }
 								indent = 24;
 							}
 						}
@@ -442,5 +453,39 @@ public class DescriptionListWidget extends AbstractSelectionList<DescriptionList
 			return super.mouseClicked(mouseX, mouseY, button);
 		}
 	}
+
+    protected class MailableContactEntry extends DescriptionEntry {
+        private final String email;
+
+        public MailableContactEntry(FormattedCharSequence text, String email, int indent) {
+            super(text, indent);
+            this.email = email;
+        }
+
+        public MailableContactEntry(FormattedCharSequence text, String link) {
+            this(text, link, 0);
+        }
+
+
+        @Override
+        public void render(GuiGraphics guiGraphics, int index, int y, int x, int itemWidth, int itemHeight, int mouseX, int mouseY, boolean isSelected, float delta) {
+            super.render(guiGraphics, index, y, x, itemWidth, itemHeight, mouseX, mouseY, isSelected, delta);
+            guiGraphics.drawString(textRenderer, Component.literal(" ").append(Component.literal("✉")), x + indent + textRenderer.width(text) + 1, y, 0xFFAAAAAA);
+        }
+
+        @Override
+        public boolean mouseClicked(double mouseX, double mouseY, int button) {
+            if (isMouseOver(mouseX, mouseY)) {
+                minecraft.setScreen(new ConfirmLinkScreen((open) -> {
+                    if (open) {
+                        Util.getPlatform().openUri("mailto:" + email);
+                    }
+                    minecraft.setScreen(parent);
+                }, "mailto:" + email, false));
+            }
+
+            return super.mouseClicked(mouseX, mouseY, button);
+        }
+    }
 
 }
