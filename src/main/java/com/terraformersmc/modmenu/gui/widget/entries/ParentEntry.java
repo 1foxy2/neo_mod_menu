@@ -152,7 +152,7 @@ public class ParentEntry extends ModListEntry {
 			list.getParent().showModChildren.add(id);
 		}
 
-		list.filter(list.getParent().getSearchInput(), false);
+		list.filter(list.getParent().getSearchInput(), false, false);
 	}
 
 	@Override
