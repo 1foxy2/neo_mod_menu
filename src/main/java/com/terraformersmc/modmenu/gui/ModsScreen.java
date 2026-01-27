@@ -315,7 +315,9 @@ public class ModsScreen extends Screen {
 		this.addRenderableWidget(this.doneButton);
 
         // Ensure a valid entry is selected
-        this.updateSelectedEntry(this.modList.getEntry(0));
+        if (selected == null) {
+            this.updateSelectedEntry(this.modList.getEntry(0));
+        }
         this.modList.select(this.selected);
 
 		this.init = true;
