@@ -3,7 +3,6 @@ package com.terraformersmc.mod_menu.gui.widget.entries;
 import com.terraformersmc.mod_menu.gui.widget.ModListWidget;
 import com.terraformersmc.mod_menu.util.mod.Mod;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.input.KeyEvent;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.List;
@@ -21,12 +20,20 @@ public class ChildEntry extends ModListEntry {
 	}
 
     @Override
-    public void renderContent(GuiGraphics guiGraphics, int mouseX, int mouseY, boolean isSelected, float delta) {
-        super.renderContent(guiGraphics, mouseX, mouseY, isSelected, delta);
-        int x = this.getContentX() - 15;
-        int y = this.getContentY() + this.getYOffset();
-//		int rowWidth = this.getContentWidth();
-        int rowHeight = this.getContentHeight();
+	public void render(
+		GuiGraphics guiGraphics,
+		int index,
+		int y,
+		int x,
+		int rowWidth,
+		int rowHeight,
+		int mouseX,
+		int mouseY,
+		boolean isSelected,
+		float delta
+	) {
+		super.render(guiGraphics, index, y, x, rowWidth, rowHeight, mouseX, mouseY, isSelected, delta);
+		x -= 9;
         int color = 0xFFA0A0A0;
         for (int i = 1; i < parents.size(); i++) {
             if (parents.get(i) instanceof ChildParentEntry childParent) {
@@ -41,8 +48,8 @@ public class ChildEntry extends ModListEntry {
     }
 
 	@Override
-	public boolean keyPressed(KeyEvent event) {
-		if (event.isLeft()) {
+	public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+		if (keyCode == GLFW.GLFW_KEY_LEFT) {
 			list.setSelected(parent);
 			list.ensureVisible(parent);
 			return true;

@@ -2,7 +2,6 @@ package com.terraformersmc.mod_menu.gui.widget;
 
 import com.terraformersmc.mod_menu.gui.ModsScreen;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
@@ -18,9 +17,4 @@ public class ModMenuButtonWidget extends Button {
 				Button.DEFAULT_NARRATION
 		);
 	}
-
-    @Override
-    protected void renderContents(GuiGraphics guiGraphics, int i, int i1, float v) {
-
-    }
 }
