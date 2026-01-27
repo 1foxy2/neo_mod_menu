@@ -4,7 +4,6 @@ import com.mojang.logging.LogUtils;
 import com.terraformersmc.mod_menu.ModMenu;
 import com.terraformersmc.mod_menu.gui.ModsScreen;
 import net.minecraft.client.resources.language.I18n;
-import net.minecraft.data.DataProvider;
 import net.minecraft.util.Tuple;
 
 import java.util.List;

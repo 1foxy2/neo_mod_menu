@@ -29,12 +29,10 @@ public class NeoforgeIconHandler implements Closeable {
 			if (cachedIcon != null) {
 				return cachedIcon;
 			}
-
 			cachedIcon = getCachedModIcon(path);
 			if (cachedIcon != null) {
 				return cachedIcon;
 			}
-
 			try (InputStream inputStream = Files.newInputStream(path)) {
 				NativeImage image = NativeImage.read(Objects.requireNonNull(inputStream));
 				Tuple<DynamicTexture, Dimension> tex = new Tuple<>(new DynamicTexture(image),
