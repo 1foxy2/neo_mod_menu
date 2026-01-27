@@ -284,7 +284,9 @@ public class ModsScreen extends Screen {
 		this.searchBox.setFocused(true);
 
         // Ensure a valid entry is selected
-        this.updateSelectedEntry(this.modList.getEntry(0));
+        if (selected == null) {
+            this.updateSelectedEntry(this.modList.getEntry(0));
+        }
         this.modList.select(this.selected);
 
 		init = true;
