@@ -8,10 +8,7 @@ import com.terraformersmc.mod_menu.util.mod.ModBadge;
 import com.terraformersmc.mod_menu.util.mod.neoforge.NeoforgeIconHandler;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
-import net.fabricmc.loader.api.metadata.CustomValue;
-import net.fabricmc.loader.api.metadata.ModEnvironment;
-import net.fabricmc.loader.api.metadata.ModMetadata;
-import net.fabricmc.loader.api.metadata.Person;
+import net.fabricmc.loader.api.metadata.*;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.util.Tuple;
 import net.neoforged.fml.ModList;
@@ -195,6 +192,20 @@ public class FabricMod implements Mod {
 
         return metadata.getAuthors().stream().map(Person::getName).collect(Collectors.toList());
 	}
+
+    public ContactInformation getContact(String author) {
+        for (Person person : metadata.getAuthors()) {
+            if (person.getName().equals(author)) {
+                return person.getContact();
+            }
+        }
+        for (Person person : metadata.getContributors()) {
+            if (person.getName().equals(author)) {
+                return person.getContact();
+            }
+        }
+        return null;
+    }
 
 	@Override
 	public @NotNull Map<String, Collection<String>> getContributors() {
