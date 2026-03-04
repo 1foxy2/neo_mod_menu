@@ -45,7 +45,9 @@ public abstract class MixinBrandingControl {
                         I18n.get("menu.modded"));
             }
             lineConsumer.accept(0, neoForge);
-            lineConsumer.accept(1, brandings.get(1));
+            for (int i = 1; i < brandings.size(); i++) {
+                lineConsumer.accept(i, brandings.get(i));
+            }
             ci.cancel();
         }
     }
