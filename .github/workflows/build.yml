@@ -12,6 +12,9 @@ jobs:
           fetch-depth: 0
           fetch-tags: true
 
+      - name: GradleW checksum check
+        uses: gradle/wrapper-validation@v5
+
       - name: Setup JDK 25
         uses: actions/setup-java@v4
         with:
