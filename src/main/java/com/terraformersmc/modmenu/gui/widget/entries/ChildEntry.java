@@ -2,7 +2,7 @@ package com.terraformersmc.modmenu.gui.widget.entries;
 
 import com.terraformersmc.modmenu.gui.widget.ModListWidget;
 import com.terraformersmc.modmenu.util.mod.Mod;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.input.KeyEvent;
 import org.lwjgl.glfw.GLFW;
 
@@ -21,8 +21,8 @@ public class ChildEntry extends ModListEntry {
 	}
 
     @Override
-    public void renderContent(GuiGraphics guiGraphics, int mouseX, int mouseY, boolean isSelected, float delta) {
-        super.renderContent(guiGraphics, mouseX, mouseY, isSelected, delta);
+    public void extractContent(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, boolean isSelected, float delta) {
+        super.extractContent(guiGraphics, mouseX, mouseY, isSelected, delta);
         int x = this.getContentX() - 15;
         int y = this.getContentY() + this.getYOffset();
 //		int rowWidth = this.getContentWidth();

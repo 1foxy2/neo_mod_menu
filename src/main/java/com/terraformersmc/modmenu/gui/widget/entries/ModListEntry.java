@@ -7,10 +7,9 @@ import com.terraformersmc.modmenu.util.DrawingUtil;
 import com.terraformersmc.modmenu.util.ModMenuScreenTexts;
 import com.terraformersmc.modmenu.util.mod.Mod;
 import com.terraformersmc.modmenu.util.mod.ModBadgeRenderer;
-import net.minecraft.util.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.ObjectSelectionList;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.renderer.RenderPipelines;
@@ -21,6 +20,7 @@ import net.minecraft.network.chat.FormattedText;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.ARGB;
 import net.minecraft.util.Tuple;
+import net.minecraft.util.Util;
 
 import java.awt.*;
 
@@ -54,8 +54,8 @@ public class ModListEntry extends ObjectSelectionList.Entry<ModListEntry> {
 	}
 
 	@Override
-	public void renderContent(
-		GuiGraphics guiGraphics,
+	public void extractContent(
+		GuiGraphicsExtractor guiGraphics,
 		int mouseX,
 		int mouseY,
 		boolean hovered,
@@ -107,7 +107,7 @@ public class ModListEntry extends ObjectSelectionList.Entry<ModListEntry> {
 			);
 		}
 
-		guiGraphics.drawString(font,
+		guiGraphics.text(font,
 			Language.getInstance().getVisualOrder(trimmedName),
 			x + iconSize + 3,
 			y + 1,

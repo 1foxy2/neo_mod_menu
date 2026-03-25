@@ -1,7 +1,7 @@
 package com.terraformersmc.modmenu.gui.widget;
 
 import com.terraformersmc.modmenu.ModMenu;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
@@ -29,7 +29,7 @@ public class BadgeToogleButton extends LegacyTexturedButtonWidget {
 	}
 
 	@Override
-	public void renderContents(GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
+	public void extractContents(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float delta) {
 		int v = this.v;
 		int u = this.u;
 

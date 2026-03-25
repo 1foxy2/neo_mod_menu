@@ -1,7 +1,7 @@
 package com.terraformersmc.modmenu.gui.widget;
 
 import com.mojang.blaze3d.platform.cursor.CursorTypes;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.ImageButton;
 import net.minecraft.client.renderer.RenderPipelines;
@@ -45,7 +45,7 @@ public class LegacyTexturedButtonWidget extends ImageButton {
 	}
 
 	@Override
-	public void renderContents(GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
+	public void extractContents(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float delta) {
 		int v = this.v;
 
 		if (!this.isActive()) {

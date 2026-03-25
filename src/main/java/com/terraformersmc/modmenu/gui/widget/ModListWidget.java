@@ -8,15 +8,13 @@ import com.terraformersmc.modmenu.util.mod.ModBadge;
 import com.terraformersmc.modmenu.util.mod.ModSearch;
 import com.terraformersmc.modmenu.util.mod.neoforge.NeoforgeIconHandler;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.AbstractSelectionList;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.ObjectSelectionList;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.CommonColors;
 import net.minecraft.util.Mth;
 import org.jetbrains.annotations.Nullable;
-import org.lwjgl.glfw.GLFW;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -269,7 +267,7 @@ public class ModListWidget extends ObjectSelectionList<ModListEntry> implements 
 	}
 
 	@Override
-	protected void renderListItems(GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
+	protected void extractListItems(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float delta) {
 		int entryLeft = this.getRowLeft();
 		int entryWidth = this.getRowWidth();
 		int entryHeight = this.defaultEntryHeight - 4;
@@ -286,7 +284,7 @@ public class ModListWidget extends ObjectSelectionList<ModListEntry> implements 
 				if (this.isSelectedItem(index)) {
 					int entryContentLeft = entryLeft + entry.getXOffset() - 2;
 					int entryContentWidth = entryWidth - entry.getXOffset() + 4;
-					this.renderSelection(
+					this.drawSelectionHighlight(
 							guiGraphics,
 							entryContentLeft,
 							entryTop + yOffset,
@@ -296,7 +294,7 @@ public class ModListWidget extends ObjectSelectionList<ModListEntry> implements 
 					);
 				}
                 entry.setYOffset(yOffset);
-				entry.renderContent(
+				entry.extractContent(
 					guiGraphics,
 					mouseX,
 					mouseY,
@@ -308,9 +306,9 @@ public class ModListWidget extends ObjectSelectionList<ModListEntry> implements 
 	}
 
 	/**
-	 * Version of {@link #renderSelection(GuiGraphics, AbstractSelectionList.Entry, int)} with unconstrained positioning and sizing.
+	 * Version of {@link #drawSelectionHighlight(GuiGraphicsExtractor, int, int, int, int, int, int)} with unconstrained positioning and sizing.
 	 */
-	protected void renderSelection(GuiGraphics context, int x, int y, int width, int height, int borderColor, int fillColor) {
+	protected void drawSelectionHighlight(GuiGraphicsExtractor context, int x, int y, int width, int height, int borderColor, int fillColor) {
 		context.fill(x, y - 2, x + width, y + height + 2, borderColor);
 		context.fill(x + 1, y - 1, x + width - 1, y + height + 1, fillColor);
 	}

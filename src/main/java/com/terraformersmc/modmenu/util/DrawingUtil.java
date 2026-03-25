@@ -4,7 +4,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.terraformersmc.modmenu.ModMenu;
 import com.terraformersmc.modmenu.util.mod.Mod;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.locale.Language;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
@@ -22,7 +22,7 @@ public class DrawingUtil {
 
 	public static void drawRandomVersionBackground(
 		Mod mod,
-		GuiGraphics guiGraphics,
+		GuiGraphicsExtractor guiGraphics,
 		int x,
 		int y,
 		int width,
@@ -39,7 +39,7 @@ public class DrawingUtil {
 	}
 
 	public static void drawWrappedString(
-		GuiGraphics guiGraphics,
+		GuiGraphicsExtractor guiGraphics,
 		String string,
 		int x,
 		int y,
@@ -66,12 +66,12 @@ public class DrawingUtil {
 				int width = CLIENT.font.width(line);
 				x1 += (float) (wrapWidth - width);
 			}
-			guiGraphics.drawString(CLIENT.font, line, x1, y + i * CLIENT.font.lineHeight, color);
+			guiGraphics.text(CLIENT.font, line, x1, y + i * CLIENT.font.lineHeight, color);
 		}
 	}
 
 	public static void drawBadge(
-		GuiGraphics guiGraphics,
+		GuiGraphicsExtractor guiGraphics,
 		int x,
 		int y,
 		int tagWidth,
@@ -90,7 +90,7 @@ public class DrawingUtil {
 		);
 		guiGraphics.fill(x + tagWidth, y, x + tagWidth + 1, y + CLIENT.font.lineHeight, outlineColor);
 		guiGraphics.fill(x + 1, y, x + tagWidth, y + CLIENT.font.lineHeight, fillColor);
-		guiGraphics.drawString(CLIENT.font,
+		guiGraphics.text(CLIENT.font,
 			charSequence,
 			(int) (x + 1 + (tagWidth - CLIENT.font.width(charSequence)) / (float) 2),
 			y + 1,

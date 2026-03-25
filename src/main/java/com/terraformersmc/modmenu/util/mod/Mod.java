@@ -41,7 +41,7 @@ public interface Mod {
 	@NotNull
 	default String getSummary() {
 		String string = getTranslatedSummary();
-		return TextPlaceholderApiCompat.PARSER.parseText(string, ParserContext.of()).getString();
+		return TextPlaceholderApiCompat.PARSER.parseComponent(string, ParserContext.of()).getString();
 	}
 
 	@NotNull
@@ -74,7 +74,7 @@ public interface Mod {
 
 	default Component getFormattedDescription() {
 		String string = getTranslatedDescription();
-		return TextPlaceholderApiCompat.PARSER.parseText(string, ParserContext.of());
+		return TextPlaceholderApiCompat.PARSER.parseComponent(string, ParserContext.of());
 	}
 
 
@@ -86,7 +86,7 @@ public interface Mod {
 		if (config.disabled_mod_badges.containsKey(getId()))
 			defaultBadges.removeAll(config.disabled_mod_badges.get(getId()));
 
-		Set<String> badgelist = config.mod_badges.computeIfAbsent(this.getId(), v -> new LinkedHashSet<>());
+		Set<String> badgelist = config.mod_badges.computeIfAbsent(this.getId(), _ -> new LinkedHashSet<>());
 		this.getBadges().clear();
 		this.getBadges().addAll(ModBadge.convert(defaultBadges, this.getId()));
 		this.getBadges().addAll(ModBadge.convert(badgelist, this.getId()));

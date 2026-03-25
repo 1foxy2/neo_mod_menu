@@ -7,7 +7,7 @@ import com.terraformersmc.modmenu.gui.widget.LegacyTexturedButtonWidget;
 import com.terraformersmc.modmenu.util.DrawingUtil;
 import com.terraformersmc.modmenu.util.mod.Mod;
 import com.terraformersmc.modmenu.util.mod.ModBadge;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
@@ -36,7 +36,7 @@ public class BadgeScreen extends Screen {
     }
 
     @Override
-    protected void renderBlurredBackground(GuiGraphics p_420069_) {
+    protected void extractBlurredBackground(GuiGraphicsExtractor graphics) {
     }
 
     @Override
@@ -86,9 +86,10 @@ public class BadgeScreen extends Screen {
         }
     }
 
+
     @Override
-    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        super.render(guiGraphics, mouseX, mouseY, partialTick);
+    public void extractRenderState(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTick) {
+        super.extractRenderState(guiGraphics, mouseX, mouseY, partialTick);
         int i = 0;
         ModBadge badge;
         for (Map<String, ModBadge> badges : ModBadge.BADGES) {

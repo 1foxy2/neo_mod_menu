@@ -15,8 +15,8 @@ import com.terraformersmc.modmenu.util.mod.Mod;
 import com.terraformersmc.modmenu.util.mod.ModBadge;
 import com.terraformersmc.modmenu.util.mod.ModBadgeRenderer;
 import net.minecraft.SharedConstants;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.util.Util;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
@@ -335,31 +335,31 @@ public class ModsScreen extends Screen {
 	}
 
 	@Override
-	public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
-		super.render(guiGraphics, mouseX, mouseY, delta);
+	public void extractRenderState(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float delta) {
+		super.extractRenderState(guiGraphics, mouseX, mouseY, delta);
 		boolean hideTop = ModMenu.getConfig().HIDE_SCREEN_TOP.get();
 		int rightPaneY = hideTop ? 5 : RIGHT_PANE_Y;
 		ModListEntry selectedEntry = selected;
 		if (selectedEntry != null) {
-			this.descriptionListWidget.render(guiGraphics, mouseX, mouseY, delta);
+			this.descriptionListWidget.extractRenderState(guiGraphics, mouseX, mouseY, delta);
 		}
 
-		this.modList.render(guiGraphics, mouseX, mouseY, delta);
-		this.searchBox.render(guiGraphics, mouseX, mouseY, delta);
+		this.modList.extractRenderState(guiGraphics, mouseX, mouseY, delta);
+		this.searchBox.extractRenderState(guiGraphics, mouseX, mouseY, delta);
 		if (!hideTop) {
-			guiGraphics.drawCenteredString(this.font, this.title, this.modList.getWidth() / 2, 8, 16777215);
+			guiGraphics.centeredText(this.font, this.title, this.modList.getWidth() / 2, 8, 16777215);
 		}
 		assert minecraft != null;
 		int grayColor = 0xFFAAAAAA;
 		if (!(ModMenu.getConfig().DISABLE_DRAG_AND_DROP.get() || hideTop)) {
-			guiGraphics.drawCenteredString(
+			guiGraphics.centeredText(
 				this.font,
 				ModMenuScreenTexts.DROP_INFO_LINE_1,
 				this.width - this.modList.getWidth() / 2,
 				RIGHT_PANE_Y / 2 - minecraft.font.lineHeight - 1,
 				grayColor
 			);
-			guiGraphics.drawCenteredString(
+			guiGraphics.centeredText(
 				this.font,
 				ModMenuScreenTexts.DROP_INFO_LINE_2,
 				this.width - this.modList.getWidth() / 2,
@@ -379,7 +379,7 @@ public class ModsScreen extends Screen {
 				}
 				if (!ModMenu.getConfig().SHOW_LIBRARIES.get() ||
 						font.width(fullModCount) <= (this.filterOptionsShown ? this.filtersX : modList.getWidth()) - 5) {
-					guiGraphics.drawString(font,
+					guiGraphics.text(font,
 							fullModCount.getVisualOrderText(),
 							this.searchBoxX,
 							showingModTextY + 6,
@@ -387,14 +387,14 @@ public class ModsScreen extends Screen {
 							true
 					);
 				} else {
-					guiGraphics.drawString(font,
+					guiGraphics.text(font,
 							computeModCountText(false, false).getVisualOrderText(),
 							this.searchBoxX,
 							showingModTextY,
 							0xFFFFFFFF,
 							true
 					);
-					guiGraphics.drawString(font,
+					guiGraphics.text(font,
 							computeLibraryCountText(false).getVisualOrderText(),
 							this.searchBoxX,
 							showingModTextY + 11,
@@ -433,7 +433,7 @@ public class ModsScreen extends Screen {
 				), ellipsis);
 			}
 
-			guiGraphics.drawString(font,
+			guiGraphics.text(font,
 				Language.getInstance().getVisualOrder(trimmedName),
 				x + imageOffset,
 				rightPaneY + 1,
@@ -463,7 +463,7 @@ public class ModsScreen extends Screen {
 			}
 
 			if (mod.isReal()) {
-				guiGraphics.drawString(font,
+				guiGraphics.text(font,
 					mod.getPrefixedVersion(),
 					x + imageOffset,
 					rightPaneY + 2 + lineSpacing,

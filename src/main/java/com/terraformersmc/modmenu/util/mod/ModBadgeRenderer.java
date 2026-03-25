@@ -4,7 +4,7 @@ import com.terraformersmc.modmenu.ModMenu;
 import com.terraformersmc.modmenu.gui.ModsScreen;
 import com.terraformersmc.modmenu.util.DrawingUtil;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.util.FormattedCharSequence;
 
 import java.util.Set;
@@ -24,7 +24,7 @@ public class ModBadgeRenderer {
 		this.client = Minecraft.getInstance();
 	}
 
-	public void draw(GuiGraphics guiGraphics) {
+	public void draw(GuiGraphicsExtractor guiGraphics) {
 		this.badgeX = startX;
 		this.badgeY = startY;
 		Set<ModBadge> badges = mod.getBadges();
@@ -36,7 +36,7 @@ public class ModBadgeRenderer {
 		);
 	}
 
-	public void drawBadge(GuiGraphics guiGraphics, ModBadge badge) {
+	public void drawBadge(GuiGraphicsExtractor guiGraphics, ModBadge badge) {
 		this.drawBadge(guiGraphics,
 			badge.getComponent().getVisualOrderText(),
 			badge.getOutlineColor(),
@@ -46,7 +46,7 @@ public class ModBadgeRenderer {
 	}
 
 	public void drawBadge(
-		GuiGraphics guiGraphics,
+		GuiGraphicsExtractor guiGraphics,
 		FormattedCharSequence charSequence,
 		int outlineColor,
 		int fillColor,
