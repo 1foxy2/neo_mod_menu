@@ -11,6 +11,7 @@ import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.PlainTextButton;
 import net.minecraft.client.gui.components.Renderable;
+import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.layouts.LayoutElement;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.TitleScreen;
@@ -164,7 +165,7 @@ public class ModMenuEventHandler {
 		}
 	}
 
-	public static boolean buttonHasText(LayoutElement element, String... translationKeys) {
+	public static boolean buttonHasText(GuiEventListener element, String... translationKeys) {
 		if (element instanceof Button button) {
 			Component component = button.getMessage();
 			ComponentContents textContent = component.getContents();
