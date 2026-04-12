@@ -43,9 +43,12 @@ public abstract class MixinPauseScreen extends Screen {
 				int fullWidthButton = 204;
 				boolean hadExitButton = false;
 
-				GuiEventListener forgeButton = null;
+				AbstractWidget forgeButton = null;
 				for (int i = 0; i < buttons.size(); i++) {
 					if (buttons.get(i) instanceof AbstractWidget widget) {
+						if (ModMenuEventHandler.buttonHasText(widget, "fml.menu.mods")) {
+							forgeButton = widget;
+						}
 						if (buttonHasText(widget, "menu.returnToMenu")
 								|| buttonHasText(widget, "menu.disconnect"))
 							hadExitButton = true;
