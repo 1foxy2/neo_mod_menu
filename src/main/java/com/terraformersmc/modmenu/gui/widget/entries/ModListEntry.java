@@ -1,6 +1,7 @@
 package com.terraformersmc.modmenu.gui.widget.entries;
 
 import com.mojang.blaze3d.platform.cursor.CursorTypes;
+import com.mojang.datafixers.util.Pair;
 import com.terraformersmc.modmenu.ModMenu;
 import com.terraformersmc.modmenu.gui.widget.ModListWidget;
 import com.terraformersmc.modmenu.util.DrawingUtil;
@@ -19,7 +20,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.ARGB;
-import net.minecraft.util.Tuple;
 import net.minecraft.util.Util;
 
 import java.awt.*;
@@ -35,8 +35,8 @@ public class ModListEntry extends ObjectSelectionList.Entry<ModListEntry> {
 	protected final Minecraft client;
 	public final Mod mod;
 	protected final ModListWidget list;
-	protected Tuple<Identifier, Dimension> iconLocation;
-	protected Tuple<Identifier, Dimension> smallIconLocation;
+	protected Pair<Identifier, Dimension> iconLocation;
+	protected Pair<Identifier, Dimension> smallIconLocation;
 	public static final int FULL_ICON_SIZE = 32;
 	public static final int COMPACT_ICON_SIZE = 19;
 	protected long sinceLastClick;
@@ -72,27 +72,27 @@ public class ModListEntry extends ObjectSelectionList.Entry<ModListEntry> {
 			DrawingUtil.drawRandomVersionBackground(mod, guiGraphics, x, y, iconSize, iconSize);
 		}
 
-		if (this.getIconTexture().getB().height == this.getIconTexture().getB().width) {
+		if (this.getIconTexture().getSecond().height == this.getIconTexture().getSecond().width) {
 			guiGraphics.blit(RenderPipelines.GUI_TEXTURED,
-					this.getIconTexture().getA(),
+					this.getIconTexture().getFirst(),
 					x, y, 0.0f, 0.0f,
 					iconSize, iconSize,
 					iconSize, iconSize,
 					ARGB.white(1.0F));
-		} else if (this.getSquareIconTexture().getB().height == this.getSquareIconTexture().getB().width) {
+		} else if (this.getSquareIconTexture().getSecond().height == this.getSquareIconTexture().getSecond().width) {
 			guiGraphics.blit(RenderPipelines.GUI_TEXTURED,
-					this.getSquareIconTexture().getA(),
+					this.getSquareIconTexture().getFirst(),
 					x, y, 0.0f, 0.0f,
 					iconSize, iconSize,
 					iconSize, iconSize,
 					ARGB.white(1.0F));
 		} else {
-			guiGraphics.blit(RenderPipelines.GUI_TEXTURED, this.getSquareIconTexture().getA(),
-					(int) (x + (iconSize - this.getSquareIconTexture().getB().width) / 2f),
-					(int) (y + (iconSize - this.getSquareIconTexture().getB().height) / 2f),
+			guiGraphics.blit(RenderPipelines.GUI_TEXTURED, this.getSquareIconTexture().getFirst(),
+					(int) (x + (iconSize - this.getSquareIconTexture().getSecond().width) / 2f),
+					(int) (y + (iconSize - this.getSquareIconTexture().getSecond().height) / 2f),
 					0.0f, 0.0f,
-					this.getSquareIconTexture().getB().width, this.getSquareIconTexture().getB().height,
-					this.getSquareIconTexture().getB().width, this.getSquareIconTexture().getB().height,
+					this.getSquareIconTexture().getSecond().width, this.getSquareIconTexture().getSecond().height,
+					this.getSquareIconTexture().getSecond().width, this.getSquareIconTexture().getSecond().height,
 					ARGB.white(1.0F));
 		}
 
@@ -151,7 +151,7 @@ public class ModListEntry extends ObjectSelectionList.Entry<ModListEntry> {
 			final int textureSize = ModMenu.getConfig().COMPACT_LIST.get() ?
 				(int) (256 / (FULL_ICON_SIZE / (double) COMPACT_ICON_SIZE)) :
 				256;
-			if (this.client.options.touchscreen().get() || hovered) {
+			if (hovered) {
 				guiGraphics.fill(x, y, x + iconSize, y + iconSize, -1601138544);
 				boolean hoveringIcon = mouseX - x < iconSize;
 				if (this.list.getParent().modScreenErrors.containsKey(modId)) {
@@ -219,7 +219,7 @@ public class ModListEntry extends ObjectSelectionList.Entry<ModListEntry> {
 		return mod;
 	}
 
-	public Tuple<Identifier, Dimension> getIconTexture() {
+	public Pair<Identifier, Dimension> getIconTexture() {
 		if (ModMenu.shouldResetCache) {
 			this.smallIconLocation = null;
 			this.iconLocation = null;
@@ -227,42 +227,46 @@ public class ModListEntry extends ObjectSelectionList.Entry<ModListEntry> {
 		}
 
 		if (this.iconLocation == null) {
-			this.iconLocation = new Tuple<>(Identifier.fromNamespaceAndPath(ModMenu.NAMESPACE, mod.getId() + "_icon"), new Dimension());
-			Tuple<DynamicTexture, Dimension> icon = mod.getIcon(list.getNeoforgeIconHandler(),
+			Pair<DynamicTexture, Dimension> icon = mod.getIcon(list.getNeoforgeIconHandler(),
 					64 * this.client.options.guiScale().get(), false);
 
-			float multiplier = 32f / icon.getB().height;
-			this.iconLocation.setB(new Dimension(
-					(int) (icon.getB().width * multiplier),
-					(int) (icon.getB().height * multiplier)));
+			float multiplier = 32f / icon.getSecond().height;
+			this.iconLocation = new Pair<>(Identifier.fromNamespaceAndPath(ModMenu.NAMESPACE, mod.getId() + "_icon"), new Dimension(
+					(int) (icon.getSecond().width * multiplier),
+					(int) (icon.getSecond().height * multiplier)));
 
-			this.client.getTextureManager().register(this.iconLocation.getA(), icon.getA());
+			this.client.getTextureManager().register(this.iconLocation.getFirst(), icon.getFirst());
 		}
 		return iconLocation;
 	}
 
-	public Tuple<Identifier, Dimension> getSquaredIconTexture() {
-		Tuple<Identifier, Dimension> icon = new Tuple<>(getIconTexture().getA(), iconLocation.getB().getSize()) ;
+	public Pair<Identifier, Dimension> getSquaredIconTexture() {
+		Pair<Identifier, Dimension> icon = new Pair<>(getIconTexture().getFirst(), iconLocation.getSecond().getSize()) ;
 		float iconSize = ModMenu.getConfig().COMPACT_LIST.get() ? ModListEntry.COMPACT_ICON_SIZE : ModListEntry.FULL_ICON_SIZE;
-		float biggerValue = Math.max(icon.getB().width, icon.getB().height);
-		icon.getB().setSize(icon.getB().width / biggerValue * iconSize, icon.getB().height / biggerValue * iconSize);
+		float biggerValue = Math.max(icon.getSecond().width, icon.getSecond().height);
+		icon.getSecond().setSize(icon.getSecond().width / biggerValue * iconSize, icon.getSecond().height / biggerValue * iconSize);
 		return icon;
 	}
 
 
-	public Tuple<Identifier, Dimension> getSquareIconTexture() {
+	public Pair<Identifier, Dimension> getSquareIconTexture() {
 		if (this.smallIconLocation == null) {
-			this.smallIconLocation = new Tuple<>(Identifier.fromNamespaceAndPath(ModMenu.NAMESPACE, mod.getId() + "_icon_small"), new Dimension());
-			Tuple<DynamicTexture, Dimension> icon = mod.getIcon(list.getNeoforgeIconHandler(),
+			this.smallIconLocation = new Pair<>(Identifier.fromNamespaceAndPath(ModMenu.NAMESPACE, mod.getId() + "_icon_small"), new Dimension());
+			Pair<DynamicTexture, Dimension> icon = mod.getIcon(list.getNeoforgeIconHandler(),
 				64 * this.client.options.guiScale().get(), true);
 			if (icon != null) {
-				this.smallIconLocation.setB(new Dimension());
-				this.client.getTextureManager().register(this.smallIconLocation.getA(), icon.getA());
+				this.client.getTextureManager().register(this.smallIconLocation.getFirst(), icon.getFirst());
 			} else {
 				this.smallIconLocation = this.getSquaredIconTexture();
 			}
 		}
 		return smallIconLocation;
+	}
+
+	public void updatePlacement(int leftX, int width, int y) {
+		this.setX(leftX);
+		this.setWidth(width);
+		this.setY(y);
 	}
 
 	public int getXOffset() {

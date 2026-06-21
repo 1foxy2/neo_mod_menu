@@ -46,7 +46,7 @@ public class BetterModListConfigScreen extends ConfigurationScreen.Configuration
         if (subconfig.isEmpty()) return null;
         return new Element(Component.translatable(SECTION, getTranslationComponent(key)), getTooltipComponent(key, null),
                 Button.builder(Component.translatable(SECTION, Component.translatable(translationChecker.check(getTranslationKey(key) + ".button", SECTION_TEXT))),
-                                button -> minecraft.setScreen(sectionCache.computeIfAbsent(key,
+                                button -> minecraft.gui.setScreen(sectionCache.computeIfAbsent(key,
                                         k -> new BetterModListConfigScreen(context, this, subconfig.valueMap(), key, subsection.entrySet(), Component.translatable(getTranslationKey(key))).rebuild())))
                         .tooltip(Tooltip.create(getTooltipComponent(key, null)))
                         .width(Button.DEFAULT_WIDTH)

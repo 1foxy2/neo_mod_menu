@@ -60,7 +60,7 @@ public class MixinTitleScreen {
 	)
 	private Button.OnPress bettermodlist$modifyForgeModsButton(Button.OnPress onPress) {
 		if (ModMenu.getConfig().MODIFY_TITLE_SCREEN.get()) {
-			return button -> Minecraft.getInstance().setScreen(new ModsScreen((TitleScreen) (Object) this));
+			return button -> Minecraft.getInstance().gui.setScreen(new ModsScreen((TitleScreen) (Object) this));
 		}
 		return onPress;
 	}

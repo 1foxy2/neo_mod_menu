@@ -1,6 +1,7 @@
 package com.terraformersmc.modmenu.util.mod.fabric;
 
 import com.google.common.collect.Sets;
+import com.mojang.datafixers.util.Pair;
 import com.terraformersmc.modmenu.ModMenu;
 import com.terraformersmc.modmenu.util.VersionUtil;
 import com.terraformersmc.modmenu.util.mod.Mod;
@@ -10,7 +11,6 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
 import net.fabricmc.loader.api.metadata.*;
 import net.minecraft.client.renderer.texture.DynamicTexture;
-import net.minecraft.util.Tuple;
 import net.neoforged.fml.ModList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -137,7 +137,7 @@ public class FabricMod implements Mod {
 	}
 
 	@Override
-	public @NotNull Tuple<DynamicTexture, Dimension> getIcon(NeoforgeIconHandler iconHandler, int i, boolean isSmall) {
+	public @NotNull Pair<DynamicTexture, Dimension> getIcon(NeoforgeIconHandler iconHandler, int i, boolean isSmall) {
 		final String iconSourceId = getId();
 
 		String iconResourceId = iconSourceId + (isSmall ? "_small" : "");
@@ -152,7 +152,7 @@ public class FabricMod implements Mod {
 		net.neoforged.fml.ModContainer iconSource = ModList.get()
 				.getModContainerById(iconSourceId)
 			.orElseThrow(() -> new RuntimeException("Cannot get ModContainer for Fabric mod with id " + iconSourceId));
-		Tuple<DynamicTexture, Dimension> icon = iconHandler.createIcon(iconSource, iconPath);
+		Pair<DynamicTexture, Dimension> icon = iconHandler.createIcon(iconSource, iconPath);
 		if (icon == null && !isSmall) {
 			if (defaultIconWarning) {
 				LOGGER.warn("Warning! Mod {} has a broken icon, loading default icon", metadata.getId());

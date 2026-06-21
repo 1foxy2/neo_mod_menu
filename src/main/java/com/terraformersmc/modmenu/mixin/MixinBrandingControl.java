@@ -4,6 +4,7 @@ import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.terraformersmc.modmenu.ModMenu;
 import net.minecraft.client.resources.language.I18n;
+import net.minecraft.locale.Language;
 import net.neoforged.fml.ModList;
 import net.neoforged.neoforge.internal.BrandingControl;
 import org.spongepowered.asm.mixin.Mixin;
@@ -29,8 +30,8 @@ public abstract class MixinBrandingControl {
             if (ModMenu.getConfig().MOD_COUNT_LOCATION.get().isOnTitleScreen()) {
                 String count = ModMenu.getDisplayedModCount();
                 String specificKey = "modmenu.mods." + count;
-                String replacementKey = I18n.exists(specificKey) ? specificKey : "modmenu.mods.n";
-                if (ModMenu.getConfig().EASTER_EGGS.get() && I18n.exists(specificKey + ".secret")) {
+                String replacementKey = Language.getInstance().has(specificKey) ? specificKey : "modmenu.mods.n";
+                if (ModMenu.getConfig().EASTER_EGGS.get() && Language.getInstance().has(specificKey + ".secret")) {
                     replacementKey = specificKey + ".secret";
                 }
                 neoForge = neoForge.replace(I18n.get("fml.menu.branding", "", ModList.get().size()),

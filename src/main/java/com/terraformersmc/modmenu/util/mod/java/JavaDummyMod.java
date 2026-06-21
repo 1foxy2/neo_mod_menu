@@ -2,6 +2,7 @@ package com.terraformersmc.modmenu.util.mod.java;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import com.mojang.datafixers.util.Pair;
 import com.terraformersmc.modmenu.ModMenu;
 import com.terraformersmc.modmenu.util.VersionUtil;
 import com.terraformersmc.modmenu.util.mod.Mod;
@@ -9,7 +10,6 @@ import com.terraformersmc.modmenu.util.mod.ModBadge;
 import com.terraformersmc.modmenu.util.mod.neoforge.NeoforgeIconHandler;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.client.resources.language.I18n;
-import net.minecraft.util.Tuple;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.ModList;
 import org.jetbrains.annotations.NotNull;
@@ -58,7 +58,7 @@ public class JavaDummyMod implements Mod {
 	}
 
 	@Override
-	public @NotNull Tuple<DynamicTexture, Dimension> getIcon(NeoforgeIconHandler iconHandler, int i, boolean isSmall) {
+	public @NotNull Pair<DynamicTexture, Dimension> getIcon(NeoforgeIconHandler iconHandler, int i, boolean isSmall) {
 		String iconSourceId = ModMenu.MOD_ID;
 
 		String iconResourceId = iconSourceId  + (isSmall ? "_small" : "");
@@ -71,7 +71,7 @@ public class JavaDummyMod implements Mod {
 		ModContainer iconSource = ModList.get()
 				.getModContainerById(iconSourceId)
 			.orElseThrow(() -> new RuntimeException("Cannot get ModContainer for Neoforge mod with id " + finalIconSourceId));
-		Tuple<DynamicTexture, Dimension> icon = iconHandler.createIcon(iconSource, iconPath);
+		Pair<DynamicTexture, Dimension> icon = iconHandler.createIcon(iconSource, iconPath);
 		if (icon == null) {
 			if (defaultIconWarning) {
 				LOGGER.warn("Warning! Mod {} has a broken icon, loading default icon", modid);

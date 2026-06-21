@@ -316,7 +316,7 @@ public class DescriptionListWidget extends AbstractSelectionList<DescriptionList
         @Override
         public boolean mouseClicked(MouseButtonEvent event, boolean isDoubleClick) {
 			if (isMouseOver(event.x(), event.y())) {
-				minecraft.setScreen(new MinecraftCredits());
+				minecraft.gui.setScreen(new MinecraftCredits());
 			}
 
 			return super.mouseClicked(event, isDoubleClick);
@@ -344,11 +344,11 @@ public class DescriptionListWidget extends AbstractSelectionList<DescriptionList
         @Override
         public boolean mouseClicked(MouseButtonEvent event, boolean isDoubleClick) {
 			if (isMouseOver(event.x(), event.y())) {
-				minecraft.setScreen(new ConfirmLinkScreen((open) -> {
+				minecraft.gui.setScreen(new ConfirmLinkScreen((open) -> {
 					if (open) {
 						Util.getPlatform().openUri(link);
 					}
-					minecraft.setScreen(parent);
+					minecraft.gui.setScreen(parent);
 				}, link, false));
 			}
 
@@ -377,11 +377,11 @@ public class DescriptionListWidget extends AbstractSelectionList<DescriptionList
         @Override
         public boolean mouseClicked(MouseButtonEvent click, boolean doubled) {
             if (isMouseOver(click.x(), click.y())) {
-                minecraft.setScreen(new ConfirmLinkScreen((open) -> {
+                minecraft.gui.setScreen(new ConfirmLinkScreen((open) -> {
                     if (open) {
                         Util.getPlatform().openUri("mailto:" + email);
                     }
-                    minecraft.setScreen(parent);
+                    minecraft.gui.setScreen(parent);
                 }, "mailto:" + email, false));
             }
 

@@ -15,7 +15,7 @@ public class ModMenuButtonWidget extends Button.Plain {
 				width,
 				height,
 				text,
-				button -> Minecraft.getInstance().setScreen(new ModsScreen(screen)),
+				button -> Minecraft.getInstance().gui.setScreen(new ModsScreen(screen)),
 				Button.DEFAULT_NARRATION
 		);
 	}

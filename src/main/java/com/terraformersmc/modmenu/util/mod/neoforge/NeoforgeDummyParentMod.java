@@ -1,10 +1,10 @@
 package com.terraformersmc.modmenu.util.mod.neoforge;
 
+import com.mojang.datafixers.util.Pair;
 import com.terraformersmc.modmenu.ModMenu;
 import com.terraformersmc.modmenu.util.mod.Mod;
 import com.terraformersmc.modmenu.util.mod.ModBadge;
 import net.minecraft.client.renderer.texture.DynamicTexture;
-import net.minecraft.util.Tuple;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.ModList;
 import org.jetbrains.annotations.NotNull;
@@ -52,7 +52,7 @@ public class NeoforgeDummyParentMod implements Mod {
 	}
 
 	@Override
-	public @NotNull Tuple<DynamicTexture, Dimension> getIcon(NeoforgeIconHandler iconHandler, int i, boolean isSmall) {
+	public @NotNull Pair<DynamicTexture, Dimension> getIcon(NeoforgeIconHandler iconHandler, int i, boolean isSmall) {
 		String iconSourceId = host.getId();
 
 		String iconResourceId = id  + (isSmall ? "_small" : "");

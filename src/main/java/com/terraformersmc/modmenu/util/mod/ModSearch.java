@@ -1,9 +1,10 @@
 package com.terraformersmc.modmenu.util.mod;
 
+import com.mojang.datafixers.util.Pair;
 import com.terraformersmc.modmenu.ModMenu;
 import com.terraformersmc.modmenu.gui.ModsScreen;
 import net.minecraft.client.resources.language.I18n;
-import net.minecraft.util.Tuple;
+import net.minecraft.locale.Language;
 
 import java.util.List;
 import java.util.Locale;
@@ -23,12 +24,12 @@ public class ModSearch {
 							|| !child.getBadges().contains(ModBadge.LIBRARY))).toList();
 		}
 		return candidates.stream()
-			.map(modContainer -> new Tuple<>(modContainer,
+			.map(modContainer -> Pair.of(modContainer,
 				passesFilters(screen, modContainer, query.toLowerCase(Locale.ROOT))
 			))
-			.filter(pair -> pair.getB() > 0)
-			.sorted((a, b) -> b.getB() - a.getB())
-			.map(Tuple::getA)
+			.filter(pair -> pair.getSecond() > 0)
+			.sorted((a, b) -> b.getSecond() - a.getSecond())
+			.map(Pair::getFirst)
 			.collect(Collectors.toList());
 	}
 
@@ -43,7 +44,7 @@ public class ModSearch {
 		for (Map.Entry<String, ModBadge> badgeEntry : ModBadge.CUSTOM_BADGES.entrySet()) {
 			String searchTerms = badgeEntry.getValue().getComponent().getString();
 
-			if (I18n.exists("modmenu.searchTerms." + badgeEntry.getKey()))
+			if (Language.getInstance().has("modmenu.searchTerms." + badgeEntry.getKey()))
 				searchTerms = I18n.get("modmenu.searchTerms." + badgeEntry.getKey());
 
 			if (searchTerms.contains(query) && mod.getBadges().contains(badgeEntry.getValue())) {

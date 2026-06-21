@@ -21,12 +21,12 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.options.OptionsScreen;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.client.resources.language.I18n;
+import net.minecraft.locale.Language;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.packs.PackResources;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.util.GsonHelper;
-import net.minecraft.util.Tuple;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
@@ -227,8 +227,8 @@ public class ModMenu {
 				modsText.append(Component.literal(" ")).append(Component.translatable("modmenu.loaded.short", count));
 			} else {
 				String specificKey = "modmenu.loaded." + count;
-				String key = I18n.exists(specificKey) ? specificKey : "modmenu.loaded";
-				if (ModMenu.getConfig().EASTER_EGGS.get() && I18n.exists(specificKey + ".secret")) {
+				String key = Language.getInstance().has(specificKey) ? specificKey : "modmenu.loaded";
+				if (ModMenu.getConfig().EASTER_EGGS.get() && Language.getInstance().has(specificKey + ".secret")) {
 					key = specificKey + ".secret";
 				}
 				modsText.append(Component.literal(" ")).append(Component.translatable(key, count));
@@ -273,7 +273,7 @@ public class ModMenu {
 					packResources.listResources(PackType.CLIENT_RESOURCES, namespace, "modicon", (key, value) -> {
 						try {
 							NativeImage image = NativeImage.read(value.get());
-							Tuple<DynamicTexture, Dimension> tex = new Tuple<>(new DynamicTexture(key::toString, image),
+							com.mojang.datafixers.util.Pair<DynamicTexture, Dimension> tex = new com.mojang.datafixers.util.Pair<>(new DynamicTexture(key::toString, image),
 									new Dimension(image.getWidth(), image.getHeight()));
 							String id = key.getPath().replace("modicon/", "").replace(".png", "");
 							NeoforgeIconHandler.modResourceIconCache.put(id, tex);

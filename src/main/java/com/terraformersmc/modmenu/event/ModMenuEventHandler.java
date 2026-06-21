@@ -150,7 +150,7 @@ public class ModMenuEventHandler {
 						MODS_BUTTON_TEXTURE,
 						32,
 						64,
-						button -> Minecraft.getInstance().setScreen(new ModsScreen(screen)),
+						button -> Minecraft.getInstance().gui.setScreen(new ModsScreen(screen)),
 						ModMenu.createModsButtonText(true)
 				));
 				removeModsButton(screen, modsButton);
@@ -161,7 +161,7 @@ public class ModMenuEventHandler {
 	@SubscribeEvent
 	public static void onClientTick(ClientTickEvent.Post event) {
 		while (MENU_KEY_BIND.get().consumeClick()) {
-			Minecraft.getInstance().setScreen(new ModsScreen(Minecraft.getInstance().screen));
+			Minecraft.getInstance().gui.setScreen(new ModsScreen(Minecraft.getInstance().gui.screen()));
 		}
 	}
 

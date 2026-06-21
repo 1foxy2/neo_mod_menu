@@ -1,8 +1,7 @@
 package com.terraformersmc.modmenu.gui;
 
 import com.google.common.base.Joiner;
-import com.mojang.blaze3d.opengl.GlStateManager;
-import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.datafixers.util.Pair;
 import com.terraformersmc.modmenu.ModMenu;
 import com.terraformersmc.modmenu.gui.widget.DescriptionListWidget;
 import com.terraformersmc.modmenu.gui.widget.LegacyTexturedButtonWidget;
@@ -35,7 +34,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.CommonLinks;
-import net.minecraft.util.Tuple;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.loading.FMLPaths;
 import org.jetbrains.annotations.Nullable;
@@ -217,7 +215,7 @@ public class ModsScreen extends Screen {
 
 		if (!ModMenu.getConfig().HIDE_BADGE_BUTTONS.get()) {
 			this.badgeButton = LegacyTexturedButtonWidget.legacyTexturedBuilder(CommonComponents.EMPTY, button ->
-						this.minecraft.pushGuiLayer(new BadgeScreen(this.selected.mod, paneWidth, searchBoxWidth)))
+						this.minecraft.gui.pushScreenLayer(new BadgeScreen(this.selected.mod, paneWidth, searchBoxWidth)))
 					.position(paneWidth / 2 + searchBoxWidth / 2 - 20 / 2 + 26, 22)
 					.size(20, 20)
 					.uv(0, 0, 20)
@@ -284,7 +282,7 @@ public class ModsScreen extends Screen {
 
 		// Done button
 		this.doneButton = Button.builder(CommonComponents.GUI_DONE, button -> {
-			minecraft.setScreen(previousScreen);
+			minecraft.gui.setScreen(previousScreen);
 		}).pos(this.width / 2 + 4, this.height - 28).size(150, 20).build();
 
 		// Initialize data
@@ -412,11 +410,11 @@ public class ModsScreen extends Screen {
 				DrawingUtil.drawRandomVersionBackground(mod, guiGraphics, x, rightPaneY, 32, 32);
 			}
 
-			Tuple<Identifier, Dimension> iconProperties = selectedEntry.getIconTexture();
+			Pair<Identifier, Dimension> iconProperties = selectedEntry.getIconTexture();
 
-			int imageOffset = iconProperties.getB().width;
-			int imageHeight = iconProperties.getB().height;
-			guiGraphics.blit(RenderPipelines.GUI_TEXTURED, iconProperties.getA(), x, rightPaneY, 0.0F, 0.0F,
+			int imageOffset = iconProperties.getSecond().width;
+			int imageHeight = iconProperties.getSecond().height;
+			guiGraphics.blit(RenderPipelines.GUI_TEXTURED, iconProperties.getFirst(), x, rightPaneY, 0.0F, 0.0F,
 					imageOffset, imageHeight,
 					imageOffset, imageHeight);
 
@@ -536,7 +534,7 @@ public class ModsScreen extends Screen {
 	@Override
 	public void onClose() {
 		this.modList.close();
-		this.minecraft.setScreen(this.previousScreen);
+		this.minecraft.gui.setScreen(this.previousScreen);
 	}
 
 	private void setFilterOptionsShown(boolean filterOptionsShown) {
@@ -621,7 +619,7 @@ public class ModsScreen extends Screen {
 		}
 
 		String modList = mods.stream().map(Path::getFileName).map(Path::toString).collect(Collectors.joining(", "));
-		this.minecraft.setScreen(new ConfirmScreen((value) -> {
+		this.minecraft.gui.setScreen(new ConfirmScreen((value) -> {
 			if (value) {
 				boolean allSuccessful = true;
 
@@ -640,14 +638,14 @@ public class ModsScreen extends Screen {
 				}
 
 				if (allSuccessful) {
-					SystemToast.add(minecraft.getToastManager(),
+					SystemToast.add(minecraft.gui.toastManager(),
 						SystemToast.SystemToastId.PERIODIC_NOTIFICATION,
 						ModMenuScreenTexts.DROP_SUCCESSFUL_LINE_1,
 						ModMenuScreenTexts.DROP_SUCCESSFUL_LINE_2
 					);
 				}
 			}
-			this.minecraft.setScreen(this);
+			this.minecraft.gui.setScreen(this);
 		}, ModMenuScreenTexts.DROP_CONFIRM, Component.literal(modList)));
 	}
 
@@ -688,7 +686,7 @@ public class ModsScreen extends Screen {
 			Screen screen = ModMenu.getConfigScreen(modId, this);
 
 			if (screen != null) {
-				this.minecraft.setScreen(screen);
+				this.minecraft.gui.setScreen(screen);
 			}
 		} catch (java.lang.NoClassDefFoundError e) {
 			LOGGER.warn(

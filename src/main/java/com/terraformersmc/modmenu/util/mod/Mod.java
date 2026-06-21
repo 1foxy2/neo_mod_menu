@@ -1,5 +1,6 @@
 package com.terraformersmc.modmenu.util.mod;
 
+import com.mojang.datafixers.util.Pair;
 import com.terraformersmc.modmenu.ModMenu;
 import com.terraformersmc.modmenu.TextPlaceholderApiCompat;
 import com.terraformersmc.modmenu.config.BetterModListConfig;
@@ -7,8 +8,8 @@ import com.terraformersmc.modmenu.util.mod.neoforge.NeoforgeIconHandler;
 import eu.pb4.placeholders.api.ParserContext;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.client.resources.language.I18n;
+import net.minecraft.locale.Language;
 import net.minecraft.network.chat.Component;
-import net.minecraft.util.Tuple;
 import net.neoforged.fml.ModContainer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -26,17 +27,17 @@ public interface Mod {
 	@NotNull
 	default String getTranslatedName() {
 		String translationKey = "modmenu.nameTranslation." + getId();
-		if (!I18n.exists(translationKey)) {
+		if (!Language.getInstance().has(translationKey)) {
 			translationKey = "modmenu.nameTranslation." + getId().replace("_", "-");
 		}
-		if ((getId().equals("minecraft") || getId().equals("java") || ModMenu.getConfig().TRANSLATE_NAMES.get()) && I18n.exists(
+		if ((getId().equals("minecraft") || getId().equals("java") || ModMenu.getConfig().TRANSLATE_NAMES.get()) && Language.getInstance().has(
 			translationKey)) {
 			return I18n.get(translationKey);
 		}
 		return getName();
 	}
 
-	@NotNull Tuple<DynamicTexture, Dimension> getIcon(NeoforgeIconHandler iconHandler, int i, boolean isSmall);
+	@NotNull Pair<DynamicTexture, Dimension> getIcon(NeoforgeIconHandler iconHandler, int i, boolean isSmall);
 
 	@NotNull
 	default String getSummary() {
@@ -47,10 +48,10 @@ public interface Mod {
 	@NotNull
 	default String getTranslatedSummary() {
 		String translationKey = "modmenu.summaryTranslation." + getId();
-		if (!I18n.exists(translationKey)) {
+		if (!Language.getInstance().has(translationKey)) {
 			translationKey = "modmenu.summaryTranslation." + getId().replace("_", "-");
 		}
-		if ((getId().equals("minecraft") || getId().equals("java") || ModMenu.getConfig().TRANSLATE_DESCRIPTIONS.get()) && I18n.exists(
+		if ((getId().equals("minecraft") || getId().equals("java") || ModMenu.getConfig().TRANSLATE_DESCRIPTIONS.get()) && Language.getInstance().has(
 			translationKey)) {
 			return I18n.get(translationKey);
 		}
@@ -62,11 +63,11 @@ public interface Mod {
 	@NotNull
 	default String getTranslatedDescription() {
 		String translatableDescriptionKey = "modmenu.descriptionTranslation." + getId();
-		if (!I18n.exists(translatableDescriptionKey)) {
+		if (!Language.getInstance().has(translatableDescriptionKey)) {
 			translatableDescriptionKey = "modmenu.descriptionTranslation." + getId().replace("_", "-");
 		}
 		if ((getId().equals("minecraft") || getId().equals("java") || ModMenu.getConfig().TRANSLATE_DESCRIPTIONS.get())
-				&& I18n.exists(translatableDescriptionKey)) {
+				&& Language.getInstance().has(translatableDescriptionKey)) {
 			return I18n.get(translatableDescriptionKey);
 		}
 		return getDescription();

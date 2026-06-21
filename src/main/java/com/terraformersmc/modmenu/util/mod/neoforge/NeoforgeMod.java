@@ -2,12 +2,12 @@ package com.terraformersmc.modmenu.util.mod.neoforge;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import com.mojang.datafixers.util.Pair;
 import com.terraformersmc.modmenu.ModMenu;
 import com.terraformersmc.modmenu.util.VersionUtil;
 import com.terraformersmc.modmenu.util.mod.Mod;
 import com.terraformersmc.modmenu.util.mod.ModBadge;
 import net.minecraft.client.renderer.texture.DynamicTexture;
-import net.minecraft.util.Tuple;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.ModList;
@@ -181,7 +181,7 @@ public class NeoforgeMod implements Mod {
 	}
 
 	@Override
-	public @NotNull Tuple<DynamicTexture, Dimension> getIcon(NeoforgeIconHandler iconHandler, int i, boolean isSmall) {
+	public @NotNull Pair<DynamicTexture, Dimension> getIcon(NeoforgeIconHandler iconHandler, int i, boolean isSmall) {
 		String iconSourceId = getId();
 
 	    String iconResourceId = iconSourceId  + (isSmall ? "_small" : "");
@@ -210,7 +210,7 @@ public class NeoforgeMod implements Mod {
 		ModContainer iconSource = ModList.get()
 				.getModContainerById(iconSourceId)
 			.orElseThrow(() -> new RuntimeException("Cannot get ModContainer for Neoforge mod with id " + finalIconSourceId));
-		Tuple<DynamicTexture, Dimension> icon = iconHandler.createIcon(iconSource, iconPath);
+		Pair<DynamicTexture, Dimension> icon = iconHandler.createIcon(iconSource, iconPath);
 		if (icon == null && !isSmall) {
 			if (defaultIconWarning) {
 				LOGGER.warn("Warning! Mod {} has a broken icon, loading default icon", modInfo.getModId());

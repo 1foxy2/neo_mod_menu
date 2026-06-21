@@ -209,6 +209,12 @@ public class ModListWidget extends ObjectSelectionList<ModListEntry> implements 
 			}
 		}
 
+		// Entries are assigned their width as they are added. The first entries can be
+		// measured before the final content height makes scrollbar presence stable,
+		// which leaves wrapped descriptions using a stale row width until scrolling
+		// happens to reposition the list.
+		this.repositionEntriesAfterContentChange();
+
         if (!reposition) {
             // This generally leaves the same mod selected, but no mod highlighted, and the scrolling is unmodified.
             return;
@@ -229,6 +235,17 @@ public class ModListWidget extends ObjectSelectionList<ModListEntry> implements 
 
 		if (scrollAmount() > Math.max(0, this.contentHeight() - (this.getBottom() - this.getY() - 4))) {
 			setScrollAmount(Math.max(0, this.contentHeight() - (this.getBottom() - this.getY() - 4)));
+		}
+	}
+
+	private void repositionEntriesAfterContentChange() {
+		int rowLeft = this.getRowLeft();
+		int rowWidth = this.getRowWidth();
+		int nextY = this.getY() + 2 - (int) this.scrollAmount();
+
+		for (ModListEntry entry : children()) {
+			entry.updatePlacement(rowLeft, rowWidth, nextY);
+			nextY += entry.getHeight();
 		}
 	}
 
