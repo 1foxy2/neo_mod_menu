@@ -22,6 +22,7 @@ public class BetterModListConfig {
     public final ModConfigSpec.BooleanValue HIDE_MOD_LICENSE;
     public final ModConfigSpec.BooleanValue HIDE_BADGES;
     public final ModConfigSpec.BooleanValue HIDE_MOD_CREDITS;
+    public final ModConfigSpec.BooleanValue HIDE_NEOFORGE_BUTTON;
     public final ModConfigSpec.BooleanValue EASTER_EGGS;
     public final ModConfigSpec.BooleanValue RANDOM_JAVA_COLORS;
     public final ModConfigSpec.BooleanValue TRANSLATE_NAMES;
@@ -56,9 +57,9 @@ public class BetterModListConfig {
         COMPACT_LIST = builder.comment("Makes list more compacted")
                 .define("compact_list", false);
         MODS_BUTTON_STYLE = builder
-                .defineEnum("mods_button_style", TitleMenuButtonStyle.CLASSIC);
+                .defineEnum("mods_button_style", TitleMenuButtonStyle.ICON);
         GAME_MENU_BUTTON_STYLE = builder
-                .defineEnum("game_menu_button_style", GameMenuButtonStyle.REPLACE);
+                .defineEnum("game_menu_button_style", GameMenuButtonStyle.ICON);
         MOD_COUNT_LOCATION = builder
                 .defineEnum("mod_count_location", ModCountLocation.TITLE_SCREEN);
         EASTER_EGGS = builder.comment("Shows secret mod count translations defined by modmenu.mods.MOD_COUND.secret")
@@ -96,6 +97,8 @@ public class BetterModListConfig {
                 .defineList("hide_badge", ArrayList::new, String::new, object -> object instanceof String);
         HIDE_MOD_CREDITS = builder.comment("Hides mod's credits")
                 .define("hide_mod_credits", false);
+        HIDE_NEOFORGE_BUTTON = builder.comment("Hides neoforge's mods button")
+                .define("hide_neoforge_button", true);
         HIDE_CONFIG_BUTTONS = builder.comment("Hides mod's config button")
                 .define("hide_config_buttons", false);
         HIDE_BADGE_BUTTONS = builder.comment("hides button which allows changing mod's badge")
@@ -300,12 +303,17 @@ public class BetterModListConfig {
     }
 
     public enum TitleMenuButtonStyle {
-        CLASSIC(), REPLACE_REALMS(), SHRINK(), SHRINK_LEFT(), ICON()
+        CLASSIC,
+        REPLACE_REALMS,
+        SHRINK,
+        SHRINK_LEFT,
+        ICON,
+        NEO_ICON
     }
 
     public enum GameMenuButtonStyle {
-        @SerializedName(value = "replace", alternate = { "replace_bugs" }) REPLACE,
-        @SerializedName(value = "insert", alternate = { "below_bugs"}) INSERT,
-        ICON
+        INSERT,
+        ICON,
+        NEO_ICON
     }
 }

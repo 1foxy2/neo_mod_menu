@@ -4,7 +4,9 @@ import com.mojang.blaze3d.platform.InputConstants;
 import com.terraformersmc.modmenu.ModMenu;
 import com.terraformersmc.modmenu.config.BetterModListConfig;
 import com.terraformersmc.modmenu.gui.ModsScreen;
+import com.terraformersmc.modmenu.gui.widget.ModMenuButtonWidget;
 import com.terraformersmc.modmenu.gui.widget.UpdateCheckerTexturedButtonWidget;
+import net.fabricmc.fabric.api.client.screen.v1.Screens;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.AbstractWidget;
@@ -54,106 +56,85 @@ public class ModMenuEventHandler {
 		}
 	}
 
-	private static void removeModsButton(Screen screen, Button button) {
-		button.visible = false;
-		button.active = false;
-	}
-
 	private static void afterTitleScreenInit(Screen screen) {
-		final List<Renderable> buttons = screen.renderables;
-
-		int modsButtonIndex = -1;
-		final int spacing = 24;
-		int buttonsY = screen.height / 4 + 48;
-		boolean replacedRealmButton = false;
-		boolean isRealmsButton;
-		Button modsButton = null;
-		for (Renderable renderable : buttons) {
-			if (renderable instanceof ModsButton button) {
-				modsButton = button;
-			}
-		}
-
-		for (int i = 0; i < buttons.size(); i++) {
-			Renderable widget = buttons.get(i);
-			if (widget instanceof Button button && !(button instanceof PlainTextButton)) {
-				shiftButtons(button, replacedRealmButton, spacing + (replacedRealmButton ? -12 : 8));
-
-				isRealmsButton = buttonHasText(button, "menu.online");
-				if (isRealmsButton)
-					replacedRealmButton = true;
-
-				if (ModMenu.getConfig().MODS_BUTTON_STYLE.get() == BetterModListConfig.TitleMenuButtonStyle.CLASSIC) {
-					if (button.visible) {
-						shiftButtons(button, modsButtonIndex == -1, spacing);
-						if (modsButtonIndex == -1) {
-							buttonsY = button.getY();
-						}
-					}
-				}
-				if (isRealmsButton) {
-					if (ModMenu.getConfig().MODS_BUTTON_STYLE.get() ==
-							BetterModListConfig.TitleMenuButtonStyle.REPLACE_REALMS) {
-						if (modsButton != null) {
-							modsButton.setX(button.getX());
-							modsButton.setY(button.getY());
-							modsButton.setWidth(button.getWidth());
-							modsButton.setHeight(button.getHeight());
-						}
-						removeModsButton(screen, modsButton);
-						set(screen, i, modsButton);
-					} else {
-						if (ModMenu.getConfig().MODS_BUTTON_STYLE.get() ==
-								BetterModListConfig.TitleMenuButtonStyle.SHRINK) {
-							button.setWidth(98);
-						}
-						if (ModMenu.getConfig().MODS_BUTTON_STYLE.get() ==
-								BetterModListConfig.TitleMenuButtonStyle.SHRINK_LEFT) {
-							button.setWidth(98);
-							button.setX(screen.width / 2 + 2);
-						}
-
-						modsButtonIndex = i + 1;
+		final List<GuiEventListener> buttons = screen.children;
+		if (ModMenu.getConfig().MODIFY_TITLE_SCREEN.get()) {
+			int modsButtonIndex = -1;
+			final int spacing = 24;
+			int buttonsY = screen.height / 4 + 48;
+			for (int i = 0; i < buttons.size(); i++) {
+				GuiEventListener widget = buttons.get(i);
+				if (widget instanceof Button button) {
+					if (ModMenu.getConfig().MODS_BUTTON_STYLE.get() == BetterModListConfig.TitleMenuButtonStyle.CLASSIC) {
 						if (button.visible) {
-							buttonsY = button.getY();
+							shiftButtons(button, modsButtonIndex == -1, spacing);
+							if (modsButtonIndex == -1) {
+								buttonsY = button.getY();
+							}
+						}
+					}
+
+					if (buttonHasText(button, "menu.online")) {
+						if (ModMenu.getConfig().MODS_BUTTON_STYLE.get() == BetterModListConfig.TitleMenuButtonStyle.REPLACE_REALMS) {
+							set(screen, i, new ModMenuButtonWidget(
+									button.getX(),
+									button.getY(),
+									button.getWidth(),
+									button.getHeight(),
+									ModMenu.createModsButtonText(true),
+									screen
+							));
+						} else {
+							if (ModMenu.getConfig().MODS_BUTTON_STYLE.get() == BetterModListConfig.TitleMenuButtonStyle.SHRINK) {
+								button.setWidth(98);
+							}
+							if (ModMenu.getConfig().MODS_BUTTON_STYLE.get() == BetterModListConfig.TitleMenuButtonStyle.SHRINK_LEFT) {
+								button.setWidth(98);
+								button.setX(screen.width / 2 + 2);
+							}
+
+							modsButtonIndex = i + 1;
+							if (button.visible) {
+								buttonsY = button.getY();
+							}
 						}
 					}
 				}
-				if (modsButtonIndex == -1 && buttonHasText(button, "fml.menu.mods")) {
-					if (ModMenu.getConfig().MODS_BUTTON_STYLE.get() != BetterModListConfig.TitleMenuButtonStyle.CLASSIC) {
-						buttonsY = button.getY();
-					}
-					modsButtonIndex = i;
-				}
 			}
 
-		}
-		if (modsButtonIndex != -1) {
-			if (ModMenu.getConfig().MODS_BUTTON_STYLE.get() == BetterModListConfig.TitleMenuButtonStyle.CLASSIC) {
-				modsButton.setY(buttonsY + spacing);
-			} else if (ModMenu.getConfig().MODS_BUTTON_STYLE.get() == BetterModListConfig.TitleMenuButtonStyle.SHRINK) {
-				modsButton.setX((screen.width / 2 + 2));
-				modsButton.setY((buttonsY));
-				modsButton.setWidth((98));
-			} else if (ModMenu.getConfig().MODS_BUTTON_STYLE.get() == BetterModListConfig.TitleMenuButtonStyle.SHRINK_LEFT) {
-				modsButton.setX((screen.width / 2 - 100));
-				modsButton.setY((buttonsY));
-				modsButton.setWidth((98));
-			} else if (ModMenu.getConfig().MODS_BUTTON_STYLE.get() == BetterModListConfig.TitleMenuButtonStyle.ICON) {
-				add(screen, modsButtonIndex, new UpdateCheckerTexturedButtonWidget(screen.width / 2 + 104,
-						buttonsY,
-						20,
-						20,
-						0,
-						0,
-						20,
-						MODS_BUTTON_TEXTURE,
-						32,
-						64,
-						button -> Minecraft.getInstance().gui.setScreen(new ModsScreen(screen)),
-						ModMenu.createModsButtonText(true)
-				));
-				removeModsButton(screen, modsButton);
+			if (modsButtonIndex != -1) {
+				if (ModMenu.getConfig().MODS_BUTTON_STYLE.get() == BetterModListConfig.TitleMenuButtonStyle.CLASSIC) {
+					add(screen, modsButtonIndex, new ModMenuButtonWidget(
+							screen.width / 2 - 100,
+							buttonsY + spacing,
+							200,
+							20,
+							ModMenu.createModsButtonText(true),
+							screen
+					));
+				} else if (ModMenu.getConfig().MODS_BUTTON_STYLE.get() == BetterModListConfig.TitleMenuButtonStyle.SHRINK) {
+					add(screen, modsButtonIndex,
+							new ModMenuButtonWidget(
+									screen.width / 2 + 2,
+									buttonsY,
+									98,
+									20,
+									ModMenu.createModsButtonText(true),
+									screen
+							)
+					);
+				} else if (ModMenu.getConfig().MODS_BUTTON_STYLE.get() == BetterModListConfig.TitleMenuButtonStyle.SHRINK_LEFT) {
+					add(screen, modsButtonIndex,
+							new ModMenuButtonWidget(
+									screen.width / 2 - 100,
+									buttonsY,
+									98,
+									20,
+									ModMenu.createModsButtonText(true),
+									screen
+							)
+					);
+				}
 			}
 		}
 	}

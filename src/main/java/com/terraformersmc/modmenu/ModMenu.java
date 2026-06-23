@@ -219,7 +219,7 @@ public class ModMenu {
 			gameMenuStyle == BetterModListConfig.GameMenuButtonStyle.ICON;
 		var isShort = title ?
 			titleStyle == BetterModListConfig.TitleMenuButtonStyle.SHRINK :
-			gameMenuStyle == BetterModListConfig.GameMenuButtonStyle.REPLACE;
+			gameMenuStyle == BetterModListConfig.GameMenuButtonStyle.ICON;
 		MutableComponent modsText = ModMenuScreenTexts.TITLE.copy();
 		if (ModMenu.getConfig().MOD_COUNT_LOCATION.get().isOnModsButton() && !isIcon) {
 			String count = ModMenu.getDisplayedModCount();

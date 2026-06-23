@@ -2,6 +2,7 @@ package com.terraformersmc.modmenu.gui.widget;
 
 
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 
@@ -21,5 +22,6 @@ public class UpdateCheckerTexturedButtonWidget extends LegacyTexturedButtonWidge
 		Component message
 	) {
 		super(x, y, width, height, u, v, hoveredVOffset, texture, textureWidth, textureHeight, pressAction, message);
+		setTooltip(Tooltip.create(message));
 	}
 }

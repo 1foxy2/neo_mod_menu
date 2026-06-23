@@ -7,6 +7,7 @@ import net.minecraft.client.gui.components.ImageButton;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
+import net.minecraft.util.ARGB;
 
 public class LegacyTexturedButtonWidget extends ImageButton {
 	protected final int u;
@@ -64,7 +65,8 @@ public class LegacyTexturedButtonWidget extends ImageButton {
 			this.width,
 			this.height,
 			this.textureWidth,
-			this.textureHeight
+			this.textureHeight,
+			ARGB.color(getAlpha(), 0xffffff)
 		);
         if (this.isHovered()) {
             guiGraphics.requestCursor(this.isActive() ? CursorTypes.POINTING_HAND : CursorTypes.NOT_ALLOWED);

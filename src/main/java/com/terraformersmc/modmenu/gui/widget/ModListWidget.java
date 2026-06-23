@@ -136,7 +136,7 @@ public class ModListWidget extends ObjectSelectionList<ModListEntry> implements 
 	}
 
 	public void finalizeInit() {
-		reloadFilters();
+		filter(parent.getSearchInput(), true, true);
 		if (restoreScrollY != null) {
 			setScrollAmount(restoreScrollY);
 			restoreScrollY = null;
@@ -273,6 +273,9 @@ public class ModListWidget extends ObjectSelectionList<ModListEntry> implements 
 				}
 			}
 		} else {
+			if (child.getBadges().contains(ModBadge.LIBRARY) && !ModMenu.getConfig().SHOW_LIBRARIES.get()) {
+				return;
+			}
 			this.addEntry(new ChildEntry(
 					child,
 					parent,

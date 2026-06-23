@@ -1,5 +1,9 @@
 package com.terraformersmc.modmenu.mixin;
 
+import com.llamalad7.mixinextras.expression.Definition;
+import com.llamalad7.mixinextras.expression.Expression;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.terraformersmc.modmenu.ModMenu;
 import com.terraformersmc.modmenu.config.BetterModListConfig;
@@ -8,21 +12,19 @@ import com.terraformersmc.modmenu.gui.ModsScreen;
 import com.terraformersmc.modmenu.gui.widget.ModMenuButtonWidget;
 import com.terraformersmc.modmenu.gui.widget.UpdateCheckerTexturedButtonWidget;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.components.AbstractWidget;
-import net.minecraft.client.gui.components.events.GuiEventListener;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.SpriteIconButton;
 import net.minecraft.client.gui.layouts.GridLayout;
 import net.minecraft.client.gui.layouts.LayoutElement;
+import net.minecraft.client.gui.layouts.LinearLayout;
 import net.minecraft.client.gui.screens.PauseScreen;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.server.IntegratedServer;
 import net.minecraft.network.chat.Component;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
-import java.util.List;
-
-import static com.terraformersmc.modmenu.event.ModMenuEventHandler.buttonHasText;
 
 @Mixin(PauseScreen.class)
 public abstract class MixinPauseScreen extends Screen {
@@ -30,111 +32,82 @@ public abstract class MixinPauseScreen extends Screen {
 		super(title);
 	}
 
-	@Inject(method = "createPauseMenu", at = @At(value = "TAIL"))
-	private void onInitWidgets(CallbackInfo ci, @Local GridLayout gridlayout) {
-		if (gridlayout != null) {
-			final List<GuiEventListener> buttons = children;
-			if (ModMenu.getConfig().MODIFY_GAME_MENU.get()) {
-				int modsButtonIndex = -1;
-				final int spacing = 24;
-				int buttonsY = this.height / 4 + 8;
-				BetterModListConfig.GameMenuButtonStyle style = ModMenu.getConfig().GAME_MENU_BUTTON_STYLE.get();
-				int vanillaButtonsY = this.height / 4 + 72 - 16 + 1;
-				int fullWidthButton = 204;
-				boolean hadExitButton = false;
+	@Definition(id = "integratedServer", local = @Local(type = IntegratedServer.class, name = "integratedServer"))
+	@Expression("integratedServer = ?")
+	@Inject(method = "createPauseMenu", at = @At("MIXINEXTRAS:EXPRESSION"))
+	private void insertModMenuIconButton(CallbackInfo ci, @Local(name = "iconButtonRow") LinearLayout iconButtonRow) {
+		if (!ModMenu.getConfig().MODIFY_GAME_MENU.get()) return;
+		BetterModListConfig.GameMenuButtonStyle style = ModMenu.getConfig().GAME_MENU_BUTTON_STYLE.get();
+		if (style == BetterModListConfig.GameMenuButtonStyle.ICON) {
+			iconButtonRow.addChild(new UpdateCheckerTexturedButtonWidget(
+					0,
+					0,
+					20,
+					20,
+					0,
+					0,
+					20,
+					ModMenuEventHandler.MODS_BUTTON_TEXTURE,
+					32,
+					64,
+					_ -> Minecraft.getInstance().gui.setScreen(new ModsScreen(this)),
+					ModMenu.createModsButtonText(true)
+			));
+		}
+	}
 
-				AbstractWidget forgeButton = null;
-				for (int i = 0; i < buttons.size(); i++) {
-					if (buttons.get(i) instanceof AbstractWidget widget) {
-						if (ModMenuEventHandler.buttonHasText(widget, "fml.menu.mods")) {
-							forgeButton = widget;
-						}
-						if (buttonHasText(widget, "menu.returnToMenu")
-								|| buttonHasText(widget, "menu.disconnect"))
-							hadExitButton = true;
+	@WrapOperation(
+			method = "createPauseMenu",
+			at = @At(
+					value = "INVOKE",
+					target = "Lnet/minecraft/client/gui/components/SpriteIconButton;builder(" +
+							"Lnet/minecraft/network/chat/Component;Lnet/minecraft/client/gui/components/Button$OnPress;" +
+							"Z)Lnet/minecraft/client/gui/components/SpriteIconButton$Builder;",
+					ordinal = 0
+			)
+	)
+	private SpriteIconButton.Builder replaceForgeButton(Component message, Button.OnPress onPress, boolean iconOnly, Operation<SpriteIconButton.Builder> original) {
+		if (!ModMenu.getConfig().MODIFY_GAME_MENU.get()) return original.call(message, onPress, iconOnly);
+		BetterModListConfig.GameMenuButtonStyle style = ModMenu.getConfig().GAME_MENU_BUTTON_STYLE.get();
+		if (style == BetterModListConfig.GameMenuButtonStyle.NEO_ICON) {
+			return original.call(ModMenu.createModsButtonText(true), (Button.OnPress) _ -> Minecraft.getInstance().gui.setScreen(new ModsScreen(this)), iconOnly);
+		}
+		return original.call(message, onPress, iconOnly);
+	}
 
-						ModMenuEventHandler.shiftButtons(widget, hadExitButton, spacing + (hadExitButton ? 12 : -12));
+	@WrapOperation(
+			method = "createPauseMenu",
+			at = @At(
+					value = "INVOKE",
+					target = "Lnet/minecraft/client/gui/layouts/LinearLayout;" +
+							"addChild(Lnet/minecraft/client/gui/layouts/LayoutElement;" +
+							")Lnet/minecraft/client/gui/layouts/LayoutElement;",
+					ordinal = 0
+			)
+	)
+	private <T extends LayoutElement> T hideForgeButton(LinearLayout instance, T child, Operation<T> original) {
+		if (!ModMenu.getConfig().MODIFY_GAME_MENU.get() ||
+				ModMenu.getConfig().GAME_MENU_BUTTON_STYLE.get() == BetterModListConfig.GameMenuButtonStyle.NEO_ICON ||
+				!ModMenu.getConfig().HIDE_NEOFORGE_BUTTON.get()
+		) return original.call(instance, child);
 
-						if (style == BetterModListConfig.GameMenuButtonStyle.INSERT) {
-							if (!(widget instanceof AbstractWidget button) || button.visible) {
-								ModMenuEventHandler.shiftButtons(widget, modsButtonIndex == -1 || buttonHasText(widget, "menu.reportBugs", "menu.server_links"), spacing);
-								if (modsButtonIndex == -1) {
-									buttonsY = widget.getY();
-								}
-							}
-						}
+		return child;
+	}
 
-						boolean isShortFeedback = ModMenuEventHandler.buttonHasText(widget, "menu.feedback");
-						boolean isLongFeedback = ModMenuEventHandler.buttonHasText(widget, "menu.sendFeedback");
-						if (isShortFeedback || isLongFeedback) {
-							modsButtonIndex = i + 1;
-							vanillaButtonsY = widget.getY();
-							if (style == BetterModListConfig.GameMenuButtonStyle.REPLACE) {
-								if (widget instanceof AbstractWidget cw) {
-									cw.visible = false;
-									cw.active = false;
-								}
-								if (isShortFeedback) {
-									fullWidthButton = widget.getWidth();
-								}
-								buttons.stream()
-										.filter(w -> buttonHasText(w, "menu.reportBugs"))
-										.forEach(w -> {
-											if (w instanceof AbstractWidget cw) {
-												cw.visible = false;
-												cw.active = false;
-											}
-										});
-							} else {
-								modsButtonIndex = i + 1;
-								if (!(widget instanceof AbstractWidget button) || button.visible) {
-									buttonsY = widget.getY();
-								}
-							}
-						}
-					}
-				}
-
-				if (modsButtonIndex != -1) {
-					if (style == BetterModListConfig.GameMenuButtonStyle.INSERT) {
-						ModMenuEventHandler.add(this, modsButtonIndex, new ModMenuButtonWidget(
-								this.width / 2 - 102,
-								buttonsY + spacing,
-								fullWidthButton,
-								20,
-								ModMenu.createModsButtonText(true),
-								this
-						));
-					} else if (style == BetterModListConfig.GameMenuButtonStyle.REPLACE) {
-						addRenderableWidget(new ModMenuButtonWidget(
-								this.width / 2 - 102,
-								vanillaButtonsY,
-								fullWidthButton,
-								20,
-								ModMenu.createModsButtonText(true),
-								this
-						));
-					} else if (style == BetterModListConfig.GameMenuButtonStyle.ICON) {
-						ModMenuEventHandler.add(this, modsButtonIndex, new UpdateCheckerTexturedButtonWidget(
-								this.width / 2 + 4 + 100 + 2,
-								vanillaButtonsY,
-								20,
-								20,
-								0,
-								0,
-								20,
-								ModMenuEventHandler.MODS_BUTTON_TEXTURE,
-								32,
-								64,
-								button -> Minecraft.getInstance().gui.setScreen(new ModsScreen(this)),
-								ModMenu.createModsButtonText(true)
-						));
-					}
-				}
-				if (forgeButton != null) {
-					removeWidget(forgeButton);
-				}
-			}
+	@Inject(method = "createPauseMenu", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/layouts/GridLayout$RowHelper;addChild(Lnet/minecraft/client/gui/layouts/LayoutElement;ILnet/minecraft/client/gui/layouts/LayoutSettings;)Lnet/minecraft/client/gui/layouts/LayoutElement;", ordinal = 1, shift = At.Shift.AFTER))
+	private void insertModMenuFullButton(CallbackInfo ci, @Local(name = "helper") GridLayout.RowHelper helper) {
+		if (!ModMenu.getConfig().MODIFY_GAME_MENU.get()) return;
+		BetterModListConfig.GameMenuButtonStyle style = ModMenu.getConfig().GAME_MENU_BUTTON_STYLE.get();
+		if (style == BetterModListConfig.GameMenuButtonStyle.INSERT) {
+			final int fullWidthButton = 204; // PauseScreen.BUTTON_WIDTH_FULL
+			helper.addChild(new ModMenuButtonWidget(
+					0,
+					0,
+					fullWidthButton,
+					20,
+					ModMenu.createModsButtonText(true),
+					this
+			), 2);
 		}
 	}
 }
