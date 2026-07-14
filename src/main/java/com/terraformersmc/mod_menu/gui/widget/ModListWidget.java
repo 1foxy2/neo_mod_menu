@@ -15,7 +15,6 @@ import net.minecraft.client.gui.components.ObjectSelectionList;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
-import net.neoforged.fml.loading.FMLConfig;
 import org.joml.Matrix4f;
 import org.lwjgl.glfw.GLFW;
 
@@ -31,6 +30,7 @@ public class ModListWidget extends ObjectSelectionList<ModListEntry> implements 
 	private boolean scrolling;
 	private final NeoforgeIconHandler iconHandler = new NeoforgeIconHandler();
 	private Double restoreScrollY = null;
+	private List<ModListEntry> draggingEntries = new ArrayList<>();
 
 	public ModListWidget(
 		Minecraft client,
@@ -250,7 +250,6 @@ public class ModListWidget extends ObjectSelectionList<ModListEntry> implements 
 		}
 	}
 
-
 	@Override
 	protected void renderListItems(GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
 		int entryCount = this.getItemCount();
@@ -302,6 +301,17 @@ public class ModListWidget extends ObjectSelectionList<ModListEntry> implements 
 				}
 
 				entryLeft = this.getRowLeft();
+				boolean isHovered = this.isMouseOver(mouseX, mouseY) && Objects.equals(this.getEntryAtPos(mouseX, mouseY), entry);
+				if (isHovered && !draggingEntries.isEmpty() && !draggingEntries.contains(entry)) {
+					guiGraphics.pose().pushPose();
+					guiGraphics.pose().translate(0, 0, 200);
+					if (mouseY < entryBottom - itemHeight / 2f) {
+						guiGraphics.fill(entryLeft, entryTop, entryLeft + getRowWidth(), entryTop + 5, 0xFFFF0000);
+					} else {
+						guiGraphics.fill(entryLeft, entryBottom - 5, entryLeft + getRowWidth(), entryBottom, 0xFF00FF00);
+					}
+					guiGraphics.pose().popPose();
+				}
 				entry.render(guiGraphics,
 					index,
 					entryTop,
@@ -310,7 +320,7 @@ public class ModListWidget extends ObjectSelectionList<ModListEntry> implements 
 					entryHeight,
 					mouseX,
 					mouseY,
-					this.isMouseOver(mouseX, mouseY) && Objects.equals(this.getEntryAtPos(mouseX, mouseY), entry),
+					isHovered,
 					delta
 				);
 			}
@@ -328,25 +338,87 @@ public class ModListWidget extends ObjectSelectionList<ModListEntry> implements 
 	}
 
 	@Override
-	public boolean mouseClicked(double double_1, double double_2, int int_1) {
-		this.updateScrollingState(double_1, double_2, int_1);
-		if (!this.isMouseOver(double_1, double_2)) {
+	public boolean mouseClicked(double mouseX, double mouseY, int button) {
+		this.updateScrollingState(mouseX, mouseY, button);
+		if (!this.isMouseOver(mouseX, mouseY)) {
 			return false;
 		} else {
-			ModListEntry entry = this.getEntryAtPos(double_1, double_2);
+			ModListEntry entry = this.getEntryAtPos(mouseX, mouseY);
 			if (entry != null) {
-				if (entry.mouseClicked(double_1, double_2, int_1)) {
+				if (entry.mouseClicked(mouseX, mouseY, button)) {
 					this.setFocused(entry);
 					this.setDragging(true);
 					return true;
 				}
-			} else if (int_1 == 0 && this.clickedHeader((int) (double_1 - (double) (this.getX() + this.width / 2 - this.getRowWidth() / 2)),
-				(int) (double_2 - (double) this.getY()) + (int) this.getScrollAmount() - 4
+			} else if (button == 0 && this.clickedHeader((int) (mouseX - (double) (this.getX() + this.width / 2 - this.getRowWidth() / 2)),
+				(int) (mouseY - (double) this.getY()) + (int) this.getScrollAmount() - 4
 			)) {
 				return true;
 			}
 
 			return this.scrolling;
+		}
+	}
+
+	@Override
+	public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
+		if (draggingEntries.isEmpty()) {
+		double originalX = mouseX - dragX;
+		double originalY = mouseY - dragY;
+		if (!this.isMouseOver(originalX, originalY)) {
+			return false;
+		} else {
+			ModListEntry entry = this.getEntryAtPos(originalX, originalY);
+			if (entry != null) {
+				draggingEntries.clear();
+				draggingEntries.add(entry);
+				return true;
+			}
+		}
+		}
+		return super.mouseDragged(mouseX, mouseY, button, dragX, dragY);
+	}
+
+	@Override
+	public boolean mouseReleased(double mouseX, double mouseY, int button) {
+
+		if (!draggingEntries.isEmpty()) {
+			if (isMouseOver(mouseX, mouseY)) {
+
+				int int_5 = Mth.floor(mouseY - (double) this.getY()) - this.headerHeight + (int) this.getScrollAmount() - 4;
+				int index = int_5 / this.itemHeight;
+				ModListEntry entry = mouseX < (double) this.getScrollbarPosition() && mouseX >= (double) getRowLeft() && mouseX <= (double) (getRowLeft() + getRowWidth()) && index >= 0 && int_5 >= 0 && index < this.getItemCount() ?
+						this.children().get(index) :
+						null;
+				if (entry != null && !draggingEntries.contains(entry)) {
+					List<Mod> draggedMods = draggingEntries.stream().map(ModListEntry::getMod).toList();
+					for (Map.Entry<Mod, Mod> listEntry : List.copyOf(ModMenu.PARENT_MAP.entries())) {
+						if (draggedMods.contains(listEntry.getValue())) {
+							ModMenu.PARENT_MAP.remove(listEntry.getKey(), listEntry.getValue());
+						}
+					}
+					int rowTop = getRowTop(index);
+					if (mouseY > rowTop + itemHeight / 2f) {
+						ModMenu.PARENT_MAP.putAll(entry.getMod(), draggedMods);
+					}
+					reloadFilters();
+					ModMenu.getConfig().saveParents();
+				}
+			}
+			draggingEntries.clear();
+		}
+		return super.mouseReleased(mouseX, mouseY, button);
+	}
+
+	@Override
+	public void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+		super.renderWidget(guiGraphics, mouseX, mouseY, partialTick);
+		if (!draggingEntries.isEmpty()) {
+			int iconSize = 40;
+			guiGraphics.pose().pushPose();
+			guiGraphics.pose().translate(0, 0, 200);
+			draggingEntries.forEach(entry -> entry.renderIcon(guiGraphics, mouseX - iconSize / 2, mouseY - iconSize / 2, iconSize));
+			guiGraphics.pose().popPose();
 		}
 	}
 
@@ -366,6 +438,11 @@ public class ModListWidget extends ObjectSelectionList<ModListEntry> implements 
 		return x < (double) this.getScrollbarPosition() && x >= (double) getRowLeft() && x <= (double) (getRowLeft() + getRowWidth()) && index >= 0 && int_5 >= 0 && index < this.getItemCount() ?
 			this.children().get(index) :
 			null;
+	}
+
+	public int getIndexAtY(double y) {
+		int int_5 = Mth.floor(y - (double) this.getY()) - this.headerHeight + (int) this.getScrollAmount() - 4;
+		return int_5 / this.itemHeight;
 	}
 
 	@Override
@@ -422,6 +499,11 @@ public class ModListWidget extends ObjectSelectionList<ModListEntry> implements 
 	@Override
 	public int getRowBottom(int index) {
 		return super.getRowBottom(index);
+	}
+
+	@Override
+	public int getRowTop(int index) {
+		return super.getRowTop(index);
 	}
 
 	@Override

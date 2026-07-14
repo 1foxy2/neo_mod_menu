@@ -18,10 +18,8 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.SharedConstants;
 import net.minecraft.Util;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.gui.components.*;
 import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.components.EditBox;
-import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.components.toasts.SystemToast;
 import net.minecraft.client.gui.screens.ConfirmLinkScreen;
 import net.minecraft.client.gui.screens.ConfirmScreen;
@@ -57,8 +55,9 @@ public class ModsScreen extends Screen {
 	private static final ResourceLocation CONFIGURE_BUTTON_LOCATION = ResourceLocation.fromNamespaceAndPath(ModMenu.MOD_ID,
 		"textures/gui/configure_button.png"
 	);
-	public static final ResourceLocation BADGE_BUTTON_LOCATION = ResourceLocation.fromNamespaceAndPath(ModMenu.MOD_ID,
-			"textures/gui/badge_button.png"
+	public static final WidgetSprites BADGE_BUTTON_SPRITES = new WidgetSprites(
+			ResourceLocation.fromNamespaceAndPath(ModMenu.MOD_ID, "badge_button"),
+			ResourceLocation.fromNamespaceAndPath(ModMenu.MOD_ID, "badge_button_hovered")
 	);
 
 	private static final Logger LOGGER = LoggerFactory.getLogger("Better ModList | ModsScreen");
@@ -84,7 +83,6 @@ public class ModsScreen extends Screen {
 	private AbstractWidget librariesButton;
 	private ModListWidget modList;
 	private @Nullable AbstractWidget configureButton;
-	private @Nullable AbstractWidget badgeButton;
 	private @Nullable AbstractWidget parentButton;
 	private AbstractWidget websiteButton;
 	private AbstractWidget issuesButton;
@@ -228,17 +226,8 @@ public class ModsScreen extends Screen {
 				.build();
 		}
 
-		if (!ModMenu.getConfig().HIDE_BADGE_BUTTONS.get()) {
-			this.badgeButton = LegacyTexturedButtonWidget.legacyTexturedBuilder(CommonComponents.EMPTY, button ->
-						this.minecraft.pushGuiLayer(new BadgeScreen(this.selected.mod, paneWidth, searchBoxWidth)))
-					.position(paneWidth / 2 + searchBoxWidth / 2 - 20 / 2 + 26, 22)
-					.size(20, 20)
-					.uv(0, 0, 20)
-					.texture(BADGE_BUTTON_LOCATION, 32, 64)
-					.build();
-		}
 		if (!ModMenu.getConfig().HIDE_PARENTS_BUTTONS.get()) {
-			this.parentButton =  new ParentButton(paneWidth / 2 + searchBoxWidth / 2 - 20 / 2 + 52, 22, 20, 20, button -> {
+			this.parentButton =  new ParentButton(paneWidth / 2 + searchBoxWidth / 2 - 20 / 2 + 26, 22, 20, 20, button -> {
 						Pair<Mod, List<Mod>> currentParent = ModMenu.CURRENT_PARENT;
 						if (currentParent != null) {
 							if (currentParent.getLeft() == selected.getMod()) {
@@ -248,6 +237,7 @@ public class ModsScreen extends Screen {
 									currentParent.getRight().add(selected.getMod());
 								}
 								modList.reloadFilters();
+								ModMenu.getConfig().saveParents();
 							}
 						} else {
 							ModMenu.CURRENT_PARENT = Pair.of(selected.getMod(), ModMenu.PARENT_MAP.get(selected.getMod()));
@@ -332,9 +322,6 @@ public class ModsScreen extends Screen {
 		this.addWidget(this.modList);
 		if (this.configureButton != null) {
 			this.addRenderableWidget(this.configureButton);
-		}
-		if (this.badgeButton != null) {
-			this.addRenderableWidget(this.badgeButton);
 		}
 		if (this.parentButton != null) {
 			this.addRenderableWidget(this.parentButton);

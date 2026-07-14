@@ -133,7 +133,7 @@ public class ModMenuConfig {
 
         MOD_BADGES = builder.comment("Adds badge to mod in this format \"modid=badge1, badge2\"")
                 .defineList("mod_badges", ArrayList::new, String::new, object -> object instanceof String);
-        MOD_PARENTS = builder.comment("Make mods apear under another mod in this format \"parenModId=childId1, childId2\"")
+        MOD_PARENTS = builder.comment("Make mods apear under another mod in this format \"parenModId=childId1, childId2\", add ! at the beginning of parentId to prevent creating a fake parent")
                 .defineList("mod_parents", ArrayList::new, String::new, object -> object instanceof String);
 
         //    UPDATE_CHECKER = builder
@@ -192,12 +192,18 @@ public class ModMenuConfig {
                 }
 
                 String parentId = parentString;
+                boolean fakeParent = true;
+                if (parentId.startsWith("!")) {
+                    fakeParent = false;
+                    parentId = parentId.substring(1);
+                }
 
                 Mod parent;
                 modParentSet.clear();
                 while (true) {
                     parent = ModMenu.MODS.getOrDefault(parentId, dummyParents.get(parentId));
-                    if (parent == null) {
+                    if (parent == null && fakeParent) {
+                        parentId = parentId.substring(1);
                         parent = new NeoforgeDummyParentMod(mod, parentId);
                         dummyParents.put(parentId, parent);
                     }
@@ -276,6 +282,37 @@ public class ModMenuConfig {
         });
 
         this.MOD_BADGES.set(list);
+        ModMenu.CONFIG.getRight().save();
+    }
+
+    public void saveParents() {
+        List<String> list = new ArrayList<>();
+        ModMenu.PARENT_MAP.asMap().forEach((parent, childs) -> {
+            StringBuilder string = new StringBuilder();
+            if (!(parent instanceof NeoforgeDummyParentMod)) {
+                string.append("!");
+            }
+            string.append(parent.getId()).append("=");
+            boolean hasChild = false;
+            for (Mod mod : childs) {
+                String originalParent = mod.getParent();
+                if (originalParent == null || !originalParent.equals(parent.getId())) {
+                    if (hasChild) {
+                        string.append(", ");
+                    } else {
+                        hasChild = true;
+                    }
+                    string.append(mod.getId());
+                }
+            }
+
+            if (hasChild) {
+                list.add(string.toString());
+            }
+
+        });
+
+        this.MOD_PARENTS.set(list);
         ModMenu.CONFIG.getRight().save();
     }
 

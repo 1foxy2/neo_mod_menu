@@ -1,5 +1,6 @@
 package com.terraformersmc.mod_menu.gui;
 
+import com.mojang.logging.LogUtils;
 import com.terraformersmc.mod_menu.ModMenu;
 import com.terraformersmc.mod_menu.config.ModMenuConfig;
 import com.terraformersmc.mod_menu.gui.widget.BadgeToogleButton;
@@ -9,6 +10,7 @@ import com.terraformersmc.mod_menu.util.mod.Mod;
 import com.terraformersmc.mod_menu.util.mod.ModBadge;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.gui.components.ImageButton;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
 import org.jetbrains.annotations.Nullable;
@@ -21,12 +23,17 @@ public class BadgeScreen extends Screen {
     private @Nullable AbstractWidget badgeButton;
     private final Mod mod;
     private final int posX;
+    private final int posY;
+    private final int iconSize;
+    private boolean inverted;
 
-    protected BadgeScreen(Mod mod, int paneWidth, int searchBoxWidth) {
+    public BadgeScreen(Mod mod, int posX, int posY, int iconSize) {
         super(CommonComponents.EMPTY);
 
         this.mod = mod;
-        this.posX = paneWidth / 2 + searchBoxWidth / 2 - 20 / 2 + 26;
+        this.posX = posX;
+        this.posY = posY;
+        this.iconSize = iconSize;
     }
 
     @Override
@@ -37,15 +44,13 @@ public class BadgeScreen extends Screen {
 
     @Override
     protected void init() {
-        this.badgeButton = LegacyTexturedButtonWidget.legacyTexturedBuilder(CommonComponents.EMPTY, button ->
-                        this.onClose())
-                .position(posX, 22)
-                .size(20, 20)
-                .uv(0, 0, 20)
-                .texture(ModsScreen.BADGE_BUTTON_LOCATION, 32, 64)
-                .build();
+        this.badgeButton = new ImageButton(
+                posX, posY, iconSize, iconSize, ModsScreen.BADGE_BUTTON_SPRITES, button ->
+                this.onClose()
+        );
         this.addRenderableWidget(badgeButton);
-
+        int totalBadges = ModBadge.CUSTOM_BADGES.size() + ModBadge.DEFAULT_BADGES.size();
+        inverted = posY + iconSize + 2 + 11 * totalBadges > height;
         int i = 0;
         final int buttonX = posX - 11;
         for (Map<String, ModBadge> badgeMap : ModBadge.BADGES) {
@@ -73,7 +78,7 @@ public class BadgeScreen extends Screen {
                             }
                             ((BadgeToogleButton) button).toggle();
                         }, mod.getBadges().contains(badge))
-                        .position(buttonX, 43 + 11 * i)
+                        .position(buttonX, getYForIndex(i) - 1)
                         .size(11, 11)
                         .uv(0, 0, 11)
                         .build());
@@ -91,11 +96,15 @@ public class BadgeScreen extends Screen {
             for (Map.Entry<String, ModBadge> mapEntry : badges.entrySet()) {
                 badge = mapEntry.getValue();
                 int badgeWidth = minecraft.font.width(badge.getComponent().getVisualOrderText()) + 6;
-                DrawingUtil.drawBadge(guiGraphics, posX, 43 + 11 * i, badgeWidth,
+                DrawingUtil.drawBadge(guiGraphics, posX, getYForIndex(i), badgeWidth,
                         badge.getComponent().getVisualOrderText(),
                         badge.getOutlineColor(), badge.getFillColor(), badge.getTextColor());
                 i++;
             }
         }
+    }
+
+    public int getYForIndex(int i) {
+        return posY + (inverted ? -11 : iconSize + 2) + 11 * (inverted ? -i : i);
     }
 }
