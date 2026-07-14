@@ -2,7 +2,7 @@ package com.terraformersmc.modmenu.event;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import com.terraformersmc.modmenu.ModMenu;
-import com.terraformersmc.modmenu.config.BetterModListConfig;
+import com.terraformersmc.modmenu.configuration.BetterModListConfig;
 import com.terraformersmc.modmenu.gui.ModsScreen;
 import com.terraformersmc.modmenu.gui.widget.UpdateCheckerTexturedButtonWidget;
 import net.minecraft.client.KeyMapping;

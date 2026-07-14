@@ -2,7 +2,7 @@ package com.terraformersmc.modmenu.util.mod;
 
 import com.terraformersmc.modmenu.ModMenu;
 import com.terraformersmc.modmenu.TextPlaceholderApiCompat;
-import com.terraformersmc.modmenu.config.BetterModListConfig;
+import com.terraformersmc.modmenu.configuration.BetterModListConfig;
 import com.terraformersmc.modmenu.util.mod.neoforge.NeoforgeIconHandler;
 import eu.pb4.placeholders.api.ParserContext;
 import net.minecraft.client.renderer.texture.DynamicTexture;

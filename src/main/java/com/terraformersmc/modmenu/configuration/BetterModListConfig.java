@@ -1,4 +1,4 @@
-package com.terraformersmc.modmenu.config;
+package com.terraformersmc.modmenu.configuration;
 
 import com.google.gson.annotations.SerializedName;
 import com.terraformersmc.modmenu.ModMenu;

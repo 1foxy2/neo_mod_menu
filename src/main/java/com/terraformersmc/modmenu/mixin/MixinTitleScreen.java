@@ -1,7 +1,7 @@
 package com.terraformersmc.modmenu.mixin;
 
 import com.terraformersmc.modmenu.ModMenu;
-import com.terraformersmc.modmenu.config.BetterModListConfig;
+import com.terraformersmc.modmenu.configuration.BetterModListConfig;
 import com.terraformersmc.modmenu.gui.ModsScreen;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;

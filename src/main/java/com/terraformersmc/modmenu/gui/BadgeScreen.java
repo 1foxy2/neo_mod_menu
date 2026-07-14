@@ -1,7 +1,7 @@
 package com.terraformersmc.modmenu.gui;
 
 import com.terraformersmc.modmenu.ModMenu;
-import com.terraformersmc.modmenu.config.BetterModListConfig;
+import com.terraformersmc.modmenu.configuration.BetterModListConfig;
 import com.terraformersmc.modmenu.gui.widget.BadgeToogleButton;
 import com.terraformersmc.modmenu.gui.widget.LegacyTexturedButtonWidget;
 import com.terraformersmc.modmenu.util.DrawingUtil;

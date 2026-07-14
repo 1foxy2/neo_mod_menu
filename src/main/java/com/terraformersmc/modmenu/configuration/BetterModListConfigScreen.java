@@ -1,4 +1,4 @@
-package com.terraformersmc.modmenu.config;
+package com.terraformersmc.modmenu.configuration;
 
 import com.electronwill.nightconfig.core.UnmodifiableConfig;
 import com.terraformersmc.modmenu.ModMenu;
