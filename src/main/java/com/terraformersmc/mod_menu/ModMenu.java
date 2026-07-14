@@ -45,6 +45,7 @@ import java.io.InputStreamReader;
 import java.text.NumberFormat;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -73,6 +74,7 @@ public class ModMenu {
 	public static final Map<String, Mod> MODS = new HashMap<>();
 	public static final Map<String, Mod> ROOT_MODS = new HashMap<>();
 	public static final LinkedListMultimap<Mod, Mod> PARENT_MAP = LinkedListMultimap.create();
+	public static Pair<Mod, List<Mod>> CURRENT_PARENT = null;
 
 	public static final Map<String, IConfigScreenFactory> configScreenFactories = new HashMap<>();
 
