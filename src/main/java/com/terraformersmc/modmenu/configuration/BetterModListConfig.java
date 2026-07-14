@@ -36,6 +36,7 @@ public class BetterModListConfig {
     public final ModConfigSpec.BooleanValue MODIFY_GAME_MENU;
     public final ModConfigSpec.BooleanValue HIDE_CONFIG_BUTTONS;
     public final ModConfigSpec.BooleanValue HIDE_BADGE_BUTTONS;
+    public final ModConfigSpec.BooleanValue HIDE_PARENTS_BUTTONS;
     public final ModConfigSpec.BooleanValue HIDE_SCREEN_TOP;
     public final ModConfigSpec.BooleanValue CONFIG_MODE;
     public final ModConfigSpec.BooleanValue DISABLE_DRAG_AND_DROP;
@@ -100,6 +101,8 @@ public class BetterModListConfig {
                 .define("hide_config_buttons", false);
         HIDE_BADGE_BUTTONS = builder.comment("hides button which allows changing mod's badge")
                 .define("hide_badge_buttons", true);
+        HIDE_PARENTS_BUTTONS = builder.comment("hides button which allows changing mod's childs")
+                .define("hide_parents_buttons", true);
         HIDE_SCREEN_TOP = builder.comment("Hides search bar and drag and drop text, also moves mod's icon up")
                 .define("hide_screen_top", false);
         HIDDEN_MODS = builder.comment("Add modid of the mod to hide it from the modlist")
@@ -156,7 +159,7 @@ public class BetterModListConfig {
                 return;
 
             String[] parentToMod = parentToMods.split("=");
-            modParents.put(parentToMod[0], Arrays.stream(parentToMod[1].split(", ")).toList());
+            modParents.put(parentToMod[0], Arrays.stream(parentToMod[1].split(",\\s*")).toList());
         });
         modParents.forEach((parentString, children) -> {
             for (String id : children) {

@@ -38,6 +38,7 @@ import net.minecraft.util.CommonLinks;
 import net.minecraft.util.Tuple;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.loading.FMLPaths;
+import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -86,6 +87,7 @@ public class ModsScreen extends Screen {
 	private ModListWidget modList;
 	private @Nullable AbstractWidget configureButton;
 	private @Nullable AbstractWidget badgeButton;
+	private @Nullable AbstractWidget parentButton;
 	private AbstractWidget websiteButton;
 	private AbstractWidget issuesButton;
 	private DescriptionListWidget descriptionListWidget;
@@ -224,6 +226,23 @@ public class ModsScreen extends Screen {
 					.texture(BADGE_BUTTON_LOCATION, 32, 64)
 					.build();
 		}
+		if (!ModMenu.getConfig().HIDE_PARENTS_BUTTONS.get()) {
+			this.parentButton =  new ParentButton(paneWidth / 2 + searchBoxWidth / 2 - 20 / 2 + 52, 22, 20, 20, button -> {
+						Pair<Mod, List<Mod>> currentParent = ModMenu.CURRENT_PARENT;
+						if (currentParent != null) {
+							if (currentParent.getLeft() == selected.getMod()) {
+								ModMenu.CURRENT_PARENT = null;
+							} else {
+								if (!currentParent.getRight().remove(selected.getMod())) {
+									currentParent.getRight().add(selected.getMod());
+								}
+								modList.reloadFilters();
+							}
+						} else {
+							ModMenu.CURRENT_PARENT = Pair.of(selected.getMod(), ModMenu.PARENT_MAP.get(selected.getMod()));
+						}
+					}, this);
+		}
 
 		// Website button
 		int urlButtonWidths = this.paneWidth / 2 - 2;
@@ -306,6 +325,9 @@ public class ModsScreen extends Screen {
 		}
 		if (this.badgeButton != null) {
 			this.addRenderableWidget(this.badgeButton);
+		}
+		if (this.parentButton != null) {
+			this.addRenderableWidget(this.parentButton);
 		}
 
 		this.addRenderableWidget(this.websiteButton);
