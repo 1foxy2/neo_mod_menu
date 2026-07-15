@@ -27,9 +27,9 @@ repositories {
 
 dependencies {
     // Add FFAPI dependency
-    compileOnly "org.sinytra.forgified-fabric-api:forgified-fabric-api:0.102.0+2.0.12+1.21.1"
-    //runtimeOnly "org.sinytra.forgified-fabric-api:forgified-fabric-api:0.102.0+2.0.12+1.21.1"
-    compileOnly "org.sinytra:connector:2.0.0-beta.3+1.21.1"
+    compileOnly "org.sinytra.forgified-fabric-api:forgified-fabric-api:0.154.0+3.2.3+26.1.2"
+    //runtimeOnly "org.sinytra.forgified-fabric-api:forgified-fabric-api:0.154.0+3.2.3+26.1.2"
+    compileOnly "org.sinytra:connector:3.0.0-beta.1+26.1.2"
     jarJar(implementation 'com.github.1foxy2:TextPlaceholderAPI-neoforge:51d8f4bf77')
 }
 
