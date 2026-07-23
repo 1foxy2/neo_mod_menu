@@ -1,10 +1,7 @@
 plugins {
-    id 'eclipse'
-    id 'idea'
+    id 'java-library'
     id 'maven-publish'
-    id 'net.minecraftforge.gradle' version '[6.0,6.2)'
-    id 'org.parchmentmc.librarian.forgegradle' version '1.+'
-    id 'org.spongepowered.mixin' version '0.7.+'
+    id 'net.neoforged.moddev.legacyforge' version '2.0.141'
 }
 
 version = mod_version
@@ -20,65 +17,42 @@ java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 mixin {
     add sourceSets.main, "mod_menu.refmap.json"
     config "mod_menu.mixins.json"
+}
 
-    debug.verbose = true
-    debug.export = true
+jar {
+    manifest.attributes([
+            "MixinConfigs": "${mod_id}.mixins.json"
+    ])
 }
 
 println "Java: ${System.getProperty 'java.version'}, JVM: ${System.getProperty 'java.vm.version'} (${System.getProperty 'java.vendor'}), Arch: ${System.getProperty 'os.arch'}"
-minecraft {
-    mappings channel: mapping_channel, version: mapping_version
 
-    copyIdeResources = true
+legacyForge  {
+    version = project.minecraft_version + "-" + project.forge_version
 
-    accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
+    parchment {
+        mappingsVersion = project.parchment_mappings_version
+        minecraftVersion = project.parchment_minecraft_version
+    }
+
+    accessTransformers = project.files('src/main/resources/META-INF/accesstransformer.cfg')
+
     runs {
-        // applies to all the run configs below
-        configureEach {
-            workingDirectory project.file('run')
-
-            // Recommended logging data for a userdev environment
-            // The markers can be added/remove as needed separated by commas.
-            // "SCAN": For mods scan.
-            // "REGISTRIES": For firing of registry events.
-            // "REGISTRYDUMP": For getting the contents of all registries.
-            property 'forge.logging.markers', 'REGISTRIES'
-
-            // Recommended logging level for the console
-            // You can set various levels here.
-            // Please read: https://stackoverflow.com/questions/2031163/when-to-use-the-different-log-levels
-            property 'forge.logging.console.level', 'debug'
-
-            mods {
-                "${mod_id}" {
-                    source sourceSets.main
-                }
-            }
-        }
-
         client {
-            // Comma-separated list of namespaces to load gametests from. Empty = all namespaces.
-            property 'forge.enabledGameTestNamespaces', mod_id
+            client()
         }
 
         server {
-            property 'forge.enabledGameTestNamespaces', mod_id
-            args '--nogui'
+            server()
         }
-
-        // This run config launches GameTestServer and runs all registered gametests, then exits.
-        // By default, the server will crash when no gametests are provided.
-        // The gametest system is also enabled by default for other run configs under the /test command.
-        gameTestServer {
-            property 'forge.enabledGameTestNamespaces', mod_id
-        }
-
         data {
-            // example of overriding the workingDirectory set in configureEach above
-            workingDirectory project.file('run-data')
+            data()
+        }
+    }
 
-            // Specify the modid for data generation, where to output the resulting resource, and where to look for existing resources.
-            args '--mod', mod_id, '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
+    mods {
+        "${mod_id}" {
+            sourceSet(sourceSets.main)
         }
     }
 }
@@ -105,11 +79,7 @@ repositories {
     }
 }
 
-jarJar.enable()
-
 dependencies {
-    minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
-
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 
     compileOnly(files("./libs/fabric-api-base-0.4.31+ef105b4977.jar"))
@@ -117,13 +87,14 @@ dependencies {
     compileOnly(files("./libs/fabric-loader-2.6.0+0.15.0+1.20.1-full.jar"))
 
     compileOnly("org.sinytra:Connector:1.0.0-beta.46+1.20.1")
-    implementation fg.deobf('com.github.1foxy2:TextPlaceholderAPI-neoforge:2c9c884ab1')
+    modImplementation('com.github.1foxy2:TextPlaceholderAPI-neoforge:2c9c884ab1')
     jarJar('com.github.1foxy2:TextPlaceholderAPI-neoforge:[2.0,3.0)')
-    implementation fg.deobf("curse.maven:cumulus-915473:5748437")
+    modImplementation("curse.maven:cumulus-915473:5748437")
+    modImplementation("curse.maven:goetic-legacy-1537404:8471137")
+    modImplementation("curse.maven:goety-586095:8443949")
+    modImplementation("curse.maven:curios-309927:6418456")
     compileOnly(annotationProcessor("io.github.llamalad7:mixinextras-common:0.5.0"))
-    implementation(jarJar("io.github.llamalad7:mixinextras-forge:0.5.0")) {
-        jarJar.ranged(it, "[0.5.0,)")
-    }
+    implementation(jarJar("io.github.llamalad7:mixinextras-forge:0.5.0"))
 }
 
 // This block of code expands all declared replace properties in the specified resource targets.
@@ -161,25 +132,6 @@ tasks.named('jar', Jar).configure {
 
     // This is the preferred method to reobfuscate your jar file
     finalizedBy 'reobfJar'
-}
-
-// However if you are in a multi-project build, dev time needs unobfed jar files, so you can delay the obfuscation until publishing by doing:
-// tasks.named('publish').configure {
-//     dependsOn 'reobfJar'
-// }
-
-// Example configuration to allow publishing using the maven-publish plugin
-publishing {
-    publications {
-        register('mavenJava', MavenPublication) {
-            artifact jar
-        }
-    }
-    repositories {
-        maven {
-            url "file://${project.projectDir}/mcmodsrepo"
-        }
-    }
 }
 
 tasks.withType(JavaCompile).configureEach {

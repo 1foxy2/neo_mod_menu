@@ -10,5 +10,8 @@
     "MixinPauseScreen",
     "MixinTitleScreen",
     "MixinTitleScreenUpdateIndicator"
+  ],
+  "mixins": [
+    "TextParserV1Mixin"
   ]
 }
