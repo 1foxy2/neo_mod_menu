@@ -163,7 +163,7 @@ public class ModListEntry extends ObjectSelectionList.Entry<ModListEntry> {
 				}
 			}
 		}
-		if (hovered) {
+		if (ModMenu.getConfig().EDITOR_MODE.get() && hovered) {
 			guiGraphics.pose().pushPose();
 			guiGraphics.pose().translate(0, 0, 200);
 			guiGraphics.blitSprite(
@@ -204,7 +204,7 @@ public class ModListEntry extends ObjectSelectionList.Entry<ModListEntry> {
 	public boolean mouseClicked(double mouseX, double mouseY, int delta) {
 		list.select(this);
 		int iconSize = ModMenu.getConfig().COMPACT_LIST.get() ? COMPACT_ICON_SIZE : FULL_ICON_SIZE;
-		if (mouseX - list.getRowLeft() > list.getRowWidth() - iconSize) {
+		if (ModMenu.getConfig().EDITOR_MODE.get() && mouseX - list.getRowLeft() > list.getRowWidth() - iconSize) {
 			this.client.pushGuiLayer(new BadgeScreen(
 					mod,
 					list.getRowLeft() + list.getRowWidth() - iconSize,

@@ -35,10 +35,9 @@ public class ModMenuConfig {
     public final ModConfigSpec.BooleanValue MODIFY_TITLE_SCREEN;
     public final ModConfigSpec.BooleanValue MODIFY_GAME_MENU;
     public final ModConfigSpec.BooleanValue HIDE_CONFIG_BUTTONS;
-    public final ModConfigSpec.BooleanValue HIDE_BADGE_BUTTONS;
-    public final ModConfigSpec.BooleanValue HIDE_PARENTS_BUTTONS;
     public final ModConfigSpec.BooleanValue HIDE_SCREEN_TOP;
     public final ModConfigSpec.BooleanValue CONFIG_MODE;
+    public final ModConfigSpec.BooleanValue EDITOR_MODE;
     public final ModConfigSpec.BooleanValue DISABLE_DRAG_AND_DROP;
     public final ModConfigSpec.ConfigValue<List<? extends String>> HIDDEN_MODS;
     public final ModConfigSpec.ConfigValue<List<? extends String>> HIDDEN_CONFIGS;
@@ -81,6 +80,8 @@ public class ModMenuConfig {
                 .define("modify_game_menu", true);
         CONFIG_MODE = builder.comment("Will only show mods with config available")
                 .define("config_mode", false);
+        EDITOR_MODE = builder.comment("Allows to edit mod badges and parents ingame by dragging or button")
+                .define("editor_mode", false);
         DISABLE_DRAG_AND_DROP = builder.comment("Disables drag and drop mods adding")
                 .define("disable_drag_and_drop", false);
         USE_CATALOGUE_ICON = builder.comment("Will use catalogue's icon if present")
@@ -102,10 +103,6 @@ public class ModMenuConfig {
                 .define("hide_mod_credits", false);
         HIDE_CONFIG_BUTTONS = builder.comment("Hides mod's config button")
                 .define("hide_config_buttons", false);
-        HIDE_BADGE_BUTTONS = builder.comment("hides button which allows changing mod's badge")
-                .define("hide_badge_buttons", true);
-        HIDE_PARENTS_BUTTONS = builder.comment("hides button which allows changing mod's childs")
-                .define("hide_parents_buttons", true);
         HIDE_SCREEN_TOP = builder.comment("Hides search bar and drag and drop text, also moves mod's icon up")
                 .define("hide_screen_top", false);
         HIDDEN_MODS = builder.comment("Add modid of the mod to hide it from the modlist")

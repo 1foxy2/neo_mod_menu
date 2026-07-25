@@ -39,7 +39,8 @@ import java.util.List;
 public class ModMenuEventHandler {
 	public static final ResourceLocation MODS_BUTTON_TEXTURE = ResourceLocation.fromNamespaceAndPath(ModMenu.MOD_ID, "textures/gui/mods_button.png");
 	private static final Lazy<KeyMapping> MENU_KEY_BIND = Lazy.of(() -> new KeyMapping("key.modmenu.open_menu",
-			KeyConflictContext.IN_GAME, InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_UNKNOWN, "key.categories.misc"));;
+			KeyConflictContext.IN_GAME, InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_UNKNOWN, "key.categories.misc"));
+	;
 
 	@SubscribeEvent
 	public static void onScreenInit(ScreenEvent.Init.Post event) {
@@ -179,7 +180,7 @@ public class ModMenuEventHandler {
 			ComponentContents textContent = component.getContents();
 
 			return textContent instanceof TranslatableContents && Arrays.stream(translationKeys)
-				.anyMatch(s -> ((TranslatableContents) textContent).getKey().equals(s));
+					.anyMatch(s -> ((TranslatableContents) textContent).getKey().equals(s));
 		}
 		return false;
 	}
@@ -188,7 +189,7 @@ public class ModMenuEventHandler {
 		if (shiftUp) {
 			element.setY(element.getY() - spacing / 2);
 		} else if (!(element instanceof AbstractWidget button &&
-			button.getMessage().equals(Component.translatable("title.credits"))
+				button.getMessage().equals(Component.translatable("title.credits"))
 		)) {
 			element.setY(element.getY() + spacing / 2);
 		}
@@ -248,17 +249,14 @@ public class ModMenuEventHandler {
 		throw new IndexOutOfBoundsException(String.format("Index: %d, Size: %d", index, index - remaining));
 	}
 
-	@EventBusSubscriber(modid = ModMenu.MOD_ID, bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
-	public static class modBusEvents {
-		@SubscribeEvent
-		public static void registerKeyMapping(RegisterKeyMappingsEvent event) {
-			event.register(ModMenuEventHandler.MENU_KEY_BIND.get());
-		}
+	@SubscribeEvent
+	public static void registerKeyMapping(RegisterKeyMappingsEvent event) {
+		event.register(ModMenuEventHandler.MENU_KEY_BIND.get());
+	}
 
-		@SubscribeEvent
-		public static void registerReloadManager(RegisterClientReloadListenersEvent event) {
-			event.registerReloadListener((ResourceManagerReloadListener) manager ->
-					ModMenu.createBadgesAndIcons());
-		}
+	@SubscribeEvent
+	public static void registerReloadManager(RegisterClientReloadListenersEvent event) {
+		event.registerReloadListener((ResourceManagerReloadListener) manager ->
+				ModMenu.createBadgesAndIcons());
 	}
 }

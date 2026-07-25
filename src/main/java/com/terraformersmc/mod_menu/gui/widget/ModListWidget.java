@@ -30,7 +30,7 @@ public class ModListWidget extends ObjectSelectionList<ModListEntry> implements 
 	private boolean scrolling;
 	private final NeoforgeIconHandler iconHandler = new NeoforgeIconHandler();
 	private Double restoreScrollY = null;
-	private List<ModListEntry> draggingEntries = new ArrayList<>();
+	private final List<ModListEntry> draggingEntries = new ArrayList<>();
 
 	public ModListWidget(
 		Minecraft client,
@@ -362,19 +362,19 @@ public class ModListWidget extends ObjectSelectionList<ModListEntry> implements 
 
 	@Override
 	public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
-		if (draggingEntries.isEmpty()) {
-		double originalX = mouseX - dragX;
-		double originalY = mouseY - dragY;
-		if (!this.isMouseOver(originalX, originalY)) {
-			return false;
-		} else {
-			ModListEntry entry = this.getEntryAtPos(originalX, originalY);
-			if (entry != null) {
-				draggingEntries.clear();
-				draggingEntries.add(entry);
-				return true;
+		if (ModMenu.getConfig().EDITOR_MODE.get() && draggingEntries.isEmpty()) {
+			double originalX = mouseX - dragX;
+			double originalY = mouseY - dragY;
+			if (!this.isMouseOver(originalX, originalY)) {
+				return false;
+			} else {
+				ModListEntry entry = this.getEntryAtPos(originalX, originalY);
+				if (entry != null) {
+					draggingEntries.clear();
+					draggingEntries.add(entry);
+					return true;
+				}
 			}
-		}
 		}
 		return super.mouseDragged(mouseX, mouseY, button, dragX, dragY);
 	}

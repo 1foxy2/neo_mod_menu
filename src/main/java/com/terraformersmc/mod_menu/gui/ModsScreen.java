@@ -226,7 +226,7 @@ public class ModsScreen extends Screen {
 				.build();
 		}
 
-		if (!ModMenu.getConfig().HIDE_PARENTS_BUTTONS.get()) {
+		if (ModMenu.getConfig().EDITOR_MODE.get()) {
 			this.parentButton =  new ParentButton(paneWidth / 2 + searchBoxWidth / 2 - 20 / 2 + 26, 22, 20, 20, button -> {
 						Pair<Mod, List<Mod>> currentParent = ModMenu.CURRENT_PARENT;
 						if (currentParent != null) {
