@@ -95,11 +95,13 @@ public abstract class MixinTitleScreen extends Screen {
 	)
 	private GuiEventListener removeForgeButton(TitleScreen instance, GuiEventListener guiEventListener, Operation<GuiEventListener> original, @Local(name = "numberOfButtons") LocalIntRef numberOfButtons, @Local(name = "currentButton") LocalIntRef currentButton) {
 		if (ModMenu.getConfig().MODIFY_TITLE_SCREEN.get() ) {
-			if (ModMenu.getConfig().HIDE_NEOFORGE_BUTTON.get() && ModMenu.getConfig().MODS_BUTTON_STYLE.get() != BetterModListConfig.TitleMenuButtonStyle.NEO_ICON) {
-				numberOfButtons.set(numberOfButtons.get() - 1);
-				currentButton.set(currentButton.get() - 1);
+			if (ModMenu.getConfig().HIDE_NEOFORGE_BUTTON.get()) {
+				if (ModMenu.getConfig().MODS_BUTTON_STYLE.get() != BetterModListConfig.TitleMenuButtonStyle.NEO_ICON) {
+					numberOfButtons.set(numberOfButtons.get() - 1);
+					currentButton.set(currentButton.get() - 1);
+				}
+				return guiEventListener;
 			}
-			return guiEventListener;
 		}
 		return original.call(instance, guiEventListener);
 	}
