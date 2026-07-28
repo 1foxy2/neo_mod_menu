@@ -96,7 +96,7 @@ public class JavaDummyMod implements Mod {
 	public @NotNull String getTranslatedDescription() {
 		var description = Mod.super.getTranslatedDescription();
 
-		description = description + "\n" + I18n.get("mod_menu.javaDistributionName", getName());
+		description = description + "\n" + I18n.get("modmenu.javaDistributionName", getName());
 
 		return description;
 	}

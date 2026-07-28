@@ -506,7 +506,7 @@ public class ModsScreen extends Screen {
 				}
 				DrawingUtil.drawWrappedString(
 					guiGraphics,
-					I18n.get("mod_menu.authorPrefix", authors),
+					I18n.get("modmenu.authorPrefix", authors),
 					x + imageOffset,
 					rightPaneY + 2 + lineSpacing * 2,
 					this.paneWidth - imageOffset - 4,
@@ -530,9 +530,9 @@ public class ModsScreen extends Screen {
 				.filter(mod -> !mod.isHidden() && mod.getBadges().contains(ModBadge.LIBRARY))
 				.map(Mod::getId)
 				.collect(Collectors.toSet()), false);
-			return TranslationUtil.translateNumeric("mod_menu.showingModsLibraries", rootMods, rootLibs);
+			return TranslationUtil.translateNumeric("modmenu.showingModsLibraries", rootMods, rootLibs);
 		} else {
-			return TranslationUtil.translateNumeric("mod_menu.showingMods", rootMods);
+			return TranslationUtil.translateNumeric("modmenu.showingMods", rootMods);
 		}
 	}
 
@@ -543,7 +543,7 @@ public class ModsScreen extends Screen {
 				.filter(mod -> !mod.isHidden() && mod.getBadges().contains(ModBadge.LIBRARY))
 				.map(Mod::getId)
 				.collect(Collectors.toSet()), false);
-			return TranslationUtil.translateNumeric("mod_menu.showingLibraries", rootLibs);
+			return TranslationUtil.translateNumeric("modmenu.showingLibraries", rootLibs);
 		} else {
 			return Component.empty();
 		}

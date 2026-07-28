@@ -6,7 +6,7 @@ import net.minecraft.resources.ResourceLocation;
 
 public class BadgeToogleButton extends LegacyTexturedButtonWidget {
 	private static final ResourceLocation BADGE_TOGGLE_TEXTURE =
-			ResourceLocation.fromNamespaceAndPath("mod_menu", "textures/gui/badge_toggle_button.png");
+			ResourceLocation.fromNamespaceAndPath("modmenu", "textures/gui/badge_toggle_button.png");
 	private boolean hasBadge;
 
 	public BadgeToogleButton(

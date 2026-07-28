@@ -95,7 +95,7 @@ public class ModMenuConfigScreen extends ConfigurationScreen.ConfigurationSectio
         final List<T> list = Arrays.stream(clazz.getEnumConstants()).filter(spec::test).toList();
 
         return new Element(getTranslationComponent(key), getTooltipComponent(key, null),
-                new OptionInstance<>(getTranslationKey(key), getTooltip(key, null), (caption, displayvalue) -> Component.translatable("mod_menu.configuration." + key + "." + displayvalue.name().toLowerCase()),
+                new OptionInstance<>(getTranslationKey(key), getTooltip(key, null), (caption, displayvalue) -> Component.translatable("modmenu.configuration." + key + "." + displayvalue.name().toLowerCase()),
                         new Custom<>(list), source.get(), newValue -> {
                     // regarding change detection: new value always is different (cycle button)
                     undoManager.add(v -> {
