@@ -182,7 +182,7 @@ public class ModsScreen extends Screen {
 				}
 				this.minecraft.setScreen(this);
 			}, mod.getWebsite(), false));
-		}, Supplier::get) {
+		}, c -> c.get()) {
 			@Override
 			public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
 				visible = selected != null;
@@ -206,7 +206,7 @@ public class ModsScreen extends Screen {
 				}
 				this.minecraft.setScreen(this);
 			}, mod.getIssueTracker(), false));
-		}, Supplier::get) {
+		}, c -> c.get()) {
 			@Override
 			public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
 				visible = selected != null;
@@ -235,7 +235,7 @@ public class ModsScreen extends Screen {
 			ModMenu.getConfig().SORTING.get().cycleValue();
 			ModMenu.CONFIG.getRight().save();
 			modList.reloadFilters();
-		}, Supplier::get) {
+		}, c -> c.get()) {
 			@Override
 			public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
 				guiGraphics.pose().translate(0, 0, 1);
@@ -248,7 +248,7 @@ public class ModsScreen extends Screen {
 			ModMenu.getConfig().SHOW_LIBRARIES.set(!ModMenu.getConfig().SHOW_LIBRARIES.get());
 			ModMenu.CONFIG.getRight().save();
 			modList.reloadFilters();
-		}, Supplier::get) {
+		}, c -> c.get()) {
 			@Override
 			public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
 				guiGraphics.pose().translate(0, 0, 1);
@@ -272,13 +272,13 @@ public class ModsScreen extends Screen {
 				Button.builder(Component.translatable("modmenu.modsFolder"), button -> Util.getPlatform().openFile(FMLPaths.MODSDIR.get().toFile()))
 						.pos(this.width / 2 - 154, this.height - 28)
 						.size(150, 20)
-						.createNarration(Supplier::get)
+						.createNarration(c -> c.get())
 						.build());
 		this.addRenderableWidget(
 				Button.builder(CommonComponents.GUI_DONE, button -> minecraft.setScreen(previousScreen))
 						.pos(this.width / 2 + 4, this.height - 28)
 						.size(150, 20)
-						.createNarration(Supplier::get)
+						.createNarration(c -> c.get())
 						.build());
         modList.finalizeInit();
 		this.searchBox.setFocused(true);
