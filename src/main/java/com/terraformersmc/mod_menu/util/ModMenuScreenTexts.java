@@ -19,8 +19,8 @@ public final class ModMenuScreenTexts {
 	public static final Component TOGGLE_FILTER_OPTIONS = Component.translatable("modmenu.toggleFilterOptions");
 	public static final Component WEBSITE = Component.translatable("modmenu.website");
 
-	public static final String LIBRARIES = ModMenu.MOD_ID + ".configuration.show_libraries";
-	public static final String SORTING = ModMenu.MOD_ID + ".configuration.sorting";
+	public static final String LIBRARIES = "option.modmenu.show_libraries";
+	public static final String SORTING = "option.modmenu.sorting";
 
 	private ModMenuScreenTexts() {
 	}
