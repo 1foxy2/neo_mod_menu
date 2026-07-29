@@ -189,18 +189,17 @@ public class ModMenuConfig {
                 }
 
                 String parentId = parentString;
-                boolean fakeParent = true;
-                if (parentId.startsWith("!")) {
-                    fakeParent = false;
-                    parentId = parentId.substring(1);
-                }
 
                 Mod parent;
                 modParentSet.clear();
                 while (true) {
+                    boolean fakeParent = true;
+                    if (parentId.startsWith("!")) {
+                        fakeParent = false;
+                        parentId = parentId.substring(1);
+                    }
                     parent = ModMenu.MODS.getOrDefault(parentId, dummyParents.get(parentId));
                     if (parent == null && fakeParent) {
-                        parentId = parentId.substring(1);
                         parent = new NeoforgeDummyParentMod(mod, parentId);
                         dummyParents.put(parentId, parent);
                     }
