@@ -102,11 +102,11 @@ public class ModMenu {
 		return configScreenFactories.get(container.getModId());
 	}
 
-	public ModMenu() {
-		IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
+	public ModMenu(FMLJavaModLoadingContext context) {
+		IEventBus bus = context.getModEventBus();
 		bus.addListener(this::onClientSetup);
 
-		ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, CONFIG.getValue());
+		context.registerConfig(ModConfig.Type.CLIENT, CONFIG.getValue());
 
 		// Fill mods map
 		ModList.get().forEachModContainer((s, modContainer) -> {

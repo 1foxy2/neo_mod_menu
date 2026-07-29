@@ -90,9 +90,9 @@ dependencies {
     modImplementation('com.github.1foxy2:TextPlaceholderAPI-neoforge:2c9c884ab1')
     jarJar('com.github.1foxy2:TextPlaceholderAPI-neoforge:[2.0,3.0)')
     modImplementation("curse.maven:cumulus-915473:5748437")
-    modImplementation("curse.maven:goetic-legacy-1537404:8471137")
+    /*modImplementation("curse.maven:goetic-legacy-1537404:8471137")
     modImplementation("curse.maven:goety-586095:8443949")
-    modImplementation("curse.maven:curios-309927:6418456")
+    modImplementation("curse.maven:curios-309927:6418456")*/
     compileOnly(annotationProcessor("io.github.llamalad7:mixinextras-common:0.5.0"))
     implementation(jarJar("io.github.llamalad7:mixinextras-forge:0.5.0"))
 }
