@@ -11,6 +11,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.ObjectSelectionList;
 import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.CommonColors;
 import net.minecraft.util.Mth;
@@ -28,6 +29,7 @@ public class ModListWidget extends ObjectSelectionList<ModListEntry> implements 
 	private boolean scrolling;
 	private final NeoforgeIconHandler iconHandler = new NeoforgeIconHandler();
 	private Double restoreScrollY = null;
+	private final List<ModListEntry> draggingEntries = new ArrayList<>();
 
 	public ModListWidget(
 		Minecraft client,
@@ -136,7 +138,7 @@ public class ModListWidget extends ObjectSelectionList<ModListEntry> implements 
 	}
 
 	public void finalizeInit() {
-		reloadFilters();
+		filter(parent.getSearchInput(), true, true);
 		if (restoreScrollY != null) {
 			setScrollAmount(restoreScrollY);
 			restoreScrollY = null;
@@ -294,11 +296,19 @@ public class ModListWidget extends ObjectSelectionList<ModListEntry> implements 
 					);
 				}
                 entry.setYOffset(yOffset);
+				boolean isHovered = this.isMouseOver(mouseX, mouseY) && Objects.equals(this.getEntryAtPos(mouseX, mouseY), entry);
+				if (isHovered && !draggingEntries.isEmpty() && !draggingEntries.contains(entry)) {
+					if (mouseY < getRowMiddle(index)) {
+						guiGraphics.fill(entryLeft, entryTop, entryLeft + getRowWidth(), entryTop + 5, 0xFFFF0000);
+					} else {
+						guiGraphics.fill(entryLeft, entryBottom - 5, entryLeft + getRowWidth(), entryBottom, 0xFF00FF00);
+					}
+				}
 				entry.extractContent(
 					guiGraphics,
 					mouseX,
 					mouseY,
-					this.isMouseOver(mouseX, mouseY) && Objects.equals(this.getEntryAtPos(mouseX, mouseY), entry),
+					isHovered,
 					delta
 				);
 			}
@@ -313,6 +323,68 @@ public class ModListWidget extends ObjectSelectionList<ModListEntry> implements 
 		context.fill(x + 1, y - 1, x + width - 1, y + height + 1, fillColor);
 	}
 
+
+	@Override
+	public boolean mouseDragged(MouseButtonEvent event, double dx, double dy) {
+		if (ModMenu.getConfig().EDITOR_MODE.get() && draggingEntries.isEmpty()) {
+			double originalX = event.x() - dx;
+			double originalY = event.y() - dy;
+			if (!this.isMouseOver(originalX, originalY)) {
+				return false;
+			} else {
+				ModListEntry entry = this.getEntryAtPos(originalX, originalY);
+				if (entry != null) {
+					draggingEntries.clear();
+					draggingEntries.add(entry);
+					return true;
+				}
+			}
+		}
+		return super.mouseDragged(event, dx, dy);
+	}
+
+	@Override
+	public boolean mouseReleased(MouseButtonEvent event) {
+		if (!draggingEntries.isEmpty()) {
+			double mouseX = event.x();
+			double mouseY = event.y();
+			if (isMouseOver(mouseX, mouseY)) {
+
+				int int_5 = Mth.floor(mouseY - (double) this.getY()) + (int) this.scrollAmount() - 4;
+				int index = int_5 / this.defaultEntryHeight;
+				ModListEntry entry = mouseX < (double) this.scrollBarX() && mouseX >= (double) getRowLeft() && mouseX <= (double) (getRowLeft() + getRowWidth()) && index >= 0 && int_5 >= 0 && index < this.getItemCount() ?
+						this.children().get(index) :
+						null;
+				if (entry != null && !draggingEntries.contains(entry)) {
+					List<Mod> draggedMods = draggingEntries.stream().map(ModListEntry::getMod).toList();
+					for (Map.Entry<Mod, Mod> listEntry : List.copyOf(ModMenu.PARENT_MAP.entries())) {
+						if (draggedMods.contains(listEntry.getValue())) {
+							ModMenu.PARENT_MAP.remove(listEntry.getKey(), listEntry.getValue());
+						}
+					}
+					int rowTop = getRowTop(index);
+					if (mouseY > rowTop + defaultEntryHeight / 2f) {
+						ModMenu.PARENT_MAP.putAll(entry.getMod(), draggedMods);
+					}
+					reloadFilters();
+					ModMenu.getConfig().saveParents();
+				}
+			}
+			draggingEntries.clear();
+			return true;
+		}
+		return super.mouseReleased(event);
+	}
+
+
+	@Override
+	public void extractWidgetRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a) {
+		super.extractWidgetRenderState(graphics, mouseX, mouseY, a);
+		if (!draggingEntries.isEmpty()) {
+			int iconSize = 40;
+			draggingEntries.forEach(entry -> entry.renderIcon(graphics, mouseX - iconSize / 2, mouseY - iconSize / 2, iconSize));
+		}
+	}
     public void ensureVisible(ModListEntry entry) {
         int i = this.getRowTop(this.children().indexOf(entry));
         int j = i - this.getY() - 4 - this.defaultEntryHeight;
@@ -336,6 +408,11 @@ public class ModListWidget extends ObjectSelectionList<ModListEntry> implements 
 		}
 
 		return false;
+	}
+
+	public int getRowMiddle(int row) {
+		ModListEntry child = this.children().get(row);
+		return child.getY() + child.getHeight() / 2;
 	}
 
 	public final ModListEntry getEntryAtPos(double x, double y) {

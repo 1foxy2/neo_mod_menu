@@ -2,6 +2,8 @@ package com.terraformersmc.modmenu.gui.widget.entries;
 
 import com.mojang.blaze3d.platform.cursor.CursorTypes;
 import com.terraformersmc.modmenu.ModMenu;
+import com.terraformersmc.modmenu.gui.BadgeScreen;
+import com.terraformersmc.modmenu.gui.ModsScreen;
 import com.terraformersmc.modmenu.gui.widget.ModListWidget;
 import com.terraformersmc.modmenu.util.DrawingUtil;
 import com.terraformersmc.modmenu.util.ModMenuScreenTexts;
@@ -72,29 +74,7 @@ public class ModListEntry extends ObjectSelectionList.Entry<ModListEntry> {
 			DrawingUtil.drawRandomVersionBackground(mod, guiGraphics, x, y, iconSize, iconSize);
 		}
 
-		if (this.getIconTexture().getB().height == this.getIconTexture().getB().width) {
-			guiGraphics.blit(RenderPipelines.GUI_TEXTURED,
-					this.getIconTexture().getA(),
-					x, y, 0.0f, 0.0f,
-					iconSize, iconSize,
-					iconSize, iconSize,
-					ARGB.white(1.0F));
-		} else if (this.getSquareIconTexture().getB().height == this.getSquareIconTexture().getB().width) {
-			guiGraphics.blit(RenderPipelines.GUI_TEXTURED,
-					this.getSquareIconTexture().getA(),
-					x, y, 0.0f, 0.0f,
-					iconSize, iconSize,
-					iconSize, iconSize,
-					ARGB.white(1.0F));
-		} else {
-			guiGraphics.blit(RenderPipelines.GUI_TEXTURED, this.getSquareIconTexture().getA(),
-					(int) (x + (iconSize - this.getSquareIconTexture().getB().width) / 2f),
-					(int) (y + (iconSize - this.getSquareIconTexture().getB().height) / 2f),
-					0.0f, 0.0f,
-					this.getSquareIconTexture().getB().width, this.getSquareIconTexture().getB().height,
-					this.getSquareIconTexture().getB().width, this.getSquareIconTexture().getB().height,
-					ARGB.white(1.0F));
-		}
+		renderIcon(guiGraphics, x, y, iconSize);
 
 		Component name = Component.literal(mod.getTranslatedName());
 		FormattedText trimmedName = name;
@@ -191,13 +171,57 @@ public class ModListEntry extends ObjectSelectionList.Entry<ModListEntry> {
                 }
 			}
 		}
+		if (ModMenu.getConfig().EDITOR_MODE.get() && hovered) {
+			guiGraphics.blitSprite(
+					RenderPipelines.GUI_TEXTURED,
+					x + rowWidth - iconSize < mouseX ? ModsScreen.BADGE_BUTTON_SPRITES.enabledFocused() : ModsScreen.BADGE_BUTTON_SPRITES.enabled(),
+					x + rowWidth - iconSize + 4,
+					y,
+					iconSize,
+					iconSize
+			);
+		}
+	}
+
+	public void renderIcon(GuiGraphicsExtractor guiGraphics, int x, int y, int iconSize) {
+		if (this.getIconTexture().getB().height == this.getIconTexture().getB().width) {
+			guiGraphics.blit(RenderPipelines.GUI_TEXTURED,
+					this.getIconTexture().getA(),
+					x, y, 0.0f, 0.0f,
+					iconSize, iconSize,
+					iconSize, iconSize,
+					ARGB.white(1.0F));
+		} else if (this.getSquareIconTexture().getB().height == this.getSquareIconTexture().getB().width) {
+			guiGraphics.blit(RenderPipelines.GUI_TEXTURED,
+					this.getSquareIconTexture().getA(),
+					x, y, 0.0f, 0.0f,
+					iconSize, iconSize,
+					iconSize, iconSize,
+					ARGB.white(1.0F));
+		} else {
+			guiGraphics.blit(RenderPipelines.GUI_TEXTURED, this.getSquareIconTexture().getA(),
+					(int) (x + (iconSize - this.getSquareIconTexture().getB().width) / 2f),
+					(int) (y + (iconSize - this.getSquareIconTexture().getB().height) / 2f),
+					0.0f, 0.0f,
+					this.getSquareIconTexture().getB().width, this.getSquareIconTexture().getB().height,
+					this.getSquareIconTexture().getB().width, this.getSquareIconTexture().getB().height,
+					ARGB.white(1.0F));
+		}
 	}
 
     @Override
 	public boolean mouseClicked(MouseButtonEvent click, boolean doubleClick) {
 		list.select(this);
+		int iconSize = ModMenu.getConfig().COMPACT_LIST.get() ? COMPACT_ICON_SIZE : FULL_ICON_SIZE;
+		if (ModMenu.getConfig().EDITOR_MODE.get() && click.x() - list.getRowLeft() > list.getRowWidth() - iconSize) {
+			this.client.pushGuiLayer(new BadgeScreen(
+					mod,
+					this.getX() + getContentWidth() - iconSize + 4,
+					this.getContentY() + this.getYOffset(),
+					iconSize
+			));
+		}
 		if (ModMenu.getConfig().QUICK_CONFIGURE.get() && this.list.getParent().getModHasConfigScreen(this.mod.getContainer())) {
-			int iconSize = ModMenu.getConfig().COMPACT_LIST.get() ? COMPACT_ICON_SIZE : FULL_ICON_SIZE;
 			if (click.x() - list.getRowLeft() <= iconSize + getXOffset()) {
 				this.openConfig();
 			} else if (Util.getMillis() - this.sinceLastClick < 250) {

@@ -125,7 +125,9 @@ public class NeoforgeMod implements Mod {
 
 		/* Hardcode parents and badges for Fabric API & kotlin api */
 		if (id.startsWith("fabric")) {
-			modMenuData.fillParentIfEmpty("fabric-api");
+			if (!id.equals("fabric_api")) {
+				modMenuData.fillParentIfEmpty("fabric_api");
+			}
 			badgeNames.add("library");
 		}
 

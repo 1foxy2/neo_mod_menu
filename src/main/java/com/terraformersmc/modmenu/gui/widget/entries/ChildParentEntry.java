@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Objects;
 
 public class ChildParentEntry extends ChildEntry {
-	private static final Identifier PARENT_MOD_TEXTURE = Identifier.fromNamespaceAndPath(ModMenu.MOD_ID, "textures/gui/parent_mod.png");
+	private static final Identifier PARENT_MOD_TEXTURE = Identifier.fromNamespaceAndPath(ModMenu.NAMESPACE, "textures/gui/parent_mod.png");
 	protected List<Mod> children;
 	protected ModListWidget list;
 	protected boolean hoveringIcon = false;
@@ -41,7 +41,7 @@ public class ChildParentEntry extends ChildEntry {
 		float delta
 	) {
 		super.extractContent(guiGraphics, mouseX, mouseY, isSelected, delta);
-        int x = this.getContentX() - 15 + getXOffset();
+        int x = this.getContentX() - 2 + getXOffset();
         int y = this.getContentY() + this.getYOffset();
 		Font font = client.font;
 		int childrenBadgeHeight = font.lineHeight;
@@ -62,49 +62,56 @@ public class ChildParentEntry extends ChildEntry {
 		int childrenBadgeY = y + iconSize - childrenBadgeHeight;
 		int childrenOutlineColor = 0xff107454;
 		int childrenFillColor = 0xff093929;
-		guiGraphics.fill(childrenBadgeX + 1,
-			childrenBadgeY,
-			childrenBadgeX + childrenBadgeWidth - 1,
-			childrenBadgeY + 1,
-			childrenOutlineColor
+		guiGraphics.fill(
+				childrenBadgeX + 1,
+				childrenBadgeY,
+				childrenBadgeX + childrenBadgeWidth - 1,
+				childrenBadgeY + 1,
+				childrenOutlineColor
 		);
-		guiGraphics.fill(childrenBadgeX,
-			childrenBadgeY + 1,
-			childrenBadgeX + 1,
-			childrenBadgeY + childrenBadgeHeight - 1,
-			childrenOutlineColor
+		guiGraphics.fill(
+				childrenBadgeX,
+				childrenBadgeY + 1,
+				childrenBadgeX + 1,
+				childrenBadgeY + childrenBadgeHeight - 1,
+				childrenOutlineColor
 		);
-		guiGraphics.fill(childrenBadgeX + childrenBadgeWidth - 1,
-			childrenBadgeY + 1,
-			childrenBadgeX + childrenBadgeWidth,
-			childrenBadgeY + childrenBadgeHeight - 1,
-			childrenOutlineColor
+		guiGraphics.fill(
+				childrenBadgeX + childrenBadgeWidth - 1,
+				childrenBadgeY + 1,
+				childrenBadgeX + childrenBadgeWidth,
+				childrenBadgeY + childrenBadgeHeight - 1,
+				childrenOutlineColor
 		);
-		guiGraphics.fill(childrenBadgeX + 1,
-			childrenBadgeY + 1,
-			childrenBadgeX + childrenBadgeWidth - 1,
-			childrenBadgeY + childrenBadgeHeight - 1,
-			childrenFillColor
+		guiGraphics.fill(
+				childrenBadgeX + 1,
+				childrenBadgeY + 1,
+				childrenBadgeX + childrenBadgeWidth - 1,
+				childrenBadgeY + childrenBadgeHeight - 1,
+				childrenFillColor
 		);
-		guiGraphics.fill(childrenBadgeX + 1,
-			childrenBadgeY + childrenBadgeHeight - 1,
-			childrenBadgeX + childrenBadgeWidth - 1,
-			childrenBadgeY + childrenBadgeHeight,
-			childrenOutlineColor
+		guiGraphics.fill(
+				childrenBadgeX + 1,
+				childrenBadgeY + childrenBadgeHeight - 1,
+				childrenBadgeX + childrenBadgeWidth - 1,
+				childrenBadgeY + childrenBadgeHeight,
+				childrenOutlineColor
 		);
-		guiGraphics.text(font,
-			str.getVisualOrderText(),
-			(int) (childrenBadgeX + (float) childrenBadgeWidth / 2 - (float) childrenWidth / 2),
-			childrenBadgeY + 1,
-			0xFFCACACA,
-			false
+		guiGraphics.text(
+				font,
+				str.getVisualOrderText(),
+				(int) (childrenBadgeX + (float) childrenBadgeWidth / 2 - (float) childrenWidth / 2),
+				childrenBadgeY + 1,
+				0xFFCACACA,
+				false
 		);
 		this.hoveringIcon = mouseX >= x - 1 && mouseX <= x - 1 + iconSize && mouseY >= y - 1 && mouseY <= y - 1 + iconSize;
 		if (isMouseOver(mouseX, mouseY)) {
 			guiGraphics.fill(x, y, x + iconSize, y + iconSize, 0xA0909090);
 			int xOffset = list.getParent().showModChildren.contains(getMod().getId()) ? iconSize : 0;
 			int yOffset = hoveringIcon ? iconSize : 0;
-			guiGraphics.blit(RenderPipelines.GUI_TEXTURED,
+			guiGraphics.blit(
+					RenderPipelines.GUI_TEXTURED,
 					PARENT_MOD_TEXTURE,
 					x,
 					y,
@@ -145,10 +152,11 @@ public class ChildParentEntry extends ChildEntry {
 		} else {
 			list.getParent().showModChildren.add(id);
 		}
+
 		list.filter(list.getParent().getSearchInput(), false, false);
 	}
 
-    @Override
+	@Override
 	public boolean keyPressed(KeyEvent event) {
 		String modId = getMod().getId();
 		if (event.isSelection()) {
@@ -157,6 +165,7 @@ public class ChildParentEntry extends ChildEntry {
 			} else {
 				list.getParent().showModChildren.add(modId);
 			}
+
 			list.filter(list.getParent().getSearchInput(), false);
 			return true;
 		} else if (event.isLeft()) {
@@ -164,16 +173,18 @@ public class ChildParentEntry extends ChildEntry {
 				list.getParent().showModChildren.remove(modId);
 				list.filter(list.getParent().getSearchInput(), false);
 			}
+
 			return true;
 		} else if (event.isRight()) {
 			if (!list.getParent().showModChildren.contains(modId)) {
 				list.getParent().showModChildren.add(modId);
 				list.filter(list.getParent().getSearchInput(), false);
+				return true;
 			} else {
 				return list.keyPressed(new KeyEvent(GLFW.GLFW_KEY_DOWN, 0, 0));
 			}
-			return true;
 		}
+
 		return super.keyPressed(event);
 	}
 
