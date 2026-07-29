@@ -102,11 +102,11 @@ public class ModMenu {
 		return configScreenFactories.get(container.getModId());
 	}
 
-	public ModMenu(FMLJavaModLoadingContext context) {
-		IEventBus bus = context.getModEventBus();
+	public ModMenu() {
+		IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
 		bus.addListener(this::onClientSetup);
 
-		context.registerConfig(ModConfig.Type.CLIENT, CONFIG.getValue());
+		ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, CONFIG.getValue());
 
 		// Fill mods map
 		ModList.get().forEachModContainer((s, modContainer) -> {
@@ -215,7 +215,7 @@ public class ModMenu {
 				modsText.append(Component.literal(" ")).append(Component.translatable("modmenu.loaded.short", count));
 			} else {
 				String specificKey = "modmenu.loaded." + count;
-				String key = I18n.exists(specificKey) ? specificKey : "modmenu.loaded";
+				String key = I18n.exists(specificKey) ? specificKey : "mod_menu.loaded";
 				if (ModMenu.getConfig().EASTER_EGGS.get() && I18n.exists(specificKey + ".secret")) {
 					key = specificKey + ".secret";
 				}
