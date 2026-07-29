@@ -103,7 +103,11 @@ public class NeoforgeMod implements Mod {
 
 			if (modMenuMap.get("links") instanceof ArrayList<?> list) list.forEach(string -> {
 				String[] strings = string.toString().split("=");
-				links.put(strings[0], strings[1]);
+				String link = strings[0];
+				if (link.startsWith("mod_menu")) {
+					link = link.replace("mod_menu", "modmenu");
+				}
+				links.put(link, strings[1]);
 			});
 
 			if (modMenuMap.get("contributors") instanceof ArrayList<?> list) contributors.addAll((List<String>) list);
