@@ -27,7 +27,7 @@ public interface Mod {
 	default String getTranslatedName() {
 		String translationKey = "modmenu.nameTranslation." + getId();
 		if (!I18n.exists(translationKey)) {
-			translationKey = "modmenu.nameTranslation." + getId();
+			translationKey = "mod_menu.nameTranslation." + getId();
 		}
 		if (!I18n.exists(translationKey)) {
 			translationKey = "modmenu.nameTranslation." + getId().replace("_", "-");
@@ -51,7 +51,7 @@ public interface Mod {
 	default String getTranslatedSummary() {
 		String translationKey = "modmenu.summaryTranslation." + getId();
 		if (!I18n.exists(translationKey)) {
-			translationKey = "modmenu.summaryTranslation." + getId();
+			translationKey = "mod_menu.summaryTranslation." + getId();
 		}
 		if (!I18n.exists(translationKey)) {
 			translationKey = "modmenu.summaryTranslation." + getId().replace("_", "-");
@@ -69,7 +69,7 @@ public interface Mod {
 	default String getTranslatedDescription() {
 		String translatableDescriptionKey = "modmenu.descriptionTranslation." + getId();
 		if (!I18n.exists(translatableDescriptionKey)) {
-			translatableDescriptionKey = "modmenu.descriptionTranslation." + getId();
+			translatableDescriptionKey = "mod_menu.descriptionTranslation." + getId();
 		}
 		if (!I18n.exists(translatableDescriptionKey)) {
 			translatableDescriptionKey = "modmenu.descriptionTranslation." + getId().replace("_", "-");
