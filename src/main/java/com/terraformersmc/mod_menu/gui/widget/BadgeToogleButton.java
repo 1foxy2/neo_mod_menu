@@ -1,5 +1,6 @@
 package com.terraformersmc.mod_menu.gui.widget;
 
+import com.terraformersmc.mod_menu.ModMenu;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.ImageButton;
 import net.minecraft.network.chat.Component;
@@ -7,7 +8,7 @@ import net.minecraft.resources.ResourceLocation;
 
 public class BadgeToogleButton extends ImageButton {
 	private static final ResourceLocation BADGE_TOGGLE_TEXTURE =
-			new ResourceLocation("mod_menu", "textures/gui/badge_toggle_button.png");
+			new ResourceLocation(ModMenu.MOD_ID, "textures/gui/badge_toggle_button.png");
 	private boolean hasBadge;
 
 	public BadgeToogleButton(

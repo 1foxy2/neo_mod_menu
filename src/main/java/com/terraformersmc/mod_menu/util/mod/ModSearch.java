@@ -39,13 +39,13 @@ public class ModSearch {
 		String modDescription = mod.getDescription();
 		String modSummary = mod.getSummary();
 
-		String library = I18n.get("mod_menu.searchTerms.library");
-		String sinytra = I18n.get("mod_menu.searchTerms.sinytra");
-		String modpack = I18n.get("mod_menu.searchTerms.modpack");
-		String deprecated = I18n.get("mod_menu.searchTerms.deprecated");
-		String clientside = I18n.get("mod_menu.searchTerms.clientside");
-		String neoforge = I18n.get("mod_menu.searchTerms.forge");
-		String configurable = I18n.get("mod_menu.searchTerms.configurable");
+		String library = I18n.get("modmenu.searchTerms.library");
+		String sinytra = I18n.get("modmenu.searchTerms.sinytra");
+		String modpack = I18n.get("modmenu.searchTerms.modpack");
+		String deprecated = I18n.get("modmenu.searchTerms.deprecated");
+		String clientside = I18n.get("modmenu.searchTerms.clientside");
+		String neoforge = I18n.get("modmenu.searchTerms.forge");
+		String configurable = I18n.get("modmenu.searchTerms.configurable");
 
 		// Libraries are currently hidden, ignore them entirely
 		if (mod.isHidden() || !ModMenu.getConfig().SHOW_LIBRARIES.get() && mod.getBadges().contains(ModBadge.LIBRARY)) {
@@ -64,8 +64,8 @@ public class ModSearch {
         for (Map.Entry<String, ModBadge> badgeEntry : ModBadge.CUSTOM_BADGES.entrySet()) {
             String searchTerms = badgeEntry.getValue().getComponent().getString();
 
-            if (I18n.exists("mod_menu.searchTerms." + badgeEntry.getKey()))
-                searchTerms = I18n.get("mod_menu.searchTerms." + badgeEntry.getKey());
+            if (I18n.exists("modmenu.searchTerms." + badgeEntry.getKey()))
+                searchTerms = I18n.get("modmenu.searchTerms." + badgeEntry.getKey());
 
             if (searchTerms.toLowerCase().contains(query) && mod.getBadges().contains(badgeEntry.getValue())) {
                 hasCustomBadge = true;

@@ -112,7 +112,7 @@ public class ModListEntry extends ObjectSelectionList.Entry<ModListEntry> {
 					guiGraphics.blit(ERROR_ICON, x, y, 96.0F, (float) v, iconSize, iconSize, textureSize, textureSize);
 					if (hoveringIcon) {
 						Throwable e = this.list.getParent().modScreenErrors.get(modId);
-						this.list.getParent().setTooltipForNextRenderPass(this.client.font.split(Component.translatable("mod_menu.configure.error", modId, modId).copy().append("\n\n").append(e.toString()).withStyle(ChatFormatting.RED), 175));
+						this.list.getParent().setTooltipForNextRenderPass(this.client.font.split(Component.translatable("modmenu.configure.error", modId, modId).copy().append("\n\n").append(e.toString()).withStyle(ChatFormatting.RED), 175));
 					}
 				} else {
 					guiGraphics.blit(MOD_CONFIGURATION_ICON, x, y, 0.0F, (float) v, iconSize, iconSize, textureSize, textureSize);

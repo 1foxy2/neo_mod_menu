@@ -25,9 +25,9 @@ public interface Mod {
 
 	@NotNull
 	default String getTranslatedName() {
-		String translationKey = "mod_menu.nameTranslation." + getId();
+		String translationKey = "modmenu.nameTranslation." + getId();
 		if (!I18n.exists(translationKey)) {
-			translationKey = "modmenu.nameTranslation." + getId();
+			translationKey = "mod_menu.nameTranslation." + getId();
 		}
 		if (!I18n.exists(translationKey)) {
 			translationKey = "modmenu.nameTranslation." + getId().replace("_", "-");
@@ -49,9 +49,9 @@ public interface Mod {
 
 	@NotNull
 	default String getTranslatedSummary() {
-		String translationKey = "mod_menu.summaryTranslation." + getId();
+		String translationKey = "modmenu.summaryTranslation." + getId();
 		if (!I18n.exists(translationKey)) {
-			translationKey = "modmenu.summaryTranslation." + getId();
+			translationKey = "mod_menu.summaryTranslation." + getId();
 		}
 		if (!I18n.exists(translationKey)) {
 			translationKey = "modmenu.summaryTranslation." + getId().replace("_", "-");
@@ -67,9 +67,9 @@ public interface Mod {
 
 	@NotNull
 	default String getTranslatedDescription() {
-		String translatableDescriptionKey = "mod_menu.descriptionTranslation." + getId();
+		String translatableDescriptionKey = "modmenu.descriptionTranslation." + getId();
 		if (!I18n.exists(translatableDescriptionKey)) {
-			translatableDescriptionKey = "modmenu.descriptionTranslation." + getId();
+			translatableDescriptionKey = "mod_menu.descriptionTranslation." + getId();
 		}
 		if (!I18n.exists(translatableDescriptionKey)) {
 			translatableDescriptionKey = "modmenu.descriptionTranslation." + getId().replace("_", "-");

@@ -5,7 +5,7 @@ import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 
 public final class ModMenuScreenTexts {
-	public static final Component TITLE = Component.translatable("mod_menu.title");
+	public static final Component TITLE = Component.translatable("modmenu.title");
 
 	public static final String LIBRARIES = ModMenu.MOD_ID + ".configuration.show_libraries";
 	public static final String SORTING = ModMenu.MOD_ID + ".configuration.sorting";
