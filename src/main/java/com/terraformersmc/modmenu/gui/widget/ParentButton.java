@@ -1,21 +1,22 @@
-package com.terraformersmc.mod_menu.gui.widget;
+package com.terraformersmc.modmenu.gui.widget;
 
-import com.terraformersmc.mod_menu.ModMenu;
-import com.terraformersmc.mod_menu.gui.ModsScreen;
-import com.terraformersmc.mod_menu.gui.widget.entries.ModListEntry;
-import com.terraformersmc.mod_menu.util.mod.Mod;
-import net.minecraft.client.gui.GuiGraphics;
+import com.terraformersmc.modmenu.ModMenu;
+import com.terraformersmc.modmenu.gui.ModsScreen;
+import com.terraformersmc.modmenu.gui.widget.entries.ModListEntry;
+import com.terraformersmc.modmenu.util.mod.Mod;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.CommonComponents;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.List;
 
 public class ParentButton extends Button {
     private final ModsScreen screen;
-    static final ResourceLocation ACCEPT_SPRITE = ResourceLocation.withDefaultNamespace("pending_invite/accept");
-    static final ResourceLocation REJECT_SPRITE = ResourceLocation.withDefaultNamespace("pending_invite/reject");
+    static final Identifier ACCEPT_SPRITE = Identifier.withDefaultNamespace("pending_invite/accept");
+    static final Identifier REJECT_SPRITE = Identifier.withDefaultNamespace("pending_invite/reject");
 
     public ParentButton(
             int x,
@@ -29,9 +30,8 @@ public class ParentButton extends Button {
     }
 
     @Override
-    public void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        super.renderWidget(guiGraphics, mouseX, mouseY, partialTick);
-        ResourceLocation resourcelocation;
+    protected void extractContents(GuiGraphicsExtractor guiGraphicsExtractor, int i, int i1, float v) {
+        Identifier resourcelocation;
         Pair<Mod, List<Mod>> currentParent = ModMenu.CURRENT_PARENT;
         ModListEntry selected = screen.getSelectedEntry();
         if (currentParent != null) {
@@ -47,6 +47,7 @@ public class ParentButton extends Button {
         } else {
             resourcelocation = ACCEPT_SPRITE;
         }
-        guiGraphics.blitSprite(resourcelocation, this.getX(), this.getY(), this.width, this.height);
+        guiGraphicsExtractor.blitSprite(RenderPipelines.GUI_TEXTURED, resourcelocation, this.getX(), this.getY(), this.width, this.height);
+
     }
 }
