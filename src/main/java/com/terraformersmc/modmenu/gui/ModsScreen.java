@@ -487,7 +487,7 @@ public class ModsScreen extends Screen {
 					rightPaneY + 2 + lineSpacing * 2,
 					this.paneWidth - imageOffset - 4,
 					1,
-					0x808080
+					0xFFAAAAAA
 				);
 			}
 		}
