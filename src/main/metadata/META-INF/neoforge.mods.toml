@@ -21,7 +21,7 @@ config="${mod_id}.mixins.json"
 [modproperties.modmenu]
 links=[
     "modmenu.original=https://modrinth.com/mod/modmenu",
-    "mod_menu.discord=https://discord.gg/GTYvTWfzxt"
+    "modmenu.discord=https://discord.gg/GTYvTWfzxt"
 ]
 contributors=[
     "shedaniel",
