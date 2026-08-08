@@ -212,4 +212,5 @@
   "option.modmenu.use_catalogue_icon.true": "On",
   "option.modmenu.use_catalogue_icon.false": "Off",
   "option.modmenu.use_catalogue_icon.tooltip": "will use catalogue's icon for mods if present"
+
 }

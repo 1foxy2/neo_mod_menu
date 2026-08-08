@@ -360,9 +360,4 @@ public class NeoforgeMod implements Mod {
 	public void setChildHasUpdate() {
 		this.childHasUpdate = true;
 	}
-
-	@Override
-	public boolean isHidden() {
-		return ModMenu.getConfig().HIDDEN_MODS.get().contains(this.getId());
-	}
 }
