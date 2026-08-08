@@ -11,7 +11,6 @@ displayName="${mod_name}" #mandatory
 #updateJSONURL="https://change.me.example.invalid/updates.json" #optional
 displayURL="https://modrinth.com/mod/better-modlist" #optional
 iconFile="assets/modmenu/icon.png" #optional
-bannerFile="assets/modmenu/icon.png" #optional
 #credits="" #optional
 issueTrackerURL="https://github.com/1foxy2/neo_mod_menu/issues" #optional
 authors="${mod_authors}" #optional
