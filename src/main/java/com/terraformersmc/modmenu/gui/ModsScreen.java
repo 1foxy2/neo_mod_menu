@@ -6,6 +6,7 @@ import com.terraformersmc.modmenu.ModMenu;
 import com.terraformersmc.modmenu.gui.widget.DescriptionListWidget;
 import com.terraformersmc.modmenu.gui.widget.LegacyTexturedButtonWidget;
 import com.terraformersmc.modmenu.gui.widget.ModListWidget;
+import com.terraformersmc.modmenu.gui.widget.ParentButton;
 import com.terraformersmc.modmenu.gui.widget.entries.ModListEntry;
 import com.terraformersmc.modmenu.util.DrawingUtil;
 import com.terraformersmc.modmenu.util.ModMenuScreenTexts;
@@ -15,11 +16,9 @@ import com.terraformersmc.modmenu.util.mod.ModBadge;
 import com.terraformersmc.modmenu.util.mod.ModBadgeRenderer;
 import net.minecraft.SharedConstants;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.util.Util;
-import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.gui.components.*;
 import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.components.EditBox;
-import net.minecraft.client.gui.components.Tooltip;
+import net.minecraft.util.Util;
 import net.minecraft.client.gui.components.toasts.SystemToast;
 import net.minecraft.client.gui.screens.ConfirmLinkScreen;
 import net.minecraft.client.gui.screens.ConfirmScreen;
@@ -36,6 +35,7 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.util.CommonLinks;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.loading.FMLPaths;
+import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,8 +56,9 @@ public class ModsScreen extends Screen {
 	private static final Identifier CONFIGURE_BUTTON_LOCATION = Identifier.fromNamespaceAndPath(ModMenu.NAMESPACE,
 		"textures/gui/configure_button.png"
 	);
-	public static final Identifier BADGE_BUTTON_LOCATION = Identifier.fromNamespaceAndPath(ModMenu.NAMESPACE,
-			"textures/gui/badge_button.png"
+	public static final WidgetSprites BADGE_BUTTON_SPRITES = new WidgetSprites(
+			Identifier.fromNamespaceAndPath(ModMenu.NAMESPACE, "badge_button"),
+			Identifier.fromNamespaceAndPath(ModMenu.NAMESPACE, "badge_button_hovered")
 	);
 
 	private static final Logger LOGGER = LoggerFactory.getLogger("Better ModList | ModsScreen");
@@ -83,7 +84,7 @@ public class ModsScreen extends Screen {
 	private AbstractWidget librariesButton;
 	private ModListWidget modList;
 	private @Nullable AbstractWidget configureButton;
-	private @Nullable AbstractWidget badgeButton;
+	private @Nullable AbstractWidget parentButton;
 	private AbstractWidget websiteButton;
 	private AbstractWidget issuesButton;
 	private DescriptionListWidget descriptionListWidget;
@@ -213,14 +214,23 @@ public class ModsScreen extends Screen {
 				.build();
 		}
 
-		if (!ModMenu.getConfig().HIDE_BADGE_BUTTONS.get()) {
-			this.badgeButton = LegacyTexturedButtonWidget.legacyTexturedBuilder(CommonComponents.EMPTY, button ->
-						this.minecraft.gui.pushScreenLayer(new BadgeScreen(this.selected.mod, paneWidth, searchBoxWidth)))
-					.position(paneWidth / 2 + searchBoxWidth / 2 - 20 / 2 + 26, 22)
-					.size(20, 20)
-					.uv(0, 0, 20)
-					.texture(BADGE_BUTTON_LOCATION, 32, 64)
-					.build();
+		if (ModMenu.getConfig().EDITOR_MODE.get()) {
+			this.parentButton =  new ParentButton(paneWidth / 2 + searchBoxWidth / 2 - 20 / 2 + 26, 22, 20, 20, button -> {
+						Pair<Mod, List<Mod>> currentParent = ModMenu.CURRENT_PARENT;
+						if (currentParent != null) {
+							if (currentParent.getLeft() == selected.getMod()) {
+								ModMenu.CURRENT_PARENT = null;
+							} else {
+								if (!currentParent.getRight().remove(selected.getMod())) {
+									currentParent.getRight().add(selected.getMod());
+								}
+								modList.reloadFilters();
+								ModMenu.getConfig().saveParents();
+							}
+						} else {
+							ModMenu.CURRENT_PARENT = Pair.of(selected.getMod(), ModMenu.PARENT_MAP.get(selected.getMod()));
+						}
+					}, this);
 		}
 
 		// Website button
@@ -302,8 +312,8 @@ public class ModsScreen extends Screen {
 		if (this.configureButton != null) {
 			this.addRenderableWidget(this.configureButton);
 		}
-		if (this.badgeButton != null) {
-			this.addRenderableWidget(this.badgeButton);
+		if (this.parentButton != null) {
+			this.addRenderableWidget(this.parentButton);
 		}
 
 		this.addRenderableWidget(this.websiteButton);
@@ -479,7 +489,7 @@ public class ModsScreen extends Screen {
 					rightPaneY + 2 + lineSpacing * 2,
 					this.paneWidth - imageOffset - 4,
 					1,
-					0x808080
+					0xFFAAAAAA
 				);
 			}
 		}

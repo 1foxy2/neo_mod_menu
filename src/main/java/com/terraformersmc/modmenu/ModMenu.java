@@ -5,8 +5,8 @@ import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Multimaps;
 import com.google.gson.*;
 import com.mojang.blaze3d.platform.NativeImage;
-import com.terraformersmc.modmenu.config.BetterModListConfig;
-import com.terraformersmc.modmenu.config.BetterModListConfigScreen;
+import com.terraformersmc.modmenu.configuration.BetterModListConfig;
+import com.terraformersmc.modmenu.configuration.BetterModListConfigScreen;
 import com.terraformersmc.modmenu.util.EnumToLowerCaseJsonConverter;
 import com.terraformersmc.modmenu.util.ModMenuScreenTexts;
 import com.terraformersmc.modmenu.util.mod.Mod;
@@ -44,10 +44,10 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nullable;
 import java.awt.*;
 import java.io.InputStreamReader;
-import java.nio.file.Path;
 import java.text.NumberFormat;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
@@ -78,6 +78,7 @@ public class ModMenu {
 	public static final Map<String, Mod> MODS = new ConcurrentHashMap<>();
 	public static final Map<String, Mod> ROOT_MODS = new ConcurrentHashMap<>();
 	public static final ListMultimap<Mod, Mod> PARENT_MAP = Multimaps.synchronizedListMultimap(LinkedListMultimap.create());
+    public static Pair<Mod, List<Mod>> CURRENT_PARENT = null;
 
 	public static final Map<String, IConfigScreenFactory> configScreenFactories = new ConcurrentHashMap<>();
 

@@ -29,7 +29,7 @@ public class NeoforgeDummyParentMod implements Mod {
 		if (parentData != null) {
 			badgeNames.addAll(parentData.getBadges());
 		}
-		if (id.equals("fabric-api")) {
+		if (id.equals("fabric_api")) {
 			badgeNames.add("library");
 		}
 	}
@@ -45,8 +45,8 @@ public class NeoforgeDummyParentMod implements Mod {
 		if (parentData != null) {
 			return parentData.getName().orElse("");
 		}
-		if (id.equals("fabric-api")) {
-			return "Fabric API";
+		if (id.equals("fabric_api")) {
+			return "Forgified Fabric API";
 		}
 		return id;
 	}
@@ -69,7 +69,7 @@ public class NeoforgeDummyParentMod implements Mod {
 		}
 		if (iconPath == null) {
 			iconSourceId = ModMenu.MOD_ID;
-			if (id.equals("fabric-api")) {
+			if (id.equals("fabric_api")) {
 				iconPath = "assets/" + ModMenu.NAMESPACE + "/fabric.png";
 			} else {
 				iconPath = "assets/" + ModMenu.NAMESPACE + "/unknown_parent.png";
@@ -174,12 +174,6 @@ public class NeoforgeDummyParentMod implements Mod {
 	public void setChildHasUpdate() {
 		this.childHasUpdate = true;
 	}
-
-	@Override
-	public boolean isHidden() {
-		return ModMenu.getConfig().HIDDEN_MODS.get().contains(this.getId());
-	}
-
 	@Override
 	public ModMenuData getModMenuData() {
 		return host.getModMenuData();

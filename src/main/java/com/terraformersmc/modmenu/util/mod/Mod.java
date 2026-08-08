@@ -3,7 +3,7 @@ package com.terraformersmc.modmenu.util.mod;
 import com.mojang.datafixers.util.Pair;
 import com.terraformersmc.modmenu.ModMenu;
 import com.terraformersmc.modmenu.TextPlaceholderApiCompat;
-import com.terraformersmc.modmenu.config.BetterModListConfig;
+import com.terraformersmc.modmenu.configuration.BetterModListConfig;
 import com.terraformersmc.modmenu.util.mod.neoforge.NeoforgeIconHandler;
 import eu.pb4.placeholders.api.ParserContext;
 import net.minecraft.client.renderer.texture.DynamicTexture;
@@ -131,7 +131,14 @@ public interface Mod {
 
 	boolean getChildHasUpdate();
 
-	boolean isHidden();
+	default boolean isHidden() {
+		for (String string : ModMenu.getConfig().HIDDEN_MODS.get()) {
+			if (getId().matches(string)) {
+				return true;
+			}
+		}
+		return false;
+	}
 
 	ModMenuData getModMenuData();
 

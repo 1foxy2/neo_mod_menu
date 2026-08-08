@@ -23,7 +23,7 @@ public class ChildEntry extends ModListEntry {
     @Override
     public void extractContent(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, boolean isSelected, float delta) {
         super.extractContent(guiGraphics, mouseX, mouseY, isSelected, delta);
-        int x = this.getContentX() - 15;
+        int x = this.getContentX() - 11;
         int y = this.getContentY() + this.getYOffset();
 //		int rowWidth = this.getContentWidth();
         int rowHeight = this.getContentHeight();

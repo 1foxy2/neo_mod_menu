@@ -125,7 +125,9 @@ public class NeoforgeMod implements Mod {
 
 		/* Hardcode parents and badges for Fabric API & kotlin api */
 		if (id.startsWith("fabric")) {
-			modMenuData.fillParentIfEmpty("fabric-api");
+			if (!id.equals("fabric_api")) {
+				modMenuData.fillParentIfEmpty("fabric_api");
+			}
 			badgeNames.add("library");
 		}
 
@@ -357,10 +359,5 @@ public class NeoforgeMod implements Mod {
 	@Override
 	public void setChildHasUpdate() {
 		this.childHasUpdate = true;
-	}
-
-	@Override
-	public boolean isHidden() {
-		return ModMenu.getConfig().HIDDEN_MODS.get().contains(this.getId());
 	}
 }

@@ -84,10 +84,7 @@ public class FabricMod implements Mod {
 				}
 			}
 			badgeNames.addAll(CustomValueUtil.getStringSet("badges", modMenuObject).orElse(new HashSet<>()));
-			CustomValueUtil.getStringMap("links", modMenuObject).orElse(new HashMap<>()).forEach((key, vakue) -> {
-				if (key.startsWith("mod_menu")) key = key.replace("mod_menu", "modmenu");
-				links.put(key, vakue);
-			});
+            links.putAll(CustomValueUtil.getStringMap("links", modMenuObject).orElse(new HashMap<>()));
 			allowsUpdateChecks = CustomValueUtil.getBoolean("update_checker", modMenuObject).orElse(true);
 		}
 
@@ -297,10 +294,5 @@ public class FabricMod implements Mod {
 	@Override
 	public void setChildHasUpdate() {
 		this.childHasUpdate = true;
-	}
-
-	@Override
-	public boolean isHidden() {
-		return ModMenu.getConfig().HIDDEN_MODS.get().contains(this.getId());
 	}
 }

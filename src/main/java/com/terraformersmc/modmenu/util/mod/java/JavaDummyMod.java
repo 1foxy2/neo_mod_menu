@@ -186,11 +186,6 @@ public class JavaDummyMod implements Mod {
 	}
 
 	@Override
-	public boolean isHidden() {
-		return ModMenu.getConfig().HIDDEN_MODS.get().contains(this.getId());
-	}
-
-	@Override
 	public Optional<ModContainer> getContainer() {
 		return Optional.empty();
 	}

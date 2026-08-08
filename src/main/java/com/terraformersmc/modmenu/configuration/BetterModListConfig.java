@@ -1,4 +1,4 @@
-package com.terraformersmc.modmenu.config;
+package com.terraformersmc.modmenu.configuration;
 
 import com.google.gson.annotations.SerializedName;
 import com.terraformersmc.modmenu.ModMenu;
@@ -36,9 +36,9 @@ public class BetterModListConfig {
     public final ModConfigSpec.BooleanValue MODIFY_TITLE_SCREEN;
     public final ModConfigSpec.BooleanValue MODIFY_GAME_MENU;
     public final ModConfigSpec.BooleanValue HIDE_CONFIG_BUTTONS;
-    public final ModConfigSpec.BooleanValue HIDE_BADGE_BUTTONS;
     public final ModConfigSpec.BooleanValue HIDE_SCREEN_TOP;
     public final ModConfigSpec.BooleanValue CONFIG_MODE;
+    public final ModConfigSpec.BooleanValue EDITOR_MODE;
     public final ModConfigSpec.BooleanValue DISABLE_DRAG_AND_DROP;
     public final ModConfigSpec.ConfigValue<List<? extends String>> HIDDEN_MODS;
     public final ModConfigSpec.ConfigValue<List<? extends String>> HIDDEN_CONFIGS;
@@ -78,6 +78,8 @@ public class BetterModListConfig {
                 .define("modify_game_menu", true);
         CONFIG_MODE = builder.comment("Will only show mods with config available")
                 .define("config_mode", false);
+        EDITOR_MODE = builder.comment("Allows to edit mod badges and parents ingame by dragging or button")
+                .define("editor_mode", false);
         DISABLE_DRAG_AND_DROP = builder.comment("Disables drag and drop mods adding")
                 .define("disable_drag_and_drop", false);
         USE_CATALOGUE_ICON = builder.comment("Will use catalogue's icon if present")
@@ -101,8 +103,6 @@ public class BetterModListConfig {
                 .define("hide_neoforge_button", true);
         HIDE_CONFIG_BUTTONS = builder.comment("Hides mod's config button")
                 .define("hide_config_buttons", false);
-        HIDE_BADGE_BUTTONS = builder.comment("hides button which allows changing mod's badge")
-                .define("hide_badge_buttons", true);
         HIDE_SCREEN_TOP = builder.comment("Hides search bar and drag and drop text, also moves mod's icon up")
                 .define("hide_screen_top", false);
         HIDDEN_MODS = builder.comment("Add modid of the mod to hide it from the modlist")
@@ -122,7 +122,7 @@ public class BetterModListConfig {
 
         MOD_BADGES = builder.comment("Adds badge to mod in this format \"modid=badge1, badge2\"")
                 .defineList("mod_badges", ArrayList::new, String::new, object -> object instanceof String);
-        MOD_PARENTS = builder.comment("Make mods apear under another mod in this format \"parenModId=childId1, childId2\"")
+        MOD_PARENTS = builder.comment("Make mods apear under another mod in this format \"parenModId=childId1, childId2\", add ! at the beginning of parentId to prevent creating a fake parent")
                 .defineList("mod_parents", ArrayList::new, String::new, object -> object instanceof String);
 
         //    UPDATE_CHECKER = builder
@@ -138,7 +138,7 @@ public class BetterModListConfig {
             if (badgeKeyValue.length != 1) {
                 Set<String> badges = new LinkedHashSet<>();
                 Set<String> disabledBadges = new LinkedHashSet<>();
-                Arrays.stream(badgeKeyValue[1].split(", ")).toList().forEach(badgeId -> {
+                Arrays.stream(badgeKeyValue[1].split(",\\s*")).toList().forEach(badgeId -> {
                     if (badgeId.startsWith("!"))
                         disabledBadges.add(badgeId.substring(1));
                     else
@@ -159,7 +159,7 @@ public class BetterModListConfig {
                 return;
 
             String[] parentToMod = parentToMods.split("=");
-            modParents.put(parentToMod[0], Arrays.stream(parentToMod[1].split(", ")).toList());
+            modParents.put(parentToMod[0], Arrays.stream(parentToMod[1].split(",\\s*")).toList());
         });
         modParents.forEach((parentString, children) -> {
             for (String id : children) {
@@ -179,8 +179,13 @@ public class BetterModListConfig {
                 Mod parent;
                 modParentSet.clear();
                 while (true) {
+                    boolean fakeParent = true;
+                    if (parentId.startsWith("!")) {
+                        fakeParent = false;
+                        parentId = parentId.substring(1);
+                    }
                     parent = ModMenu.MODS.getOrDefault(parentId, dummyParents.get(parentId));
-                    if (parent == null) {
+                    if (parent == null && fakeParent) {
                         parent = new NeoforgeDummyParentMod(mod, parentId);
                         dummyParents.put(parentId, parent);
                     }
@@ -259,6 +264,37 @@ public class BetterModListConfig {
         });
 
         this.MOD_BADGES.set(list);
+        ModMenu.CONFIG.getRight().save();
+    }
+
+    public void saveParents() {
+        List<String> list = new ArrayList<>();
+        ModMenu.PARENT_MAP.asMap().forEach((parent, childs) -> {
+            StringBuilder string = new StringBuilder();
+            if (!(parent instanceof NeoforgeDummyParentMod)) {
+                string.append("!");
+            }
+            string.append(parent.getId()).append("=");
+            boolean hasChild = false;
+            for (Mod mod : childs) {
+                String originalParent = mod.getParent();
+                if (originalParent == null || !originalParent.equals(parent.getId())) {
+                    if (hasChild) {
+                        string.append(", ");
+                    } else {
+                        hasChild = true;
+                    }
+                    string.append(mod.getId());
+                }
+            }
+
+            if (hasChild) {
+                list.add(string.toString());
+            }
+
+        });
+
+        this.MOD_PARENTS.set(list);
         ModMenu.CONFIG.getRight().save();
     }
 

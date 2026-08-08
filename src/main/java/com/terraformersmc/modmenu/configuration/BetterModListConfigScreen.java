@@ -1,4 +1,4 @@
-package com.terraformersmc.modmenu.config;
+package com.terraformersmc.modmenu.configuration;
 
 import com.electronwill.nightconfig.core.UnmodifiableConfig;
 import com.terraformersmc.modmenu.ModMenu;
@@ -57,7 +57,7 @@ public class BetterModListConfigScreen extends ConfigurationScreen.Configuration
     @Nullable
     @Override
     protected Element createBooleanValue(String key, ModConfigSpec.ValueSpec spec, Supplier<Boolean> source, Consumer<Boolean> target) {
-        if (key.contains("modify") || key.contains("config_mode") || key.contains("drag_and_drop"))
+        if (key.contains("modify") || key.contains("config_mode") || key.contains("editor_mode") || key.contains("drag_and_drop"))
             return super.createBooleanValue(key, spec, source, target);
 
         return new Element(getTranslationComponent(key), getTooltipComponent(key, null),
@@ -111,7 +111,7 @@ public class BetterModListConfigScreen extends ConfigurationScreen.Configuration
     @Nullable
     @Override
     protected <T> Element createList(String key, ModConfigSpec.ListValueSpec spec, ModConfigSpec.ConfigValue<List<T>> list) {
-        if (key.equals("mod_badges")) return null;
+        if (key.equals("mod_badges") || key.equals("mod_parents")) return null;
 
         return super.createList(key, spec, list);
     }
