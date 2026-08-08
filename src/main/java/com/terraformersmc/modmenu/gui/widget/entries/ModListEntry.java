@@ -184,28 +184,36 @@ public class ModListEntry extends ObjectSelectionList.Entry<ModListEntry> {
 	}
 
 	public void renderIcon(GuiGraphicsExtractor guiGraphics, int x, int y, int iconSize) {
-		if (this.getIconTexture().getB().height == this.getIconTexture().getB().width) {
+		Pair<Identifier, Dimension> pair = getIconTexture();
+		Identifier id = pair.getFirst();
+		Dimension dimension = pair.getSecond();
+		if (dimension.height == dimension.width) {
 			guiGraphics.blit(RenderPipelines.GUI_TEXTURED,
-					this.getIconTexture().getA(),
-					x, y, 0.0f, 0.0f,
-					iconSize, iconSize,
-					iconSize, iconSize,
-					ARGB.white(1.0F));
-		} else if (this.getSquareIconTexture().getB().height == this.getSquareIconTexture().getB().width) {
-			guiGraphics.blit(RenderPipelines.GUI_TEXTURED,
-					this.getSquareIconTexture().getA(),
+					id,
 					x, y, 0.0f, 0.0f,
 					iconSize, iconSize,
 					iconSize, iconSize,
 					ARGB.white(1.0F));
 		} else {
-			guiGraphics.blit(RenderPipelines.GUI_TEXTURED, this.getSquareIconTexture().getA(),
-					(int) (x + (iconSize - this.getSquareIconTexture().getB().width) / 2f),
-					(int) (y + (iconSize - this.getSquareIconTexture().getB().height) / 2f),
-					0.0f, 0.0f,
-					this.getSquareIconTexture().getB().width, this.getSquareIconTexture().getB().height,
-					this.getSquareIconTexture().getB().width, this.getSquareIconTexture().getB().height,
-					ARGB.white(1.0F));
+			pair = getSquareIconTexture();
+			id = pair.getFirst();
+			dimension = pair.getSecond();
+			if (dimension.height == dimension.width) {
+				guiGraphics.blit(RenderPipelines.GUI_TEXTURED,
+						id,
+						x, y, 0.0f, 0.0f,
+						iconSize, iconSize,
+						iconSize, iconSize,
+						ARGB.white(1.0F));
+			} else {
+				guiGraphics.blit(RenderPipelines.GUI_TEXTURED, id,
+						(int) (x + (iconSize - dimension.width) / 2f),
+						(int) (y + (iconSize - dimension.height) / 2f),
+						0.0f, 0.0f,
+						dimension.width, dimension.height,
+						dimension.width, dimension.height,
+						ARGB.white(1.0F));
+			}
 		}
 	}
 
@@ -214,7 +222,7 @@ public class ModListEntry extends ObjectSelectionList.Entry<ModListEntry> {
 		list.select(this);
 		int iconSize = ModMenu.getConfig().COMPACT_LIST.get() ? COMPACT_ICON_SIZE : FULL_ICON_SIZE;
 		if (ModMenu.getConfig().EDITOR_MODE.get() && click.x() - list.getRowLeft() > list.getRowWidth() - iconSize) {
-			this.client.pushGuiLayer(new BadgeScreen(
+			this.client.gui.pushScreenLayer(new BadgeScreen(
 					mod,
 					this.getX() + getContentWidth() - iconSize + 4,
 					this.getContentY() + this.getYOffset(),

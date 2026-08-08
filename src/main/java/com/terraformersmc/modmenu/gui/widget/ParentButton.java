@@ -1,5 +1,6 @@
 package com.terraformersmc.modmenu.gui.widget;
 
+import com.mojang.datafixers.util.Pair;
 import com.terraformersmc.modmenu.ModMenu;
 import com.terraformersmc.modmenu.gui.ModsScreen;
 import com.terraformersmc.modmenu.gui.widget.entries.ModListEntry;
@@ -9,7 +10,6 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.resources.Identifier;
-import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.List;
 
@@ -35,10 +35,10 @@ public class ParentButton extends Button {
         Pair<Mod, List<Mod>> currentParent = ModMenu.CURRENT_PARENT;
         ModListEntry selected = screen.getSelectedEntry();
         if (currentParent != null) {
-            if (currentParent.getLeft() == selected.getMod()) {
+            if (currentParent.getFirst() == selected.getMod()) {
                 resourcelocation = REJECT_SPRITE;
             } else {
-                if (currentParent.getRight().contains(selected.getMod())) {
+                if (currentParent.getSecond().contains(selected.getMod())) {
                     resourcelocation = REJECT_SPRITE;
                 } else {
                     resourcelocation = ACCEPT_SPRITE;

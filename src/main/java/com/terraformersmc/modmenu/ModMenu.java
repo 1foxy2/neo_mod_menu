@@ -78,7 +78,7 @@ public class ModMenu {
 	public static final Map<String, Mod> MODS = new ConcurrentHashMap<>();
 	public static final Map<String, Mod> ROOT_MODS = new ConcurrentHashMap<>();
 	public static final ListMultimap<Mod, Mod> PARENT_MAP = Multimaps.synchronizedListMultimap(LinkedListMultimap.create());
-    public static Pair<Mod, List<Mod>> CURRENT_PARENT = null;
+    public static com.mojang.datafixers.util.Pair<Mod, List<Mod>> CURRENT_PARENT = null;
 
 	public static final Map<String, IConfigScreenFactory> configScreenFactories = new ConcurrentHashMap<>();
 

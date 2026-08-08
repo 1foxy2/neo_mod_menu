@@ -35,7 +35,6 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.util.CommonLinks;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.loading.FMLPaths;
-import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -218,11 +217,11 @@ public class ModsScreen extends Screen {
 			this.parentButton =  new ParentButton(paneWidth / 2 + searchBoxWidth / 2 - 20 / 2 + 26, 22, 20, 20, button -> {
 						Pair<Mod, List<Mod>> currentParent = ModMenu.CURRENT_PARENT;
 						if (currentParent != null) {
-							if (currentParent.getLeft() == selected.getMod()) {
+							if (currentParent.getFirst() == selected.getMod()) {
 								ModMenu.CURRENT_PARENT = null;
 							} else {
-								if (!currentParent.getRight().remove(selected.getMod())) {
-									currentParent.getRight().add(selected.getMod());
+								if (!currentParent.getSecond().remove(selected.getMod())) {
+									currentParent.getSecond().add(selected.getMod());
 								}
 								modList.reloadFilters();
 								ModMenu.getConfig().saveParents();
