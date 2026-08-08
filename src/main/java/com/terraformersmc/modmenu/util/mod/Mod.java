@@ -130,7 +130,14 @@ public interface Mod {
 
 	boolean getChildHasUpdate();
 
-	boolean isHidden();
+	default boolean isHidden() {
+		for (String string : ModMenu.getConfig().HIDDEN_MODS.get()) {
+			if (getId().matches(string)) {
+				return true;
+			}
+		}
+		return false;
+	}
 
 	ModMenuData getModMenuData();
 
