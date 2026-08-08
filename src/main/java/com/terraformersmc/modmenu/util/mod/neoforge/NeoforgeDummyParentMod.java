@@ -151,8 +151,8 @@ public class NeoforgeDummyParentMod implements Mod {
 	}
 
 	@Override
-	public @NotNull Set<String> getLicense() {
-		return new HashSet<>();
+	public @NotNull Map<String, Optional<String>> getLicense() {
+		return Collections.emptyMap();
 	}
 
 	@Override

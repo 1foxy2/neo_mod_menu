@@ -1,5 +1,6 @@
 package com.terraformersmc.modmenu.util.mod.fabric;
 
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.mojang.datafixers.util.Pair;
 import com.terraformersmc.modmenu.ModMenu;
@@ -267,8 +268,8 @@ public class FabricMod implements Mod {
 	}
 
 	@Override
-	public @NotNull Set<String> getLicense() {
-		return Sets.newHashSet(metadata.getLicense());
+	public @NotNull Map<String, Optional<String>> getLicense() {
+		return Maps.toMap(metadata.getLicense(), _ -> Optional.empty());
 	}
 
 	@Override

@@ -6,6 +6,7 @@ import com.terraformersmc.modmenu.util.mod.Mod;
 import com.terraformersmc.modmenu.util.mod.fabric.FabricMod;
 import net.fabricmc.loader.api.metadata.ContactInformation;
 import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.util.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -22,10 +23,7 @@ import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.FormattedCharSequence;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class DescriptionListWidget extends AbstractSelectionList<DescriptionListWidget.DescriptionEntry> {
 
@@ -141,7 +139,7 @@ public class DescriptionListWidget extends AbstractSelectionList<DescriptionList
 			});
 		}
 
-		Set<String> licenses = mod.getLicense();
+		Map<String, Optional<String>> licenses = mod.getLicense();
 		if (!ModMenu.getConfig().HIDE_MOD_LICENSE.get() && !licenses.isEmpty()) {
 			this.addEntry(emptyEntry);
 
@@ -149,13 +147,17 @@ public class DescriptionListWidget extends AbstractSelectionList<DescriptionList
 				this.addEntry(new DescriptionEntry(line));
 			}
 
-			for (String license : licenses) {
+			licenses.forEach((license, url) -> {
 				int indent = 8;
-				for (FormattedCharSequence line : textRenderer.split(Component.literal(license), wrapWidth - 16)) {
-					this.addEntry(new DescriptionEntry(line, indent));
+				MutableComponent licenseComponent = Component.literal(license);
+				if (url.isPresent()) {
+					licenseComponent.withStyle(ChatFormatting.BLUE).withStyle(ChatFormatting.UNDERLINE);
+				}
+				for (FormattedCharSequence line : textRenderer.split(licenseComponent, wrapWidth - 16)) {
+					this.addEntry(url.isEmpty() ? new DescriptionEntry(line, indent) : new LinkEntry(line, url.get(), indent));
 					indent = 16;
 				}
-			}
+			});
 		}
 
 		if (!ModMenu.getConfig().HIDE_MOD_CREDITS.get()) {

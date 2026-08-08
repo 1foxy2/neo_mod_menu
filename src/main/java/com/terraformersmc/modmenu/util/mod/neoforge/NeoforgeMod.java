@@ -14,6 +14,8 @@ import net.neoforged.fml.ModList;
 import net.neoforged.fml.javafmlmod.AutomaticEventSubscriber;
 import net.neoforged.fml.loading.moddiscovery.ModFileInfo;
 import net.neoforged.fml.loading.moddiscovery.ModInfo;
+import net.neoforged.neoforge.client.gui.modlist.DefaultModDisplayInfo;
+import net.neoforged.neoforge.client.gui.modlist.ModDisplayInfo;
 import net.neoforged.neoforgespi.language.IModInfo;
 import net.neoforged.neoforgespi.language.ModFileScanData;
 import net.neoforged.neoforgespi.locating.IModFile;
@@ -330,11 +332,11 @@ public class NeoforgeMod implements Mod {
 	}
 
 	@Override
-	public @NotNull Set<String> getLicense() {
+	public @NotNull Map<String, Optional<String>> getLicense() {
 		if ("minecraft".equals(getId())) {
-			return Sets.newHashSet("Minecraft EULA");
+			return Map.of("Minecraft EULA", Optional.of("https://www.minecraft.net/eula"));
 		}
-		return Sets.newHashSet(modInfo.getOwningFile().getLicense());
+		return Map.of(modInfo.getOwningFile().getLicense(), modInfo.getOwningFile().getConfig().getConfigElement("licenseURL"));
 	}
 
 	@Override

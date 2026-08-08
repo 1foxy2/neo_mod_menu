@@ -1,6 +1,7 @@
 package com.terraformersmc.modmenu.util.mod.java;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.mojang.datafixers.util.Pair;
 import com.terraformersmc.modmenu.ModMenu;
@@ -157,8 +158,8 @@ public class JavaDummyMod implements Mod {
 	}
 
 	@Override
-	public @NotNull Set<String> getLicense() {
-		return Sets.newHashSet();
+	public @NotNull Map<String, Optional<String>> getLicense() {
+		return Collections.emptyMap();
 	}
 
 	@Override

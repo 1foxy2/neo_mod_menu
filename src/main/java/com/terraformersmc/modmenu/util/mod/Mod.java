@@ -121,7 +121,7 @@ public interface Mod {
 
 	@Nullable String getParent();
 
-	@NotNull Set<String> getLicense();
+	@NotNull Map<String, Optional<String>> getLicense();
 
 	@NotNull Map<String, String> getLinks();
 
