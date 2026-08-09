@@ -117,7 +117,7 @@ public interface Mod {
 
 		String forgeCredits = displayInfo.credits().getString();
 		if (!forgeCredits.isEmpty()) {
-			contributors.put("_", Set.of(forgeCredits));
+			credits.put("_", Set.of(forgeCredits));
 		}
 
 		for (var author : authors) {

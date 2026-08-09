@@ -39,6 +39,9 @@ public class ModMenuDisplayInfo implements ModDisplayInfo {
     @Override
     public Component authors() {
         List<String> names = mod.getAuthors();
+        if (names.isEmpty()) {
+            return Component.empty();
+        }
         String authors;
         if (names.size() > 1) {
             authors = Joiner.on(", ").join(names);
@@ -95,16 +98,18 @@ public class ModMenuDisplayInfo implements ModDisplayInfo {
 
     @Override
     public @Nullable URI displayUrl() {
-        if (mod.getWebsite().isEmpty()) {
+        String uri = mod.getWebsite();
+        if (uri == null) {
             return null;
         }
 
-        return URI.create(mod.getWebsite());
+        return URI.create(uri);
     }
 
     @Override
     public @Nullable URI issuesUrl() {
-        if (mod.getIssueTracker().isEmpty()) {
+        String uri = mod.getIssueTracker();
+        if (uri == null) {
             return null;
         }
 

@@ -191,7 +191,6 @@ public class DescriptionListWidget extends AbstractSelectionList<DescriptionList
 										wrapWidth - 16
 								)) {
 									this.addEntry(new DescriptionEntry(line, indent));
-									indent = 8;
 								}
 							}
 
