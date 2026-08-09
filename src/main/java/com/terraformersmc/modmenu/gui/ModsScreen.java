@@ -1,6 +1,5 @@
 package com.terraformersmc.modmenu.gui;
 
-import com.google.common.base.Joiner;
 import com.mojang.datafixers.util.Pair;
 import com.terraformersmc.modmenu.ModMenu;
 import com.terraformersmc.modmenu.gui.widget.DescriptionListWidget;
@@ -9,6 +8,7 @@ import com.terraformersmc.modmenu.gui.widget.ModListWidget;
 import com.terraformersmc.modmenu.gui.widget.ParentButton;
 import com.terraformersmc.modmenu.gui.widget.entries.ModListEntry;
 import com.terraformersmc.modmenu.util.DrawingUtil;
+import com.terraformersmc.modmenu.util.ImageData;
 import com.terraformersmc.modmenu.util.ModMenuScreenTexts;
 import com.terraformersmc.modmenu.util.TranslationUtil;
 import com.terraformersmc.modmenu.util.mod.Mod;
@@ -63,6 +63,7 @@ public class ModsScreen extends Screen {
 	private static final Logger LOGGER = LoggerFactory.getLogger("Better ModList | ModsScreen");
 	private final Screen previousScreen;
 	private ModListEntry selected;
+	private ImageData bannerData;
 	private ModBadgeRenderer modBadgeRenderer;
 	private double scrollPercent = 0;
 	private boolean keepFilterOptionsShown = false;
@@ -242,7 +243,7 @@ public class ModsScreen extends Screen {
 					var url = SharedConstants.getCurrentVersion().stable() ? CommonLinks.RELEASE_FEEDBACK : CommonLinks.SNAPSHOT_FEEDBACK;
 					ConfirmLinkScreen.confirmLinkNow(this, url, true);
 				} else {
-					var url = mod.getWebsite();
+					var url = selected.displayInfo.displayUrl();
                     if (url != null) {
                         ConfirmLinkScreen.confirmLinkNow(this, url, false);
                     }
@@ -259,7 +260,7 @@ public class ModsScreen extends Screen {
 				if (isMinecraft) {
 					ConfirmLinkScreen.confirmLinkNow(this, CommonLinks.SNAPSHOT_BUGS_FEEDBACK, true);
 				} else {
-					var url = mod.getIssueTracker();
+					var url = selected.displayInfo.issuesUrl();
                     if (url != null) {
                         ConfirmLinkScreen.confirmLinkNow(this, url, false);
                     }
@@ -413,11 +414,9 @@ public class ModsScreen extends Screen {
 				DrawingUtil.drawRandomVersionBackground(mod, guiGraphics, x, rightPaneY, 32, 32);
 			}
 
-			Pair<Identifier, Dimension> iconProperties = selectedEntry.getIconTexture();
-
-			int imageOffset = iconProperties.getSecond().width;
-			int imageHeight = iconProperties.getSecond().height;
-			guiGraphics.blit(RenderPipelines.GUI_TEXTURED, iconProperties.getFirst(), x, rightPaneY, 0.0F, 0.0F,
+			int imageOffset = bannerData.width();
+			int imageHeight = bannerData.height();
+			guiGraphics.blit(RenderPipelines.GUI_TEXTURED, bannerData.sprite(), x, rightPaneY, 0.0F, 0.0F,
 					imageOffset, imageHeight,
 					imageOffset, imageHeight);
 
@@ -465,7 +464,7 @@ public class ModsScreen extends Screen {
 
 			if (mod.isReal()) {
 				guiGraphics.text(font,
-					mod.getPrefixedVersion(),
+					selectedEntry.displayInfo.version(),
 					x + imageOffset,
 					rightPaneY + 2 + lineSpacing,
 					0xFFAAAAAA,
@@ -473,14 +472,8 @@ public class ModsScreen extends Screen {
 				);
 			}
 
-			String authors;
-			List<String> names = mod.getAuthors();
-			if (!names.isEmpty()) {
-				if (names.size() > 1) {
-					authors = Joiner.on(", ").join(names);
-				} else {
-					authors = names.getFirst();
-				}
+			String authors = selectedEntry.displayInfo.authors().getString();
+			if (!authors.isEmpty()) {
 				DrawingUtil.drawWrappedString(
 					guiGraphics,
 					I18n.get("modmenu.authorPrefix", authors),
@@ -537,6 +530,7 @@ public class ModsScreen extends Screen {
 	@Override
 	public void onClose() {
 		this.modList.close();
+		minecraft.getTextureManager().release(bannerData.sprite());
 		this.minecraft.gui.setScreen(this.previousScreen);
 	}
 
@@ -555,10 +549,14 @@ public class ModsScreen extends Screen {
 			return;
 		}
 
+		if (bannerData != null) {
+			minecraft.getTextureManager().release(bannerData.sprite());
+		}
 		this.selected = entry;
+		bannerData = selected.getBannerTexture();
 		String modId = selected.getMod().getId();
 
-		this.descriptionListWidget.updateSelectedMod(selected.getMod());
+		this.descriptionListWidget.updateSelectedMod(selected);
 
 		if (this.configureButton != null) {
 
@@ -579,10 +577,10 @@ public class ModsScreen extends Screen {
 		this.issuesButton.setMessage(isMinecraft ? REPORT_BUGS_TEXT : ModMenuScreenTexts.ISSUES);
 
 		this.websiteButton.visible = true;
-		this.websiteButton.active = isMinecraft || selected.getMod().getWebsite() != null;
+		this.websiteButton.active = isMinecraft || selected.displayInfo.displayUrl() != null;
 
 		this.issuesButton.visible = true;
-		this.issuesButton.active = isMinecraft || selected.getMod().getIssueTracker() != null;
+		this.issuesButton.active = isMinecraft || selected.displayInfo.issuesUrl() != null;
 	}
 
 	public double getScrollPercent() {

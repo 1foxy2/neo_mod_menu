@@ -70,9 +70,8 @@ public class ModListWidget extends ObjectSelectionList<ModListEntry> implements 
 	public void select(ModListEntry entry) {
 		this.setSelected(entry);
 		if (entry != null) {
-			Mod mod = entry.getMod();
 			this.minecraft.getNarrator()
-				.saySystemNow(Component.translatable("narrator.select", mod.getTranslatedName()));
+				.saySystemNow(Component.translatable("narrator.select", entry.displayInfo.displayName()));
 		}
 	}
 
@@ -480,7 +479,9 @@ public class ModListWidget extends ObjectSelectionList<ModListEntry> implements 
 
 	@Override
 	public void close() {
-		iconHandler.close();
+		for (ModListEntry entry : children()) {
+			minecraft.getTextureManager().release(entry.iconData.sprite());
+		}
 	}
 
 	public NeoforgeIconHandler getNeoforgeIconHandler() {

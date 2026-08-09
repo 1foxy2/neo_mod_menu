@@ -1,25 +1,21 @@
 package com.terraformersmc.modmenu.util.mod.fabric;
 
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
-import com.mojang.datafixers.util.Pair;
-import com.terraformersmc.modmenu.ModMenu;
+import com.terraformersmc.modmenu.util.ModMenuDisplayInfo;
 import com.terraformersmc.modmenu.util.VersionUtil;
 import com.terraformersmc.modmenu.util.mod.Mod;
 import com.terraformersmc.modmenu.util.mod.ModBadge;
-import com.terraformersmc.modmenu.util.mod.neoforge.NeoforgeIconHandler;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
 import net.fabricmc.loader.api.metadata.*;
-import net.minecraft.client.renderer.texture.DynamicTexture;
+import net.minecraft.client.Minecraft;
 import net.neoforged.fml.ModList;
+import net.neoforged.neoforge.client.gui.modlist.ModDisplayInfo;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.awt.*;
-import java.util.List;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -135,35 +131,14 @@ public class FabricMod implements Mod {
 	}
 
 	@Override
-	public @NotNull Pair<DynamicTexture, Dimension> getIcon(NeoforgeIconHandler iconHandler, int i, boolean isSmall) {
-		final String iconSourceId = getId();
-
-		String iconResourceId = iconSourceId + (isSmall ? "_small" : "");
-		if (NeoforgeIconHandler.modResourceIconCache.containsKey(iconResourceId))
-			return NeoforgeIconHandler.modResourceIconCache.get(iconResourceId);
-
-		String iconPath = metadata.getIconPath(i).orElse("assets/" + getId() + "/icon.png");
+	public @NotNull String getIconPath(boolean isSmall) {
+		String iconPath = metadata.getIconPath(64 * Minecraft.getInstance().options.guiScale().get()).orElse(getId() + ":icon.png");
 
 		if (isSmall) {
-            iconPath = iconPath.replace(".png", "_small.png");
-        }
-		net.neoforged.fml.ModContainer iconSource = ModList.get()
-				.getModContainerById(iconSourceId)
-			.orElseThrow(() -> new RuntimeException("Cannot get ModContainer for Fabric mod with id " + iconSourceId));
-		Pair<DynamicTexture, Dimension> icon = iconHandler.createIcon(iconSource, iconPath);
-		if (icon == null && !isSmall) {
-			if (defaultIconWarning) {
-				LOGGER.warn("Warning! Mod {} has a broken icon, loading default icon", metadata.getId());
-				defaultIconWarning = false;
-			}
-			return iconHandler.createIcon(
-				ModList.get()
-						.getModContainerById(ModMenu.MOD_ID)
-					.orElseThrow(() -> new RuntimeException("Cannot get ModContainer for Fabric mod with id " + ModMenu.MOD_ID)),
-				"assets/" + ModMenu.NAMESPACE + "/unknown_icon.png"
-			);
+			iconPath = iconPath.replace(".png", "_small.png");
 		}
-		return icon;
+
+		return iconPath;
 	}
 
 	@Override
@@ -214,26 +189,6 @@ public class FabricMod implements Mod {
 		}
 
 		return contributors;
-	}
-
-	@Override
-	public @NotNull SortedMap<String, Set<String>> getCredits() {
-		SortedMap<String, Set<String>> credits = new TreeMap<>();
-
-		var authors = this.getAuthors();
-		var contributors = this.getContributors();
-		for (var author : authors) {
-			contributors.put(author, List.of("Author"));
-		}
-
-		for (var contributor : contributors.entrySet()) {
-			for (var role : contributor.getValue()) {
-				credits.computeIfAbsent(role, key -> new LinkedHashSet<>());
-				credits.get(role).add(contributor.getKey());
-			}
-		}
-
-		return credits;
 	}
 
 	@Override
@@ -295,5 +250,11 @@ public class FabricMod implements Mod {
 	@Override
 	public void setChildHasUpdate() {
 		this.childHasUpdate = true;
+	}
+
+	@Override
+	public ModDisplayInfo getDisplayInfo() {
+		return forgeContainer.getCustomExtension(ModDisplayInfo.class)
+				.orElseGet(() -> new ModMenuDisplayInfo(this));
 	}
 }

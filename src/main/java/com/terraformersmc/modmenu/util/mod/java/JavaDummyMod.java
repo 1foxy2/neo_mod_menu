@@ -1,25 +1,19 @@
 package com.terraformersmc.modmenu.util.mod.java;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
-import com.mojang.datafixers.util.Pair;
 import com.terraformersmc.modmenu.ModMenu;
+import com.terraformersmc.modmenu.util.ModMenuDisplayInfo;
 import com.terraformersmc.modmenu.util.VersionUtil;
 import com.terraformersmc.modmenu.util.mod.Mod;
 import com.terraformersmc.modmenu.util.mod.ModBadge;
-import com.terraformersmc.modmenu.util.mod.neoforge.NeoforgeIconHandler;
-import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.client.resources.language.I18n;
 import net.neoforged.fml.ModContainer;
-import net.neoforged.fml.ModList;
+import net.neoforged.neoforge.client.gui.modlist.ModDisplayInfo;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.awt.*;
-import java.util.List;
 import java.util.*;
 
 public class JavaDummyMod implements Mod {
@@ -59,33 +53,8 @@ public class JavaDummyMod implements Mod {
 	}
 
 	@Override
-	public @NotNull Pair<DynamicTexture, Dimension> getIcon(NeoforgeIconHandler iconHandler, int i, boolean isSmall) {
-		String iconSourceId = ModMenu.MOD_ID;
-
-		String iconResourceId = iconSourceId  + (isSmall ? "_small" : "");
-		if (NeoforgeIconHandler.modResourceIconCache.containsKey(iconResourceId))
-			return NeoforgeIconHandler.modResourceIconCache.get(iconResourceId);
-
-		String iconPath = "assets/" + ModMenu.NAMESPACE + "/java_icon.png";
-
-		final String finalIconSourceId = iconSourceId;
-		ModContainer iconSource = ModList.get()
-				.getModContainerById(iconSourceId)
-			.orElseThrow(() -> new RuntimeException("Cannot get ModContainer for Neoforge mod with id " + finalIconSourceId));
-		Pair<DynamicTexture, Dimension> icon = iconHandler.createIcon(iconSource, iconPath);
-		if (icon == null) {
-			if (defaultIconWarning) {
-				LOGGER.warn("Warning! Mod {} has a broken icon, loading default icon", modid);
-				defaultIconWarning = false;
-			}
-			return iconHandler.createIcon(
-				ModList.get()
-						.getModContainerById(ModMenu.MOD_ID)
-					.orElseThrow(() -> new RuntimeException("Cannot get ModContainer for Neoforge mod with id " + ModMenu.NAMESPACE)),
-				"assets/" + ModMenu.NAMESPACE + "/unknown_icon.png"
-			);
-		}
-		return icon;
+	public @NotNull String getIconPath(boolean isSmall) {
+		return ModMenu.NAMESPACE + ":java_icon.png";
 	}
 
 	@Override
@@ -122,7 +91,7 @@ public class JavaDummyMod implements Mod {
 	}
 
 	@Override
-	public @NotNull SortedMap<String, Set<String>> getCredits() {
+	public @NotNull SortedMap<String, Set<String>> getCredits(ModDisplayInfo displayInfo) {
 		return new TreeMap<>();
 	}
 
@@ -189,5 +158,10 @@ public class JavaDummyMod implements Mod {
 	@Override
 	public Optional<ModContainer> getContainer() {
 		return Optional.empty();
+	}
+
+	@Override
+	public ModDisplayInfo getDisplayInfo() {
+		return new ModMenuDisplayInfo(this);
 	}
 }

@@ -1,20 +1,17 @@
 package com.terraformersmc.modmenu.util.mod;
 
-import com.mojang.datafixers.util.Pair;
 import com.terraformersmc.modmenu.ModMenu;
 import com.terraformersmc.modmenu.TextPlaceholderApiCompat;
 import com.terraformersmc.modmenu.configuration.BetterModListConfig;
-import com.terraformersmc.modmenu.util.mod.neoforge.NeoforgeIconHandler;
 import eu.pb4.placeholders.api.ParserContext;
-import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.locale.Language;
 import net.minecraft.network.chat.Component;
 import net.neoforged.fml.ModContainer;
+import net.neoforged.neoforge.client.gui.modlist.ModDisplayInfo;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.awt.*;
 import java.util.List;
 import java.util.*;
 
@@ -37,7 +34,7 @@ public interface Mod {
 		return getName();
 	}
 
-	@NotNull Pair<DynamicTexture, Dimension> getIcon(NeoforgeIconHandler iconHandler, int i, boolean isSmall);
+	@NotNull String getIconPath(boolean isSmall);
 
 	@NotNull
 	default String getSummary() {
@@ -97,6 +94,10 @@ public interface Mod {
 
 	@NotNull String getPrefixedVersion();
 
+	default String getForgeCredits() {
+		return "";
+	}
+
 	@NotNull List<String> getAuthors();
 
 	/**
@@ -107,7 +108,31 @@ public interface Mod {
 	/**
 	 * @return a mapping of roles to each contributor with that role.
 	 */
-	@NotNull SortedMap<String, Set<String>> getCredits();
+
+	default @NotNull SortedMap<String, Set<String>> getCredits(ModDisplayInfo displayInfo) {
+		SortedMap<String, Set<String>> credits = new TreeMap<>();
+
+		var authors = displayInfo.authors().getString().split(",\\s");
+		var contributors = this.getContributors();
+
+		String forgeCredits = displayInfo.credits().getString();
+		if (!forgeCredits.isEmpty()) {
+			contributors.put("_", Set.of(forgeCredits));
+		}
+
+		for (var author : authors) {
+			contributors.put(author, List.of("Author"));
+		}
+
+		for (var contributor : contributors.entrySet()) {
+			for (var role : contributor.getValue()) {
+				credits.computeIfAbsent(role, key -> new LinkedHashSet<>());
+				credits.get(role).add(contributor.getKey());
+			}
+		}
+
+		return credits;
+	}
 
 	@NotNull Set<ModBadge> getBadges();
 
@@ -143,6 +168,8 @@ public interface Mod {
 	ModMenuData getModMenuData();
 
 	Optional<ModContainer> getContainer();
+
+	ModDisplayInfo getDisplayInfo();
 
 	static class ModMenuData {
 		private final Set<ModBadge> badges = new LinkedHashSet<>();

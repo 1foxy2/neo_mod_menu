@@ -1,17 +1,14 @@
 package com.terraformersmc.modmenu.util.mod.neoforge;
 
-import com.mojang.datafixers.util.Pair;
 import com.terraformersmc.modmenu.ModMenu;
+import com.terraformersmc.modmenu.util.ModMenuDisplayInfo;
 import com.terraformersmc.modmenu.util.mod.Mod;
 import com.terraformersmc.modmenu.util.mod.ModBadge;
-import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.neoforged.fml.ModContainer;
-import net.neoforged.fml.ModList;
+import net.neoforged.neoforge.client.gui.modlist.ModDisplayInfo;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.awt.*;
-import java.util.List;
 import java.util.*;
 
 public class NeoforgeDummyParentMod implements Mod {
@@ -52,37 +49,24 @@ public class NeoforgeDummyParentMod implements Mod {
 	}
 
 	@Override
-	public @NotNull Pair<DynamicTexture, Dimension> getIcon(NeoforgeIconHandler iconHandler, int i, boolean isSmall) {
-		String iconSourceId = host.getId();
-
-		String iconResourceId = id  + (isSmall ? "_small" : "");
-		if (NeoforgeIconHandler.modResourceIconCache.containsKey(iconResourceId))
-			return NeoforgeIconHandler.modResourceIconCache.get(iconResourceId);
-
+	public @Nullable String getIconPath(boolean isSmall) {
 		NeoforgeMod.ModMenuData.DummyParentData parentData = host.getModMenuData().getDummyParentData();
 		String iconPath = null;
 		if (parentData != null) {
 			iconPath = parentData.getIcon().orElse(null);
 		}
+
 		if ("inherit".equals(iconPath)) {
-			return host.getIcon(iconHandler, i, isSmall);
+			return host.getIconPath(isSmall);
 		}
-		if (iconPath == null) {
-			iconSourceId = ModMenu.MOD_ID;
-			if (id.equals("fabric_api")) {
-				iconPath = "assets/" + ModMenu.NAMESPACE + "/fabric.png";
-			} else {
-				iconPath = "assets/" + ModMenu.NAMESPACE + "/unknown_parent.png";
-			}
+
+		if (id.equals("fabric_api")) {
+			iconPath = ModMenu.NAMESPACE + ":fabric.png";
+		} else {
+			iconPath = ModMenu.NAMESPACE + ":unknown_parent.png";
 		}
-		final String finalIconSourceId = iconSourceId;
-		ModContainer iconSource = ModList.get()
-			.getModContainerById(iconSourceId)
-			.orElseThrow(() -> new RuntimeException("Cannot get ModContainer for Fabric mod with id " + finalIconSourceId));
-		return Objects.requireNonNull(
-			iconHandler.createIcon(iconSource, iconPath),
-			"Mod icon for " + getId() + " is null somehow (should be filled with default in this case)"
-		);
+
+		return iconPath;
 	}
 
 	@Override
@@ -115,7 +99,7 @@ public class NeoforgeDummyParentMod implements Mod {
 	}
 
 	@Override
-	public @NotNull SortedMap<String, Set<String>> getCredits() {
+	public @NotNull SortedMap<String, Set<String>> getCredits(ModDisplayInfo displayInfo) {
 		return new TreeMap<>();
 	}
 
@@ -182,5 +166,10 @@ public class NeoforgeDummyParentMod implements Mod {
 	@Override
 	public Optional<ModContainer> getContainer() {
 		return Optional.empty();
+	}
+
+	@Override
+	public ModDisplayInfo getDisplayInfo() {
+		return new ModMenuDisplayInfo(this);
 	}
 }

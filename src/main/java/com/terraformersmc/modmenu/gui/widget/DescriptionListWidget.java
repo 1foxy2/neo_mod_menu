@@ -2,7 +2,7 @@ package com.terraformersmc.modmenu.gui.widget;
 
 import com.terraformersmc.modmenu.ModMenu;
 import com.terraformersmc.modmenu.gui.ModsScreen;
-import com.terraformersmc.modmenu.util.mod.Mod;
+import com.terraformersmc.modmenu.gui.widget.entries.ModListEntry;
 import com.terraformersmc.modmenu.util.mod.fabric.FabricMod;
 import net.fabricmc.loader.api.metadata.ContactInformation;
 import net.minecraft.ChatFormatting;
@@ -45,7 +45,7 @@ public class DescriptionListWidget extends AbstractSelectionList<DescriptionList
 
 	private final ModsScreen parent;
 	private final Font textRenderer;
-	private Mod selectedMod = null;
+	private ModListEntry selected = null;
 
 	public DescriptionListWidget(
 		Minecraft client,
@@ -61,12 +61,12 @@ public class DescriptionListWidget extends AbstractSelectionList<DescriptionList
 		this.textRenderer = client.font;
 
 		if (copyFrom != null) {
-			updateSelectedMod(copyFrom.selectedMod);
+			updateSelectedMod(copyFrom.selected);
 			setScrollAmount(copyFrom.scrollAmount());
 		}
 
 		if (parent.getSelectedEntry() != null) {
-			updateSelectedMod(parent.getSelectedEntry().getMod());
+			updateSelectedMod(parent.getSelectedEntry());
 		}
 	}
 
@@ -87,30 +87,30 @@ public class DescriptionListWidget extends AbstractSelectionList<DescriptionList
 
 	@Override
 	public void updateWidgetNarration(NarrationElementOutput builder) {
-		if (selectedMod != null) {
+		if (selected != null) {
 			builder.add(
 					NarratedElementType.TITLE,
-					selectedMod.getTranslatedName() + " " + selectedMod.getPrefixedVersion());
+					selected.displayInfo.displayName() + " " + selected.displayInfo.version());;
 		}
 	}
 	private void rebuildUI() {
-		if (selectedMod == null) {
+		if (selected == null) {
 			return;
 		}
 
 		DescriptionEntry emptyEntry = new DescriptionEntry(FormattedCharSequence.EMPTY);
 		int wrapWidth = getRowWidth() - 5;
 
-		Mod mod = selectedMod;
-		Component description = mod.getFormattedDescription();
+		ModListEntry mod = selected;
+		Component description = mod.displayInfo.description();
 		if (!description.getString().isEmpty()) {
 			for (FormattedCharSequence line : textRenderer.split(description, wrapWidth)) {
 				this.addEntry(new DescriptionEntry(line));
 			}
 		}
 
-		Map<String, String> links = mod.getLinks();
-		String sourceLink = mod.getSource();
+		Map<String, String> links = mod.getMod().getLinks();
+		String sourceLink = mod.getMod().getSource();
 		if ((!links.isEmpty() || sourceLink != null) && !ModMenu.getConfig().HIDE_MOD_LINKS.get()) {
 			this.addEntry(emptyEntry);
 
@@ -139,7 +139,7 @@ public class DescriptionListWidget extends AbstractSelectionList<DescriptionList
 			});
 		}
 
-		Map<String, Optional<String>> licenses = mod.getLicense();
+		Map<String, Optional<String>> licenses = mod.getMod().getLicense();
 		if (!ModMenu.getConfig().HIDE_MOD_LICENSE.get() && !licenses.isEmpty()) {
 			this.addEntry(emptyEntry);
 
@@ -161,14 +161,14 @@ public class DescriptionListWidget extends AbstractSelectionList<DescriptionList
 		}
 
 		if (!ModMenu.getConfig().HIDE_MOD_CREDITS.get()) {
-			if ("minecraft".equals(mod.getId())) {
+			if ("minecraft".equals(mod.displayInfo.id())) {
 				this.addEntry(emptyEntry);
 
 				for (FormattedCharSequence line : textRenderer.split(VIEW_CREDITS_TEXT, wrapWidth)) {
 					this.addEntry(new MojangCreditsEntry(line));
 				}
-			} else if (!"java".equals(mod.getId())) {
-				var credits = mod.getCredits();
+			} else if (!"java".equals(mod.displayInfo.id())) {
+				var credits = mod.getMod().getCredits(mod.displayInfo);
 
 				if (!credits.isEmpty()) {
 					this.addEntry(emptyEntry);
@@ -185,6 +185,21 @@ public class DescriptionListWidget extends AbstractSelectionList<DescriptionList
 						var role = iterator.next();
 						var roleName = role.getKey();
 
+						if (roleName.equals("_")) {
+							for (String roleValue : role.getValue()) {
+								for (var line : textRenderer.split(Component.literal(roleValue),
+										wrapWidth - 16
+								)) {
+									this.addEntry(new DescriptionEntry(line, indent));
+									indent = 8;
+								}
+							}
+
+							if (iterator.hasNext()) {
+								this.addEntry(emptyEntry);
+							}
+							continue;
+						}
 						for (var line : textRenderer.split(this.creditsRoleText(roleName),
 								wrapWidth - 16
 						)) {
@@ -196,7 +211,7 @@ public class DescriptionListWidget extends AbstractSelectionList<DescriptionList
 							indent = 16;
 
 							for (var line : textRenderer.split(Component.literal(contributor), wrapWidth - 24)) {
-                                if (mod instanceof FabricMod fabricMod) {
+                                if (mod.getMod() instanceof FabricMod fabricMod) {
                                     ContactInformation contact = fabricMod.getContact(contributor);
                                     if (contact != null && contact.get("email").isPresent()) {
                                         this.addEntry(new MailableContactEntry(line, contact.get("email").get(), indent));
@@ -219,8 +234,8 @@ public class DescriptionListWidget extends AbstractSelectionList<DescriptionList
 		}
 	}
 
-	public void updateSelectedMod(Mod mod) {
-        selectedMod = mod;
+	public void updateSelectedMod(ModListEntry mod) {
+        selected = mod;
         clearEntries();
         setScrollAmount(-Double.MAX_VALUE);
         rebuildUI();

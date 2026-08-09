@@ -4,7 +4,6 @@ import com.google.common.collect.LinkedListMultimap;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Multimaps;
 import com.google.gson.*;
-import com.mojang.blaze3d.platform.NativeImage;
 import com.terraformersmc.modmenu.configuration.BetterModListConfig;
 import com.terraformersmc.modmenu.configuration.BetterModListConfigScreen;
 import com.terraformersmc.modmenu.util.EnumToLowerCaseJsonConverter;
@@ -19,8 +18,6 @@ import com.terraformersmc.modmenu.util.mod.neoforge.NeoforgeMod;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.options.OptionsScreen;
-import net.minecraft.client.renderer.texture.DynamicTexture;
-import net.minecraft.client.resources.language.I18n;
 import net.minecraft.locale.Language;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -35,6 +32,7 @@ import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.gui.ConfigurationScreen;
 import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
+import net.neoforged.neoforge.client.gui.modlist.ImageResource;
 import net.neoforged.neoforge.common.ModConfigSpec;
 import org.apache.commons.lang3.tuple.Pair;
 import org.sinytra.connector.ConnectorEarlyLoader;
@@ -61,7 +59,6 @@ public class ModMenu {
 	public static final Gson GSON;
 	public static final Gson GSON_MINIFIED;
 	public static final Pair<BetterModListConfig, ModConfigSpec> CONFIG;
-	public static boolean shouldResetCache = false;
 
 	static {
 		GsonBuilder builder = new GsonBuilder().registerTypeHierarchyAdapter(Enum.class,
@@ -273,17 +270,13 @@ public class ModMenu {
 					});
 					packResources.listResources(PackType.CLIENT_RESOURCES, namespace, "modicon", (key, value) -> {
 						try {
-							NativeImage image = NativeImage.read(value.get());
-							com.mojang.datafixers.util.Pair<DynamicTexture, Dimension> tex = new com.mojang.datafixers.util.Pair<>(new DynamicTexture(key::toString, image),
-									new Dimension(image.getWidth(), image.getHeight()));
 							String id = key.getPath().replace("modicon/", "").replace(".png", "");
-							NeoforgeIconHandler.modResourceIconCache.put(id, tex);
+							NeoforgeIconHandler.modResourceIconCache.put(id, ImageResource.packAsset(key));
 						} catch (Exception e) {
 							LOGGER.warn(e.getMessage());
 						}
 					});
 				}));
-		ModMenu.shouldResetCache = true;
 
 		MODS.values().forEach(Mod::reCalculateBadge);
 	}
