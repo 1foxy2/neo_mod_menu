@@ -9,6 +9,7 @@ import com.terraformersmc.mod_menu.util.mod.neoforge.NeoforgeIconHandler;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
 import net.fabricmc.loader.api.metadata.*;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.util.Tuple;
 import net.neoforged.fml.ModList;
@@ -134,35 +135,8 @@ public class FabricMod implements Mod {
 	}
 
 	@Override
-	public @NotNull Tuple<DynamicTexture, Dimension> getIcon(NeoforgeIconHandler iconHandler, int i, boolean isSmall) {
-		final String iconSourceId = getId();
-
-		String iconResourceId = iconSourceId + (isSmall ? "_small" : "");
-		if (NeoforgeIconHandler.modResourceIconCache.containsKey(iconResourceId))
-			return NeoforgeIconHandler.modResourceIconCache.get(iconResourceId);
-
-		String iconPath = metadata.getIconPath(i).orElse("assets/" + getId() + "/icon.png");
-
-		if (isSmall) {
-            iconPath = iconPath.replace(".png", "_small.png");
-        }
-		net.neoforged.fml.ModContainer iconSource = ModList.get()
-				.getModContainerById(iconSourceId)
-			.orElseThrow(() -> new RuntimeException("Cannot get ModContainer for Fabric mod with id " + iconSourceId));
-		Tuple<DynamicTexture, Dimension> icon = iconHandler.createIcon(iconSource, iconPath);
-		if (icon == null && !isSmall) {
-			if (defaultIconWarning) {
-				LOGGER.warn("Warning! Mod {} has a broken icon, loading default icon", metadata.getId());
-				defaultIconWarning = false;
-			}
-			return iconHandler.createIcon(
-				ModList.get()
-						.getModContainerById(ModMenu.MOD_ID)
-					.orElseThrow(() -> new RuntimeException("Cannot get ModContainer for Fabric mod with id " + ModMenu.MOD_ID)),
-				"assets/" + ModMenu.MOD_ID + "/unknown_icon.png"
-			);
-		}
-		return icon;
+	public @NotNull String getIconPath(boolean isSmall) {
+		return metadata.getIconPath(64 * Minecraft.getInstance().options.guiScale().get()).orElse(getId() + ":icon.png");
 	}
 
 	@Override

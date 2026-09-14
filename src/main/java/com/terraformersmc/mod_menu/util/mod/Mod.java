@@ -39,7 +39,7 @@ public interface Mod {
 		return getName();
 	}
 
-	@NotNull Tuple<DynamicTexture, Dimension> getIcon(NeoforgeIconHandler iconHandler, int i, boolean isSmall);
+	String getIconPath(boolean isSmall);
 
 	@NotNull
 	default String getSummary() {

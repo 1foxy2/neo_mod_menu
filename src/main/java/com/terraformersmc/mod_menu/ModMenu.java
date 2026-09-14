@@ -6,6 +6,7 @@ import com.mojang.blaze3d.platform.NativeImage;
 import com.terraformersmc.mod_menu.config.ModMenuConfig;
 import com.terraformersmc.mod_menu.config.ModMenuConfigScreen;
 import com.terraformersmc.mod_menu.util.EnumToLowerCaseJsonConverter;
+import com.terraformersmc.mod_menu.util.ImageResource;
 import com.terraformersmc.mod_menu.util.ModMenuScreenTexts;
 import com.terraformersmc.mod_menu.util.mod.Mod;
 import com.terraformersmc.mod_menu.util.mod.ModBadge;
@@ -270,11 +271,8 @@ public class ModMenu {
 					});
 					packResources.listResources(PackType.CLIENT_RESOURCES, namespace, "modicon", (key, value) -> {
 						try {
-							NativeImage image = NativeImage.read(value.get());
-							Tuple<DynamicTexture, Dimension> tex = new Tuple<>(new DynamicTexture(image),
-									new Dimension(image.getWidth(), image.getHeight()));
 							String id = key.getPath().replace("modicon/", "").replace(".png", "");
-							NeoforgeIconHandler.modResourceIconCache.put(id, tex);
+							NeoforgeIconHandler.modResourceIconCache.put(id, ImageResource.packAsset(key));
 						} catch (Exception e) {
 							LOGGER.warn(e.getMessage());
 						}

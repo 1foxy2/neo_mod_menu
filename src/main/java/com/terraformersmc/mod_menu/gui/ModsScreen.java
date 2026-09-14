@@ -9,6 +9,7 @@ import com.terraformersmc.mod_menu.gui.widget.ModListWidget;
 import com.terraformersmc.mod_menu.gui.widget.ParentButton;
 import com.terraformersmc.mod_menu.gui.widget.entries.ModListEntry;
 import com.terraformersmc.mod_menu.util.DrawingUtil;
+import com.terraformersmc.mod_menu.util.ImageData;
 import com.terraformersmc.mod_menu.util.ModMenuScreenTexts;
 import com.terraformersmc.mod_menu.util.TranslationUtil;
 import com.terraformersmc.mod_menu.util.mod.Mod;
@@ -63,6 +64,7 @@ public class ModsScreen extends Screen {
 	private static final Logger LOGGER = LoggerFactory.getLogger("Better ModList | ModsScreen");
 	private final Screen previousScreen;
 	private ModListEntry selected;
+	private ImageData bannerData;
 	private ModBadgeRenderer modBadgeRenderer;
 	private double scrollPercent = 0;
 	private boolean keepFilterOptionsShown = false;
@@ -89,6 +91,7 @@ public class ModsScreen extends Screen {
 	private DescriptionListWidget descriptionListWidget;
 	private AbstractWidget modsFolderButton;
 	private AbstractWidget doneButton;
+	public int iconAnimation = 0;
 
 	public final Map<ModContainer, Boolean> modHasConfigScreen = new HashMap<>();
 	public final Map<String, Throwable> modScreenErrors = new HashMap<>();
@@ -435,11 +438,9 @@ public class ModsScreen extends Screen {
 
 			RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 			RenderSystem.enableBlend();
-			Tuple<ResourceLocation, Dimension> iconProperties = selectedEntry.getIconTexture();
-
-			int imageOffset = iconProperties.getB().width;
-			int imageHeight = iconProperties.getB().height;
-			guiGraphics.blit(iconProperties.getA(), x, rightPaneY, 0.0F, 0.0F,
+			int imageOffset = bannerData.width();
+			int imageHeight = bannerData.height();
+			guiGraphics.blit(bannerData.sprite(), x, rightPaneY, 0.0F, 0.0F,
 					imageOffset, imageHeight,
 					imageOffset, imageHeight);
 
@@ -517,6 +518,12 @@ public class ModsScreen extends Screen {
 		}
 	}
 
+	@Override
+	public void tick() {
+		super.tick();
+		iconAnimation++;
+	}
+
 	private Component computeModCountText(boolean includeLibs, boolean onInit) {
 		int[] rootMods = formatModCount(ModMenu.ROOT_MODS.values()
 			.stream()
@@ -580,7 +587,11 @@ public class ModsScreen extends Screen {
 			return;
 		}
 
+		if (bannerData != null) {
+			minecraft.getTextureManager().release(bannerData.sprite());
+		}
 		this.selected = entry;
+		bannerData = selected.getBannerTexture(selected.getMod());
 		String modId = selected.getMod().getId();
 
 		this.descriptionListWidget.updateSelectedModIfRequired(selected.getMod());

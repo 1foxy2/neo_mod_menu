@@ -52,37 +52,22 @@ public class NeoforgeDummyParentMod implements Mod {
 	}
 
 	@Override
-	public @NotNull Tuple<DynamicTexture, Dimension> getIcon(NeoforgeIconHandler iconHandler, int i, boolean isSmall) {
-		String iconSourceId = host.getId();
-
-		String iconResourceId = id  + (isSmall ? "_small" : "");
-		if (NeoforgeIconHandler.modResourceIconCache.containsKey(iconResourceId))
-			return NeoforgeIconHandler.modResourceIconCache.get(iconResourceId);
-
+	public @Nullable String getIconPath(boolean isSmall) {
 		NeoforgeMod.ModMenuData.DummyParentData parentData = host.getModMenuData().getDummyParentData();
 		String iconPath = null;
 		if (parentData != null) {
 			iconPath = parentData.getIcon().orElse(null);
 		}
+
 		if ("inherit".equals(iconPath)) {
-			return host.getIcon(iconHandler, i, isSmall);
+			return host.getIconPath(isSmall);
 		}
-		if (iconPath == null) {
-			iconSourceId = ModMenu.MOD_ID;
-			if (id.equals("fabric_api")) {
-				iconPath = "assets/" + ModMenu.MOD_ID + "/fabric.png";
-			} else {
-				iconPath = "assets/" + ModMenu.MOD_ID + "/unknown_parent.png";
-			}
+
+		if (id.equals("fabric_api")) {
+			iconPath = ModMenu.MOD_ID + ":fabric.png";
 		}
-		final String finalIconSourceId = iconSourceId;
-		ModContainer iconSource = ModList.get()
-			.getModContainerById(iconSourceId)
-			.orElseThrow(() -> new RuntimeException("Cannot get ModContainer for Fabric mod with id " + finalIconSourceId));
-		return Objects.requireNonNull(
-			iconHandler.createIcon(iconSource, iconPath),
-			"Mod icon for " + getId() + " is null somehow (should be filled with default in this case)"
-		);
+
+		return iconPath;
 	}
 
 	@Override

@@ -58,33 +58,8 @@ public class JavaDummyMod implements Mod {
 	}
 
 	@Override
-	public @NotNull Tuple<DynamicTexture, Dimension> getIcon(NeoforgeIconHandler iconHandler, int i, boolean isSmall) {
-		String iconSourceId = ModMenu.MOD_ID;
-
-		String iconResourceId = iconSourceId  + (isSmall ? "_small" : "");
-		if (NeoforgeIconHandler.modResourceIconCache.containsKey(iconResourceId))
-			return NeoforgeIconHandler.modResourceIconCache.get(iconResourceId);
-
-		String iconPath = "assets/" + ModMenu.MOD_ID + "/java_icon.png";
-
-		final String finalIconSourceId = iconSourceId;
-		ModContainer iconSource = ModList.get()
-				.getModContainerById(iconSourceId)
-			.orElseThrow(() -> new RuntimeException("Cannot get ModContainer for Neoforge mod with id " + finalIconSourceId));
-		Tuple<DynamicTexture, Dimension> icon = iconHandler.createIcon(iconSource, iconPath);
-		if (icon == null) {
-			if (defaultIconWarning) {
-				LOGGER.warn("Warning! Mod {} has a broken icon, loading default icon", modid);
-				defaultIconWarning = false;
-			}
-			return iconHandler.createIcon(
-				ModList.get()
-						.getModContainerById(ModMenu.MOD_ID)
-					.orElseThrow(() -> new RuntimeException("Cannot get ModContainer for Neoforge mod with id " + ModMenu.MOD_ID)),
-				"assets/" + ModMenu.MOD_ID + "/unknown_icon.png"
-			);
-		}
-		return icon;
+	public @NotNull String getIconPath(boolean isSmall) {
+		return ModMenu.MOD_ID + ":java_icon.png";
 	}
 
 	@Override

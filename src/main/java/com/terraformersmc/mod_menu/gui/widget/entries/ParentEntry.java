@@ -3,9 +3,11 @@ package com.terraformersmc.mod_menu.gui.widget.entries;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.terraformersmc.mod_menu.ModMenu;
 import com.terraformersmc.mod_menu.gui.widget.ModListWidget;
+import com.terraformersmc.mod_menu.util.ImageData;
 import com.terraformersmc.mod_menu.util.mod.Mod;
 import com.terraformersmc.mod_menu.util.mod.ModBadge;
 import com.terraformersmc.mod_menu.util.mod.ModSearch;
+import com.terraformersmc.mod_menu.util.mod.neoforge.NeoforgeDummyParentMod;
 import net.minecraft.Util;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
@@ -13,6 +15,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import org.lwjgl.glfw.GLFW;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -22,11 +25,31 @@ public class ParentEntry extends ModListEntry {
 	protected List<Mod> children;
 	protected ModListWidget list;
 	protected boolean hoveringIcon = false;
+	public List<ImageData> childImages = new ArrayList<>();
 
 	public ParentEntry(Mod parent, List<Mod> children, ModListWidget list) {
 		super(parent, list);
 		this.children = children;
 		this.list = list;
+		if (mod instanceof NeoforgeDummyParentMod && iconData.unknown() &&
+				ModMenu.getConfig().ICON_ANIMATION_INTERVAL.getAsInt() != 0) {
+			for (Mod child : children) {
+				ImageData imageData = getSquareIconTexture(child);
+				if (!imageData.unknown()) {
+					childImages.add(imageData);
+				}
+			}
+		}
+	}
+
+	@Override
+	public void renderIcon(GuiGraphics guiGraphics, int x, int y, int iconSize) {
+		if (!childImages.isEmpty()) {
+			renderIcon(guiGraphics, x, y, iconSize, childImages.get((list.getParent().iconAnimation /
+					ModMenu.getConfig().ICON_ANIMATION_INTERVAL.getAsInt()) % childImages.size()));
+		} else {
+			super.renderIcon(guiGraphics, x, y, iconSize);
+		}
 	}
 
 	@Override
@@ -144,7 +167,7 @@ public class ParentEntry extends ModListEntry {
 		} else {
 			list.getParent().showModChildren.add(id);
 		}
-		list.filter(list.getParent().getSearchInput(), false, false);
+		list.filter(list.getParent().getSearchInput(), false, true);
 	}
 
 	@Override
@@ -195,5 +218,13 @@ public class ParentEntry extends ModListEntry {
 	@Override
 	public boolean isMouseOver(double double_1, double double_2) {
 		return Objects.equals(this.list.getEntryAtPos(double_1, double_2), this);
+	}
+
+	@Override
+	public void close() {
+		super.close();
+		for (ImageData imageData : childImages) {
+			list.getParent().getMinecraft().getTextureManager().release(imageData.sprite());
+		}
 	}
 }

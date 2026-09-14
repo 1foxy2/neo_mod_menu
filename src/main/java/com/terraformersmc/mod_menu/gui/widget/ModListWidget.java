@@ -28,7 +28,6 @@ public class ModListWidget extends ObjectSelectionList<ModListEntry> implements 
 	private final Set<Mod> addedMods = new HashSet<>();
 	private String selectedModId = null;
 	private boolean scrolling;
-	private final NeoforgeIconHandler iconHandler = new NeoforgeIconHandler();
 	private Double restoreScrollY = null;
 	private final List<ModListEntry> draggingEntries = new ArrayList<>();
 
@@ -489,11 +488,9 @@ public class ModListWidget extends ObjectSelectionList<ModListEntry> implements 
 
 	@Override
 	public void close() {
-		iconHandler.close();
-	}
-
-	public NeoforgeIconHandler getNeoforgeIconHandler() {
-		return iconHandler;
+		for (ModListEntry entry : children()) {
+			entry.close();
+		}
 	}
 
 	@Override
