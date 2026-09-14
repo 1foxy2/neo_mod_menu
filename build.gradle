@@ -23,13 +23,24 @@ repositories {
         url "https://maven.su5ed.dev/releases"
     }
     maven { url 'https://jitpack.io' }
+    exclusiveContent {
+        forRepository {
+            maven {
+                name = "Modrinth"
+                url = "https://api.modrinth.com/maven"
+            }
+        }
+        filter {
+            includeGroup "maven.modrinth"
+        }
+    }
 }
 
 dependencies {
     // Add FFAPI dependency
-    compileOnly "org.sinytra.forgified-fabric-api:forgified-fabric-api:0.154.0+3.2.3+26.1.2"
-    //runtimeOnly "org.sinytra.forgified-fabric-api:forgified-fabric-api:0.154.0+3.2.3+26.1.2"
+    implementation "org.sinytra.forgified-fabric-api:forgified-fabric-api:0.155.2+26.1.2+3.5.5"
     compileOnly "org.sinytra:connector:3.0.0-beta.1+26.1.2"
+    implementation "maven.modrinth:RTWpcTBp:fTiMG7jQ"
     jarJar(implementation 'com.github.1foxy2:TextPlaceholderAPI-neoforge:51d8f4bf77')
 }
 

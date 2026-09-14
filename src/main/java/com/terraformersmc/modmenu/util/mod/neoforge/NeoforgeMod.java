@@ -183,49 +183,28 @@ public class NeoforgeMod implements Mod {
 	}
 
 	@Override
-	public @NotNull Tuple<DynamicTexture, Dimension> getIcon(NeoforgeIconHandler iconHandler, int i, boolean isSmall) {
-		String iconSourceId = getId();
-
-	    String iconResourceId = iconSourceId  + (isSmall ? "_small" : "");
-		if (NeoforgeIconHandler.modResourceIconCache.containsKey(iconResourceId))
-			return NeoforgeIconHandler.modResourceIconCache.get(iconResourceId);
-
-		String iconPath = modInfo.getLogoFile().orElse("assets/" + getId() + "/icon.png");
-
-		if (isSmall) {
-            String catalogueIcon;
-            if (ModMenu.getConfig().USE_CATALOGUE_ICON.get() && (catalogueIcon = ((ModInfo) modInfo).<String>getConfigElement("catalogueImageIcon").orElse(null)) != null) {
-                iconPath = catalogueIcon;
-            } else {
-                iconPath = iconPath.replace(".png", "_small.png");
-            }
-        }
+	public @NotNull String getIconPath(boolean isSmall) {
 		if ("minecraft".equals(getId())) {
-			iconSourceId = ModMenu.MOD_ID;
-			iconPath = "assets/" + ModMenu.NAMESPACE + "/minecraft_icon.png";
-		} else if ("neoforge".equals(getId()) && isSmall) {
-			iconSourceId = ModMenu.MOD_ID;
-			iconPath = "assets/" + ModMenu.NAMESPACE + "/neoforge.png";
+			return ModMenu.NAMESPACE + ":minecraft_icon.png";
 		}
 
-		final String finalIconSourceId = iconSourceId;
-		ModContainer iconSource = ModList.get()
-				.getModContainerById(iconSourceId)
-			.orElseThrow(() -> new RuntimeException("Cannot get ModContainer for Neoforge mod with id " + finalIconSourceId));
-		Tuple<DynamicTexture, Dimension> icon = iconHandler.createIcon(iconSource, iconPath);
-		if (icon == null && !isSmall) {
-			if (defaultIconWarning) {
-				LOGGER.warn("Warning! Mod {} has a broken icon, loading default icon", modInfo.getModId());
-				defaultIconWarning = false;
-			}
-			return iconHandler.createIcon(
-				ModList.get()
-						.getModContainerById(ModMenu.MOD_ID)
-					.orElseThrow(() -> new RuntimeException("Cannot get ModContainer for Neoforge mod with id " + ModMenu.NAMESPACE)),
-				"assets/" + ModMenu.NAMESPACE + "/unknown_icon.png"
-			);
+		String firstIcon;
+		String secondIcon;
+		if (isSmall) {
+			firstIcon = "iconFile";
+			secondIcon = "bannerFile";
+		} else {
+			firstIcon = "bannerFile";
+			secondIcon = "iconFile";
 		}
-		return icon;
+
+		return container.getModInfo().getConfig().getConfigElement(firstIcon)
+				.or(() -> container.getModInfo().getOwningFile().getConfig().getConfigElement(firstIcon))
+				.or(() -> container.getModInfo().getConfig().getConfigElement(secondIcon))
+				.or(() -> container.getModInfo().getOwningFile().getConfig().getConfigElement(secondIcon))
+				.or(() -> container.getModInfo().getLogoFile())
+				.or(() -> container.getModInfo().getOwningFile().getConfig().getConfigElement("logoFile"))
+				.orElse(null) instanceof String iconFile ? iconFile : getId() + ":icon.png";
 	}
 
 	@Override

@@ -5,6 +5,7 @@ import com.terraformersmc.modmenu.gui.widget.ModListWidget;
 import com.terraformersmc.modmenu.util.mod.Mod;
 import com.terraformersmc.modmenu.util.mod.ModBadge;
 import com.terraformersmc.modmenu.util.mod.ModSearch;
+import com.terraformersmc.modmenu.util.mod.neoforge.NeoforgeIconHandler;
 import net.minecraft.util.Util;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -129,7 +130,12 @@ public class ParentEntry extends ModListEntry {
 		}
 	}
 
-    @Override
+	@Override
+	public void renderIcon(GuiGraphicsExtractor guiGraphics, int x, int y, int iconSize) {
+		super.renderIcon(guiGraphics, x, y, iconSize);
+	}
+
+	@Override
 	public boolean mouseClicked(MouseButtonEvent click, boolean doubleClick) {
 		int iconSize = ModMenu.getConfig().COMPACT_LIST.get() ? COMPACT_ICON_SIZE : FULL_ICON_SIZE;
 		boolean quickConfigure = ModMenu.getConfig().QUICK_CONFIGURE.get();
