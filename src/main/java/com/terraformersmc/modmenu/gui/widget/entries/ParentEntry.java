@@ -2,9 +2,11 @@ package com.terraformersmc.modmenu.gui.widget.entries;
 
 import com.terraformersmc.modmenu.ModMenu;
 import com.terraformersmc.modmenu.gui.widget.ModListWidget;
+import com.terraformersmc.modmenu.util.ImageData;
 import com.terraformersmc.modmenu.util.mod.Mod;
 import com.terraformersmc.modmenu.util.mod.ModBadge;
 import com.terraformersmc.modmenu.util.mod.ModSearch;
+import com.terraformersmc.modmenu.util.mod.neoforge.NeoforgeDummyParentMod;
 import com.terraformersmc.modmenu.util.mod.neoforge.NeoforgeIconHandler;
 import net.minecraft.util.Util;
 import net.minecraft.client.gui.Font;
@@ -16,6 +18,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import org.lwjgl.glfw.GLFW;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -25,11 +28,31 @@ public class ParentEntry extends ModListEntry {
 	protected List<Mod> children;
 	protected ModListWidget list;
 	protected boolean hoveringIcon = false;
+	public List<ImageData> childImages = new ArrayList<>();
 
 	public ParentEntry(Mod parent, List<Mod> children, ModListWidget list) {
 		super(parent, list);
 		this.children = children;
 		this.list = list;
+		if (mod instanceof NeoforgeDummyParentMod && iconData.unknown() &&
+				ModMenu.getConfig().ICON_ANIMATION_INTERVAL.getAsInt() != 0) {
+			for (Mod child : children) {
+				ImageData imageData = getSquareIconTexture(child);
+				if (!imageData.unknown()) {
+					childImages.add(imageData);
+				}
+			}
+		}
+	}
+
+	@Override
+	public void renderIcon(GuiGraphicsExtractor guiGraphics, int x, int y, int iconSize) {
+		if (!childImages.isEmpty()) {
+			renderIcon(guiGraphics, x, y, iconSize, childImages.get((list.getParent().iconAnimation /
+					ModMenu.getConfig().ICON_ANIMATION_INTERVAL.getAsInt()) % childImages.size()));
+		} else {
+			super.renderIcon(guiGraphics, x, y, iconSize);
+		}
 	}
 
 	@Override
@@ -128,11 +151,6 @@ public class ParentEntry extends ModListEntry {
 					0xFFFFFFFF
 			);
 		}
-	}
-
-	@Override
-	public void renderIcon(GuiGraphicsExtractor guiGraphics, int x, int y, int iconSize) {
-		super.renderIcon(guiGraphics, x, y, iconSize);
 	}
 
 	@Override

@@ -37,6 +37,8 @@ public class NeoforgeIconHandler {
 	public static final Map<String, ImageResource> modResourceIconCache = new HashMap<>();
 	public static final ImageResource UNKNOWN = ImageResource.packAsset(
 			Identifier.fromNamespaceAndPath(ModMenu.NAMESPACE, "unknown_icon.png"));
+	public static final ImageResource UNKNOWN_PARENT = ImageResource.packAsset(
+			Identifier.fromNamespaceAndPath(ModMenu.NAMESPACE, "unknown_parent.png"));
 
 	public static ImageData createIcon(Mod mod, boolean small) {
 		ImageResource imageResource;
@@ -53,7 +55,8 @@ public class NeoforgeIconHandler {
 
 		boolean unknown = false;
 		if (resource == null) {
-			resource = UNKNOWN.get(Minecraft.getInstance().getResourceManager());
+			resource = (mod instanceof NeoforgeDummyParentMod ? UNKNOWN_PARENT : UNKNOWN)
+					.get(Minecraft.getInstance().getResourceManager());
 			unknown = true;
 		}
 

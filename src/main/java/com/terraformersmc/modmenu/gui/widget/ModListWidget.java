@@ -461,7 +461,7 @@ public class ModListWidget extends ObjectSelectionList<ModListEntry> implements 
 	@Override
 	public void close() {
 		for (ModListEntry entry : children()) {
-			minecraft.getTextureManager().release(entry.iconData.sprite());
+			entry.close();
 		}
 	}
 

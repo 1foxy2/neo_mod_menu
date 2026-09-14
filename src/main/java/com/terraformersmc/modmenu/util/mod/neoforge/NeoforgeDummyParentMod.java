@@ -65,8 +65,6 @@ public class NeoforgeDummyParentMod implements Mod {
 
 		if (id.equals("fabric_api")) {
 			iconPath = ModMenu.NAMESPACE + ":fabric.png";
-		} else {
-			iconPath = ModMenu.NAMESPACE + ":unknown_parent.png";
 		}
 
 		return iconPath;

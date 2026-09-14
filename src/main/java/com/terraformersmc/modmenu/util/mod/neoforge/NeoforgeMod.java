@@ -14,6 +14,7 @@ import net.neoforged.fml.ModList;
 import net.neoforged.fml.javafmlmod.AutomaticEventSubscriber;
 import net.neoforged.fml.loading.moddiscovery.ModFileInfo;
 import net.neoforged.fml.loading.moddiscovery.ModInfo;
+import net.neoforged.neoforge.common.NeoForgeMod;
 import net.neoforged.neoforgespi.language.IModInfo;
 import net.neoforged.neoforgespi.language.ModFileScanData;
 import net.neoforged.neoforgespi.locating.IModFile;
@@ -186,6 +187,8 @@ public class NeoforgeMod implements Mod {
 	public @NotNull String getIconPath(boolean isSmall) {
 		if ("minecraft".equals(getId())) {
 			return ModMenu.NAMESPACE + ":minecraft_icon.png";
+		} else if (isSmall && NeoForgeMod.MOD_ID.equals(getId())) {
+			return ModMenu.NAMESPACE + ":neoforge.png";
 		}
 
 		String firstIcon;

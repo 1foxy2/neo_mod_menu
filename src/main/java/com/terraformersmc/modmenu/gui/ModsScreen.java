@@ -570,7 +570,7 @@ public class ModsScreen extends Screen {
 			minecraft.getTextureManager().release(bannerData.sprite());
 		}
 		this.selected = entry;
-		bannerData = selected.getBannerTexture();
+		bannerData = selected.getBannerTexture(selected.getMod());
 		String modId = selected.getMod().getId();
 
 		this.descriptionListWidget.updateSelectedMod(selected.getMod());

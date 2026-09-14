@@ -1,12 +1,12 @@
 package com.terraformersmc.modmenu.gui.widget.entries;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.terraformersmc.modmenu.ModMenu;
 import com.terraformersmc.modmenu.gui.widget.ModListWidget;
+import com.terraformersmc.modmenu.util.ImageData;
 import com.terraformersmc.modmenu.util.mod.Mod;
 import com.terraformersmc.modmenu.util.mod.ModBadge;
 import com.terraformersmc.modmenu.util.mod.ModSearch;
-import net.minecraft.util.Util;
+import com.terraformersmc.modmenu.util.mod.neoforge.NeoforgeDummyParentMod;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.input.KeyEvent;
@@ -14,8 +14,10 @@ import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
+import net.minecraft.util.Util;
 import org.lwjgl.glfw.GLFW;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -25,11 +27,31 @@ public class ChildParentEntry extends ChildEntry {
 	protected List<Mod> children;
 	protected ModListWidget list;
 	protected boolean hoveringIcon = false;
+	public List<ImageData> childImages = new ArrayList<>();
 
 	public ChildParentEntry(Mod mod, ParentEntry parent, List<ModListEntry> parents, List<Mod> children, ModListWidget list, boolean bottomChild) {
 		super(mod, parent, parents, list, bottomChild);
 		this.children = children;
 		this.list = list;
+		if (mod instanceof NeoforgeDummyParentMod && iconData.unknown() &&
+				ModMenu.getConfig().ICON_ANIMATION_INTERVAL.getAsInt() != 0) {
+			for (Mod child : children) {
+				ImageData imageData = getSquareIconTexture(child);
+				if (!imageData.unknown()) {
+					childImages.add(imageData);
+				}
+			}
+		}
+	}
+
+	@Override
+	public void renderIcon(GuiGraphicsExtractor guiGraphics, int x, int y, int iconSize) {
+		if (!childImages.isEmpty()) {
+			renderIcon(guiGraphics, x, y, iconSize, childImages.get((list.getParent().iconAnimation /
+					ModMenu.getConfig().ICON_ANIMATION_INTERVAL.getAsInt()) % childImages.size()));
+		} else {
+			super.renderIcon(guiGraphics, x, y, iconSize);
+		}
 	}
 
 	@Override

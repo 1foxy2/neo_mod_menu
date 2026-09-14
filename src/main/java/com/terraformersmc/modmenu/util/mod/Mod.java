@@ -36,7 +36,7 @@ public interface Mod {
 		return getName();
 	}
 
-	@NotNull String getIconPath(boolean isSmall);
+	String getIconPath(boolean isSmall);
 
 	@NotNull
 	default String getSummary() {

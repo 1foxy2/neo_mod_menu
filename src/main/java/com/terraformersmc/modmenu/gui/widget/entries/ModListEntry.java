@@ -25,10 +25,13 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.util.ARGB;
 import net.minecraft.util.Tuple;
 import net.minecraft.util.Util;
+import net.neoforged.fml.ModList;
 
 import java.awt.*;
+import java.io.Closeable;
+import java.io.IOException;
 
-public class ModListEntry extends ObjectSelectionList.Entry<ModListEntry> {
+public class ModListEntry extends ObjectSelectionList.Entry<ModListEntry> implements Closeable {
 	public static final Identifier UNKNOWN_ICON = Identifier.withDefaultNamespace("textures/misc/unknown_pack.png");
 	private static final Identifier MOD_CONFIGURATION_ICON = Identifier.fromNamespaceAndPath(ModMenu.NAMESPACE,
 		"textures/gui/mod_configuration.png"
@@ -51,7 +54,7 @@ public class ModListEntry extends ObjectSelectionList.Entry<ModListEntry> {
 		this.mod = mod;
 		this.list = list;
 		this.client = Minecraft.getInstance();
-		this.iconData = getSquareIconTexture();
+		this.iconData = getSquareIconTexture(mod);
 	}
 
 	@Override
@@ -188,6 +191,10 @@ public class ModListEntry extends ObjectSelectionList.Entry<ModListEntry> {
 	}
 
 	public void renderIcon(GuiGraphicsExtractor guiGraphics, int x, int y, int iconSize) {
+		renderIcon(guiGraphics, x, y, iconSize, iconData);
+	}
+
+	public void renderIcon(GuiGraphicsExtractor guiGraphics, int x, int y, int iconSize, ImageData iconData) {
 		if (iconData.height() == iconData.width()) {
 			guiGraphics.blit(RenderPipelines.GUI_TEXTURED,
 					iconData.sprite(),
@@ -205,7 +212,6 @@ public class ModListEntry extends ObjectSelectionList.Entry<ModListEntry> {
 					ARGB.white(1.0F));
 		}
 	}
-
     @Override
 	public boolean mouseClicked(MouseButtonEvent click, boolean doubleClick) {
 		list.select(this);
@@ -240,8 +246,8 @@ public class ModListEntry extends ObjectSelectionList.Entry<ModListEntry> {
 		return mod;
 	}
 
-	public ImageData getBannerTexture() {
-		ImageData icon = NeoforgeIconHandler.createIcon(getMod(), false);
+	public ImageData getBannerTexture(Mod mod) {
+		ImageData icon = NeoforgeIconHandler.createIcon(mod, false);
 
 		float multiplier = 32f / icon.height();
 		return new ImageData(icon.sprite(),
@@ -249,8 +255,8 @@ public class ModListEntry extends ObjectSelectionList.Entry<ModListEntry> {
 				(int) (icon.height() * multiplier), icon.unknown());
 	}
 
-	public ImageData getSquareIconTexture() {
-		ImageData icon = NeoforgeIconHandler.createIcon(getMod(), true);
+	public ImageData getSquareIconTexture(Mod mod) {
+		ImageData icon = NeoforgeIconHandler.createIcon(mod, true);
 		if (icon.width() == icon.height()) {
 			return icon;
 		} else {
@@ -279,4 +285,9 @@ public class ModListEntry extends ObjectSelectionList.Entry<ModListEntry> {
     public int getYOffset() {
         return this.yOffset;
     }
+
+	@Override
+	public void close() {
+		list.getParent().getMinecraft().getTextureManager().release(iconData.sprite());
+	}
 }

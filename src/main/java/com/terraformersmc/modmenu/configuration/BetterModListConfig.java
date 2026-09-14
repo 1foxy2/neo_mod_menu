@@ -38,6 +38,7 @@ public class BetterModListConfig {
     public final ModConfigSpec.BooleanValue HIDE_SCREEN_TOP;
     public final ModConfigSpec.BooleanValue CONFIG_MODE;
     public final ModConfigSpec.BooleanValue EDITOR_MODE;
+    public final ModConfigSpec.IntValue ICON_ANIMATION_INTERVAL;
     public final ModConfigSpec.BooleanValue DISABLE_DRAG_AND_DROP;
     public final ModConfigSpec.ConfigValue<List<? extends String>> HIDDEN_MODS;
     public final ModConfigSpec.ConfigValue<List<? extends String>> HIDDEN_CONFIGS;
@@ -79,6 +80,8 @@ public class BetterModListConfig {
                 .define("config_mode", false);
         EDITOR_MODE = builder.comment("Allows to edit mod badges and parents ingame by dragging or button")
                 .define("editor_mode", false);
+        ICON_ANIMATION_INTERVAL = builder.comment("If above 0 and fake parent mod doesn't have an icon, will use icons of its children")
+                .defineInRange("icon_animation_interval", 20, 0, 200);
         DISABLE_DRAG_AND_DROP = builder.comment("Disables drag and drop mods adding")
                 .define("disable_drag_and_drop", false);
         USE_CATALOGUE_ICON = builder.comment("Will use catalogue's icon if present")
