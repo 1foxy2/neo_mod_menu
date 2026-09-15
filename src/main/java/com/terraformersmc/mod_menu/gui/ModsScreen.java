@@ -2,6 +2,7 @@ package com.terraformersmc.mod_menu.gui;
 
 import com.google.common.base.Joiner;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.logging.LogUtils;
 import com.terraformersmc.mod_menu.ModMenu;
 import com.terraformersmc.mod_menu.gui.widget.DescriptionListWidget;
 import com.terraformersmc.mod_menu.gui.widget.LegacyTexturedButtonWidget;
@@ -440,6 +441,7 @@ public class ModsScreen extends Screen {
 			RenderSystem.enableBlend();
 			int imageOffset = bannerData.width();
 			int imageHeight = bannerData.height();
+			LogUtils.getLogger().warn(String.valueOf(imageHeight));
 			guiGraphics.blit(bannerData.sprite(), x, rightPaneY, 0.0F, 0.0F,
 					imageOffset, imageHeight,
 					imageOffset, imageHeight);
@@ -591,7 +593,9 @@ public class ModsScreen extends Screen {
 			minecraft.getTextureManager().release(bannerData.sprite());
 		}
 		this.selected = entry;
-		bannerData = selected.getBannerTexture(selected.getMod());
+		bannerData = ModMenu.getConfig().ALWAYS_USE_SQUARE_ICON.get() ?
+				selected.getSquareIconTexture(selected.getMod()) :
+				selected.getBannerTexture(selected.getMod());
 		String modId = selected.getMod().getId();
 
 		this.descriptionListWidget.updateSelectedModIfRequired(selected.getMod());

@@ -32,7 +32,7 @@ public class ChildParentEntry extends ChildEntry {
 		this.children = children;
 		this.list = list;
 		if (mod instanceof NeoforgeDummyParentMod && iconData.unknown() &&
-				ModMenu.getConfig().ICON_ANIMATION_INTERVAL.getAsInt() != 0) {
+				ModMenu.getConfig().DUMMY_ANIMATION_INTERVAL.getAsInt() != 0) {
 			for (Mod child : children) {
 				ImageData imageData = getSquareIconTexture(child);
 				if (!imageData.unknown()) {
@@ -43,12 +43,23 @@ public class ChildParentEntry extends ChildEntry {
 	}
 
 	@Override
-	public void renderIcon(GuiGraphics guiGraphics, int x, int y, int iconSize) {
+	public void renderIcon(GuiGraphics guiGraphics, int x, int y, int iconSize, float partialTicks) {
 		if (!childImages.isEmpty()) {
-			renderIcon(guiGraphics, x, y, iconSize, childImages.get((list.getParent().iconAnimation /
-					ModMenu.getConfig().ICON_ANIMATION_INTERVAL.getAsInt()) % childImages.size()));
+			int interval = ModMenu.getConfig().DUMMY_ANIMATION_INTERVAL.getAsInt();
+			int fade = ModMenu.getConfig().DUMMY_ANIMATION_FADE.getAsInt();
+			int current = list.getParent().iconAnimation / interval;
+			if (current != 0 && list.getParent().iconAnimation % interval < fade) {
+				float fadeProgress = (list.getParent().iconAnimation % interval + partialTicks) / (fade - 1f);
+				RenderSystem.setShaderColor(1f, 1f, 1f, 1f - fadeProgress);
+				renderIcon(guiGraphics, x, y, iconSize, partialTicks, childImages.get((current - 1) % childImages.size()));
+				RenderSystem.setShaderColor(1f, 1f, 1f, fadeProgress);
+				renderIcon(guiGraphics, x, y, iconSize, partialTicks, childImages.get(current % childImages.size()));
+				RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
+			} else {
+				renderIcon(guiGraphics, x, y, iconSize, partialTicks, childImages.get(current % childImages.size()));
+			}
 		} else {
-			super.renderIcon(guiGraphics, x, y, iconSize);
+			super.renderIcon(guiGraphics, x, y, iconSize, partialTicks);
 		}
 	}
 

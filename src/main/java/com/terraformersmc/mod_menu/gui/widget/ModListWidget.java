@@ -416,7 +416,7 @@ public class ModListWidget extends ObjectSelectionList<ModListEntry> implements 
 			int iconSize = 40;
 			guiGraphics.pose().pushPose();
 			guiGraphics.pose().translate(0, 0, 200);
-			draggingEntries.forEach(entry -> entry.renderIcon(guiGraphics, mouseX - iconSize / 2, mouseY - iconSize / 2, iconSize));
+			draggingEntries.forEach(entry -> entry.renderIcon(guiGraphics, mouseX - iconSize / 2, mouseY - iconSize / 2, iconSize, packedFGColor));
 			guiGraphics.pose().popPose();
 		}
 	}

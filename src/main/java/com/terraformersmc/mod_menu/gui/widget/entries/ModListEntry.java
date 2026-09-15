@@ -80,7 +80,7 @@ public class ModListEntry extends ObjectSelectionList.Entry<ModListEntry> implem
 		RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 		RenderSystem.enableBlend();
 
-		renderIcon(guiGraphics, x, y, iconSize);
+		renderIcon(guiGraphics, x, y, iconSize, delta);
 
 		RenderSystem.disableBlend();
 		Component name = Component.literal(mod.getTranslatedName());
@@ -182,11 +182,11 @@ public class ModListEntry extends ObjectSelectionList.Entry<ModListEntry> implem
 		}
 	}
 
-	public void renderIcon(GuiGraphics guiGraphics, int x, int y, int iconSize) {
-		renderIcon(guiGraphics, x, y, iconSize, iconData);
+	public void renderIcon(GuiGraphics guiGraphics, int x, int y, int iconSize, float partialTicks) {
+		renderIcon(guiGraphics, x, y, iconSize, partialTicks, iconData);
 	}
 
-	public void renderIcon(GuiGraphics guiGraphics, int x, int y, int iconSize, ImageData iconData) {
+	public void renderIcon(GuiGraphics guiGraphics, int x, int y, int iconSize, float partialTicks, ImageData iconData) {
 		if (iconData.height() == iconData.width()) {
 			guiGraphics.blit(
 					iconData.sprite(),
