@@ -2,7 +2,6 @@ package com.terraformersmc.mod_menu.gui;
 
 import com.google.common.base.Joiner;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.logging.LogUtils;
 import com.terraformersmc.mod_menu.ModMenu;
 import com.terraformersmc.mod_menu.gui.widget.DescriptionListWidget;
 import com.terraformersmc.mod_menu.gui.widget.LegacyTexturedButtonWidget;
@@ -16,12 +15,10 @@ import com.terraformersmc.mod_menu.util.TranslationUtil;
 import com.terraformersmc.mod_menu.util.mod.Mod;
 import com.terraformersmc.mod_menu.util.mod.ModBadge;
 import com.terraformersmc.mod_menu.util.mod.ModBadgeRenderer;
-import net.minecraft.ChatFormatting;
 import net.minecraft.SharedConstants;
 import net.minecraft.Util;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.*;
-import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.toasts.SystemToast;
 import net.minecraft.client.gui.screens.ConfirmLinkScreen;
 import net.minecraft.client.gui.screens.ConfirmScreen;
@@ -33,7 +30,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.CommonLinks;
-import net.minecraft.util.Tuple;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.loading.FMLPaths;
 import org.apache.commons.lang3.tuple.Pair;
@@ -41,11 +37,9 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.awt.*;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
 import java.util.*;
 import java.util.jar.JarFile;
 import java.util.stream.Collectors;
@@ -378,18 +372,18 @@ public class ModsScreen extends Screen {
 		int grayColor = 11184810;
 		if (!(ModMenu.getConfig().DISABLE_DRAG_AND_DROP.get() || hideTop)) {
 			guiGraphics.drawCenteredString(
-				this.font,
-				ModMenuScreenTexts.DROP_INFO_LINE_1,
-				this.width - this.modList.getWidth() / 2,
-				RIGHT_PANE_Y / 2 - minecraft.font.lineHeight - 1,
-				grayColor
+					this.font,
+					ModMenuScreenTexts.DROP_INFO_LINE_1,
+					this.width - this.modList.getWidth() / 2,
+					RIGHT_PANE_Y / 2 - minecraft.font.lineHeight - 1,
+					grayColor
 			);
 			guiGraphics.drawCenteredString(
-				this.font,
-				ModMenuScreenTexts.DROP_INFO_LINE_2,
-				this.width - this.modList.getWidth() / 2,
-				RIGHT_PANE_Y / 2 + 1,
-				grayColor
+					this.font,
+					ModMenuScreenTexts.DROP_INFO_LINE_2,
+					this.width - this.modList.getWidth() / 2,
+					RIGHT_PANE_Y / 2 + 1,
+					grayColor
 			);
 		}
 
@@ -439,12 +433,16 @@ public class ModsScreen extends Screen {
 
 			RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 			RenderSystem.enableBlend();
-			int imageOffset = bannerData.width();
-			int imageHeight = bannerData.height();
-			LogUtils.getLogger().warn(String.valueOf(imageHeight));
-			guiGraphics.blit(bannerData.sprite(), x, rightPaneY, 0.0F, 0.0F,
-					imageOffset, imageHeight,
-					imageOffset, imageHeight);
+			int imageOffset = 32;
+			if (ModMenu.getConfig().ALWAYS_USE_SQUARE_ICON.get()) {
+				selectedEntry.renderIcon(guiGraphics, x, rightPaneY, 32, delta);
+			} else if (!selectedEntry.renderAnimatedIcon(guiGraphics, x, rightPaneY, 32, delta)) {
+				imageOffset = bannerData.width();
+				int imageHeight = bannerData.height();
+				guiGraphics.blit(bannerData.sprite(), x, rightPaneY, 0.0F, 0.0F,
+						imageOffset, imageHeight,
+						imageOffset, imageHeight);
+			}
 
 			imageOffset += 4;
 
@@ -456,31 +454,31 @@ public class ModsScreen extends Screen {
 			if (font.width(name) > maxNameWidth) {
 				FormattedText ellipsis = FormattedText.of("...");
 				trimmedName = FormattedText.composite(font.substrByWidth(name,
-					maxNameWidth - font.width(ellipsis)
+						maxNameWidth - font.width(ellipsis)
 				), ellipsis);
 			}
 
 			guiGraphics.drawString(font,
-				Language.getInstance().getVisualOrder(trimmedName),
-				x + imageOffset,
-				rightPaneY + 1,
-				0xFFFFFF,
-				true
+					Language.getInstance().getVisualOrder(trimmedName),
+					x + imageOffset,
+					rightPaneY + 1,
+					0xFFFFFF,
+					true
 			);
 
 			if (mouseX > x + imageOffset && mouseY > rightPaneY + 1 &&
-				mouseY < rightPaneY + 1 + font.lineHeight &&
-				mouseX < x + imageOffset + font.width(trimmedName)) {
+					mouseY < rightPaneY + 1 + font.lineHeight &&
+					mouseX < x + imageOffset + font.width(trimmedName)) {
 				this.setTooltipForNextRenderPass(ModMenuScreenTexts.modIdTooltip(mod.getId()));
 			}
 
 			if (this.init || modBadgeRenderer == null || modBadgeRenderer.getMod() != mod) {
 				modBadgeRenderer = new ModBadgeRenderer(
-					x + imageOffset + this.minecraft.font.width(trimmedName) + 2,
-					rightPaneY,
-					width - 28,
-					selectedEntry.mod,
-					this
+						x + imageOffset + this.minecraft.font.width(trimmedName) + 2,
+						rightPaneY,
+						width - 28,
+						selectedEntry.mod,
+						this
 				);
 				this.init = false;
 			}
@@ -491,11 +489,11 @@ public class ModsScreen extends Screen {
 
 			if (mod.isReal()) {
 				guiGraphics.drawString(font,
-					mod.getPrefixedVersion(),
-					x + imageOffset,
-					rightPaneY + 2 + lineSpacing,
-					0x808080,
-					true
+						mod.getPrefixedVersion(),
+						x + imageOffset,
+						rightPaneY + 2 + lineSpacing,
+						0x808080,
+						true
 				);
 			}
 			String authors;
@@ -508,13 +506,13 @@ public class ModsScreen extends Screen {
 					authors = names.getFirst();
 				}
 				DrawingUtil.drawWrappedString(
-					guiGraphics,
-					I18n.get("modmenu.authorPrefix", authors),
-					x + imageOffset,
-					rightPaneY + 2 + lineSpacing * 2,
-					this.paneWidth - imageOffset - 4,
-					1,
-					0x808080
+						guiGraphics,
+						I18n.get("modmenu.authorPrefix", authors),
+						x + imageOffset,
+						rightPaneY + 2 + lineSpacing * 2,
+						this.paneWidth - imageOffset - 4,
+						1,
+						0x808080
 				);
 			}
 		}
@@ -593,9 +591,7 @@ public class ModsScreen extends Screen {
 			minecraft.getTextureManager().release(bannerData.sprite());
 		}
 		this.selected = entry;
-		bannerData = ModMenu.getConfig().ALWAYS_USE_SQUARE_ICON.get() ?
-				selected.getSquareIconTexture(selected.getMod()) :
-				selected.getBannerTexture(selected.getMod());
+		bannerData = selected.getBannerTexture(selected.getMod());
 		String modId = selected.getMod().getId();
 
 		this.descriptionListWidget.updateSelectedModIfRequired(selected.getMod());

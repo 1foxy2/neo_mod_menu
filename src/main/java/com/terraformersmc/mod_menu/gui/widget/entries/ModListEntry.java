@@ -16,16 +16,16 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.ObjectSelectionList;
-import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.locale.Language;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.Mth;
 import net.minecraft.util.Tuple;
 
 import java.awt.*;
 import java.io.Closeable;
+import java.util.Collections;
+import java.util.List;
 
 public class ModListEntry extends ObjectSelectionList.Entry<ModListEntry> implements Closeable {
 	public static final ResourceLocation UNKNOWN_ICON = ResourceLocation.withDefaultNamespace("textures/misc/unknown_pack.png");
@@ -183,7 +183,9 @@ public class ModListEntry extends ObjectSelectionList.Entry<ModListEntry> implem
 	}
 
 	public void renderIcon(GuiGraphics guiGraphics, int x, int y, int iconSize, float partialTicks) {
-		renderIcon(guiGraphics, x, y, iconSize, partialTicks, iconData);
+		if (!renderAnimatedIcon(guiGraphics, x, y, iconSize, partialTicks)) {
+			renderIcon(guiGraphics, x, y, iconSize, partialTicks, iconData);
+		}
 	}
 
 	public void renderIcon(GuiGraphics guiGraphics, int x, int y, int iconSize, float partialTicks, ImageData iconData) {
@@ -196,13 +198,33 @@ public class ModListEntry extends ObjectSelectionList.Entry<ModListEntry> implem
 			);
 		} else {
 			guiGraphics.blit(iconData.sprite(),
-					(int) (x + (iconSize - iconData.width()) / 2f),
-					(int) (y + (iconSize - iconData.height()) / 2f),
+					(int) (x + (iconSize - iconData.width() * iconSize / 32f) / 2f),
+					(int) (y + (iconSize - iconData.height() * iconSize / 32f) / 2f),
 					0.0f, 0.0f,
-					iconData.width(), iconData.height(),
-					iconData.width(), iconData.height()
+					iconData.width() * iconSize / 32, iconData.height() * iconSize / 32,
+					iconData.width() * iconSize / 32, iconData.height() * iconSize / 32
 			);
 		}
+	}
+
+	public boolean renderAnimatedIcon(GuiGraphics guiGraphics, int x, int y, int iconSize, float partialTicks) {
+		if (!getAnimatedIcons().isEmpty()) {
+			int interval = ModMenu.getConfig().DUMMY_ANIMATION_INTERVAL.getAsInt();
+			int fade = ModMenu.getConfig().DUMMY_ANIMATION_FADE.getAsInt();
+			int current = list.getParent().iconAnimation / interval;
+			if (current != 0 && list.getParent().iconAnimation % interval < fade) {
+				float fadeProgress = (list.getParent().iconAnimation % interval + partialTicks) / (fade - 1f);
+				RenderSystem.setShaderColor(1f, 1f, 1f, 1f - fadeProgress);
+				renderIcon(guiGraphics, x, y, iconSize, partialTicks, getAnimatedIcons().get((current - 1) % getAnimatedIcons().size()));
+				RenderSystem.setShaderColor(1f, 1f, 1f, fadeProgress);
+				renderIcon(guiGraphics, x, y, iconSize, partialTicks, getAnimatedIcons().get(current % getAnimatedIcons().size()));
+				RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
+			} else {
+				renderIcon(guiGraphics, x, y, iconSize, partialTicks, getAnimatedIcons().get(current % getAnimatedIcons().size()));
+			}
+			return true;
+		}
+		return false;
 	}
 
 	@Override
@@ -253,11 +275,10 @@ public class ModListEntry extends ObjectSelectionList.Entry<ModListEntry> implem
 			return icon;
 		} else {
 			float multiplier = 32f / icon.height();
-			float iconSize = ModMenu.getConfig().COMPACT_LIST.get() ? ModListEntry.COMPACT_ICON_SIZE : ModListEntry.FULL_ICON_SIZE;
 			float biggerValue = Math.max(icon.width(), icon.height()) * multiplier;
 			return new ImageData(icon.sprite(),
-					(int) (icon.width() * multiplier / biggerValue * iconSize),
-					(int) (icon.height() * multiplier / biggerValue * iconSize), icon.unknown());
+					(int) (icon.width() * multiplier / biggerValue * 32f),
+					(int) (icon.height() * multiplier / biggerValue * 32f), icon.unknown());
 		}
 	}
 
@@ -273,5 +294,9 @@ public class ModListEntry extends ObjectSelectionList.Entry<ModListEntry> implem
 	@Override
 	public void close() {
 		list.getParent().getMinecraft().getTextureManager().release(iconData.sprite());
+	}
+
+	public List<ImageData> getAnimatedIcons() {
+		return Collections.emptyList();
 	}
 }

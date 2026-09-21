@@ -1,10 +1,8 @@
 package com.terraformersmc.mod_menu.gui;
 
-import com.mojang.logging.LogUtils;
 import com.terraformersmc.mod_menu.ModMenu;
 import com.terraformersmc.mod_menu.config.ModMenuConfig;
 import com.terraformersmc.mod_menu.gui.widget.BadgeToogleButton;
-import com.terraformersmc.mod_menu.gui.widget.LegacyTexturedButtonWidget;
 import com.terraformersmc.mod_menu.util.DrawingUtil;
 import com.terraformersmc.mod_menu.util.mod.Mod;
 import com.terraformersmc.mod_menu.util.mod.ModBadge;

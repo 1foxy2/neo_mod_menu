@@ -43,24 +43,8 @@ public class ParentEntry extends ModListEntry {
 	}
 
 	@Override
-	public void renderIcon(GuiGraphics guiGraphics, int x, int y, int iconSize, float partialTicks) {
-		if (!childImages.isEmpty()) {
-			int interval = ModMenu.getConfig().DUMMY_ANIMATION_INTERVAL.getAsInt();
-			int fade = ModMenu.getConfig().DUMMY_ANIMATION_FADE.getAsInt();
-			int current = list.getParent().iconAnimation / interval;
-			if (current != 0 && list.getParent().iconAnimation % interval < fade) {
-				float fadeProgress = (list.getParent().iconAnimation % interval + partialTicks) / (fade - 1f);
-				RenderSystem.setShaderColor(1f, 1f, 1f, 1f - fadeProgress);
-				renderIcon(guiGraphics, x, y, iconSize, partialTicks, childImages.get((current - 1) % childImages.size()));
-				RenderSystem.setShaderColor(1f, 1f, 1f, fadeProgress);
-				renderIcon(guiGraphics, x, y, iconSize, partialTicks, childImages.get(current % childImages.size()));
-				RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
-			} else {
-				renderIcon(guiGraphics, x, y, iconSize, partialTicks, childImages.get(current % childImages.size()));
-			}
-		} else {
-			super.renderIcon(guiGraphics, x, y, iconSize, partialTicks);
-		}
+	public List<ImageData> getAnimatedIcons() {
+		return childImages;
 	}
 
 	@Override
