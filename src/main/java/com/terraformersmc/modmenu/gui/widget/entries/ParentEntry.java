@@ -13,7 +13,7 @@ import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
-import org.lwjgl.glfw.GLFW;
+import org.lwjgl.sdl.SDLScancode;
 
 import java.util.Arrays;
 import java.util.List;
@@ -180,7 +180,7 @@ public class ParentEntry extends ModListEntry {
 				list.filter(list.getParent().getSearchInput(), false);
 				return true;
 			} else {
-				return list.keyPressed(new KeyEvent(GLFW.GLFW_KEY_DOWN, 0, 0));
+				return list.keyPressed(new KeyEvent(SDLScancode.SDL_SCANCODE_DOWN, 0, 0));
 			}
 		}
 

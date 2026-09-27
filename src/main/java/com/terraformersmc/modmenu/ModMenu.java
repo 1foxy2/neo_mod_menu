@@ -103,7 +103,7 @@ public class ModMenu {
 			return configScreenFactories.get(container.getModId());
 
 		configScreenFactories.putIfAbsent("minecraft", (modContainer, screen) ->
-				new OptionsScreen(screen, Minecraft.getInstance().options, Minecraft.getInstance().level != null));
+				new OptionsScreen(screen, Minecraft.getInstance().options));
 
 		Optional<IConfigScreenFactory> factoryOptional = IConfigScreenFactory.getForMod(container.getModInfo());
 

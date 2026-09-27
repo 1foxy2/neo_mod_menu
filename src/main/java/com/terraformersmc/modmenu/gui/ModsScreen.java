@@ -1,5 +1,6 @@
 package com.terraformersmc.modmenu.gui;
 
+import com.mojang.blaze3d.Blaze3D;
 import com.mojang.datafixers.util.Pair;
 import com.terraformersmc.modmenu.ModMenu;
 import com.terraformersmc.modmenu.gui.widget.DescriptionListWidget;
@@ -88,10 +89,8 @@ public class ModsScreen extends Screen {
 	private AbstractWidget websiteButton;
 	private AbstractWidget issuesButton;
 	private DescriptionListWidget descriptionListWidget;
-	private AbstractWidget modsFolderButton;
-	private AbstractWidget doneButton;
 
-	public final Map<ModContainer, Boolean> modHasConfigScreen = new HashMap<>();
+    public final Map<ModContainer, Boolean> modHasConfigScreen = new HashMap<>();
 	public final Map<String, Throwable> modScreenErrors = new HashMap<>();
 
 	private static final Component SEND_FEEDBACK_TEXT = Component.translatable("menu.sendFeedback");
@@ -286,14 +285,14 @@ public class ModsScreen extends Screen {
 		this.descriptionListWidget.setX(this.rightPaneX);
 
 		// Mods folder button
-		this.modsFolderButton = Button.builder(ModMenuScreenTexts.MODS_FOLDER, button -> {
-			Util.getPlatform().openUri(FMLPaths.MODSDIR.get().toUri());
-		}).pos(this.width / 2 - 154, this.height - 28).size(150, 20).build();
+        AbstractWidget modsFolderButton = Button.builder(ModMenuScreenTexts.MODS_FOLDER,
+						_ -> Blaze3D.openUri(FMLPaths.MODSDIR.get().toUri()))
+				.pos(this.width / 2 - 154, this.height - 28).size(150, 20).build();
 
 		// Done button
-		this.doneButton = Button.builder(CommonComponents.GUI_DONE, button -> {
-			minecraft.gui.setScreen(previousScreen);
-		}).pos(this.width / 2 + 4, this.height - 28).size(150, 20).build();
+        AbstractWidget doneButton = Button.builder(CommonComponents.GUI_DONE, button -> {
+            minecraft.gui.setScreen(previousScreen);
+        }).pos(this.width / 2 + 4, this.height - 28).size(150, 20).build();
 
 		// Initialize data
 		modList.finalizeInit();
@@ -319,8 +318,8 @@ public class ModsScreen extends Screen {
 		this.addRenderableWidget(this.websiteButton);
 		this.addRenderableWidget(this.issuesButton);
 		this.addWidget(this.descriptionListWidget);
-		this.addRenderableWidget(this.modsFolderButton);
-		this.addRenderableWidget(this.doneButton);
+		this.addRenderableWidget(modsFolderButton);
+		this.addRenderableWidget(doneButton);
 
 		this.init = true;
 		this.keepFilterOptionsShown = true;
