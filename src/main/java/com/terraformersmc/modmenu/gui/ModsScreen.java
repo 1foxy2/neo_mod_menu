@@ -78,6 +78,7 @@ public class ModsScreen extends Screen {
 	private int filtersWidth;
 	private int searchRowWidth;
 	public final Set<String> showModChildren = new HashSet<>();
+	public int iconAnimation = 0;
 
 	private EditBox searchBox;
 	private @Nullable AbstractWidget filtersButton;
@@ -413,11 +414,16 @@ public class ModsScreen extends Screen {
 				DrawingUtil.drawRandomVersionBackground(mod, guiGraphics, x, rightPaneY, 32, 32);
 			}
 
-			int imageOffset = bannerData.width();
-			int imageHeight = bannerData.height();
-			guiGraphics.blit(RenderPipelines.GUI_TEXTURED, bannerData.sprite(), x, rightPaneY, 0.0F, 0.0F,
-					imageOffset, imageHeight,
-					imageOffset, imageHeight);
+			int imageOffset = 32;
+			if (ModMenu.getConfig().ALWAYS_USE_SQUARE_ICON.get()) {
+				selectedEntry.renderIcon(guiGraphics, x, rightPaneY, 32, delta);
+			} else if (!selectedEntry.renderAnimatedIcon(guiGraphics, x, rightPaneY, 32, delta)) {
+				imageOffset = bannerData.width();
+				int imageHeight = bannerData.height();
+				guiGraphics.blit(RenderPipelines.GUI_TEXTURED, bannerData.sprite(), x, rightPaneY, 0.0F, 0.0F,
+						imageOffset, imageHeight,
+						imageOffset, imageHeight);
+			}
 
 			imageOffset += 4;
 
@@ -486,6 +492,12 @@ public class ModsScreen extends Screen {
 		}
 	}
 
+	@Override
+	public void tick() {
+		super.tick();
+		iconAnimation++;
+	}
+
 	private Component computeModCountText(boolean includeLibs, boolean onInit) {
 		int[] rootMods = formatModCount(ModMenu.ROOT_MODS.values()
 			.stream()
@@ -552,7 +564,7 @@ public class ModsScreen extends Screen {
 			minecraft.getTextureManager().release(bannerData.sprite());
 		}
 		this.selected = entry;
-		bannerData = selected.getBannerTexture();
+		bannerData = selected.getBannerTexture(selected.getMod());
 		String modId = selected.getMod().getId();
 
 		this.descriptionListWidget.updateSelectedMod(selected);

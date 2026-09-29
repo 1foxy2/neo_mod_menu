@@ -2,7 +2,6 @@ package com.terraformersmc.modmenu.mixin;
 
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
-import com.mojang.logging.LogUtils;
 import com.terraformersmc.modmenu.ModMenu;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.locale.Language;

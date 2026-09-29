@@ -3,6 +3,7 @@ package com.terraformersmc.modmenu.util.mod.neoforge;
 import com.mojang.blaze3d.platform.NativeImage;
 import com.terraformersmc.modmenu.ModMenu;
 import com.terraformersmc.modmenu.util.ImageData;
+import com.terraformersmc.modmenu.util.mod.Mod;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.client.renderer.texture.TextureManager;
@@ -24,12 +25,15 @@ public class NeoforgeIconHandler {
 	public static final Map<String, ImageResource> modResourceIconCache = new HashMap<>();
 	public static final ImageResource UNKNOWN = ImageResource.packAsset(
 			Identifier.fromNamespaceAndPath(ModMenu.NAMESPACE, "unknown_icon.png"));
+	public static final ImageResource UNKNOWN_PARENT = ImageResource.packAsset(
+			Identifier.fromNamespaceAndPath(ModMenu.NAMESPACE, "unknown_parent.png"));
 
-	public static ImageData createIcon(String modId, ModDisplayInfo displayInfo, boolean small) {
+
+	public static ImageData createIcon(Mod mod, ModDisplayInfo displayInfo, boolean small) {
 
 			ImageResource imageResource;
-			if (NeoforgeIconHandler.modResourceIconCache.containsKey(modId)) {
-				imageResource = NeoforgeIconHandler.modResourceIconCache.get(modId);
+			if (NeoforgeIconHandler.modResourceIconCache.containsKey(mod.getId())) {
+				imageResource = NeoforgeIconHandler.modResourceIconCache.get(mod.getId());
 			} else {
 				imageResource = small ? displayInfo.icon() : displayInfo.banner();
 			}
@@ -41,7 +45,8 @@ public class NeoforgeIconHandler {
 
 			boolean unknown = false;
 			if (resource == null) {
-				resource = UNKNOWN.get(Minecraft.getInstance().getResourceManager());
+				resource = (mod instanceof NeoforgeDummyParentMod ? UNKNOWN_PARENT : UNKNOWN)
+						.get(Minecraft.getInstance().getResourceManager());
 				unknown = true;
 			}
 
@@ -50,12 +55,12 @@ public class NeoforgeIconHandler {
 			try (InputStream imageStream = resource.get()) {
 				image = NativeImage.read(imageStream);
 			} catch (IOException e) {
-				LOGGER.warn("Failed to load {} resource {} for mod ID {}", type, imageResource, modId);
+				LOGGER.warn("Failed to load {} resource {} for mod ID {}", type, imageResource, mod.getId());
 				return null;
 			}
 
 			final TextureManager textureManager = Minecraft.getInstance().getTextureManager();
-			final Identifier sprite = Identifier.fromNamespaceAndPath(ModMenu.MOD_ID, "mod/" + type + "/" + modId);
+			final Identifier sprite = Identifier.fromNamespaceAndPath(ModMenu.MOD_ID, "mod/" + type + "/" + mod.getId());
 			textureManager.register(sprite, new DynamicTexture(sprite::toString, image));
 			return new ImageData(sprite, image.getWidth(), image.getHeight(), unknown);
 	}

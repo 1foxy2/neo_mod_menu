@@ -22,10 +22,15 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.ARGB;
+import net.minecraft.util.Mth;
 import net.minecraft.util.Util;
 import net.neoforged.neoforge.client.gui.modlist.ModDisplayInfo;
 
-public class ModListEntry extends ObjectSelectionList.Entry<ModListEntry> {
+import java.io.Closeable;
+import java.util.Collections;
+import java.util.List;
+
+public class ModListEntry extends ObjectSelectionList.Entry<ModListEntry> implements Closeable {
 	public static final Identifier UNKNOWN_ICON = Identifier.withDefaultNamespace("textures/misc/unknown_pack.png");
 	private static final Identifier MOD_CONFIGURATION_ICON = Identifier.fromNamespaceAndPath(ModMenu.NAMESPACE,
 		"textures/gui/mod_configuration.png"
@@ -48,7 +53,7 @@ public class ModListEntry extends ObjectSelectionList.Entry<ModListEntry> {
 		this.displayInfo = mod.getDisplayInfo();
 		this.list = list;
 		this.client = Minecraft.getInstance();
-		this.iconData = getSquareIconTexture();
+		this.iconData = getSquareIconTexture(mod, displayInfo);
 	}
 
 	@Override
@@ -75,7 +80,7 @@ public class ModListEntry extends ObjectSelectionList.Entry<ModListEntry> {
 			DrawingUtil.drawRandomVersionBackground(mod, guiGraphics, x, y, iconSize, iconSize);
 		}
 
-		renderIcon(guiGraphics, x, y, iconSize);
+		renderIcon(guiGraphics, x, y, iconSize, delta);
 
 		Component name = displayInfo.displayName();
 		FormattedText trimmedName = name;
@@ -184,23 +189,58 @@ public class ModListEntry extends ObjectSelectionList.Entry<ModListEntry> {
 		}
 	}
 
-	public void renderIcon(GuiGraphicsExtractor guiGraphics, int x, int y, int iconSize) {
+	public void renderIcon(GuiGraphicsExtractor guiGraphics, int x, int y, int iconSize, float partialTicks) {
+		if (!renderAnimatedIcon(guiGraphics, x, y, iconSize, partialTicks)) {
+			renderIcon(guiGraphics, x, y, iconSize, partialTicks, iconData);
+		}
+	}
+
+	public void renderIcon(GuiGraphicsExtractor guiGraphics, int x, int y, int iconSize, float partialTicks, ImageData iconData) {
+		renderIcon(guiGraphics, x, y, iconSize, partialTicks, iconData, ARGB.white(1.0F));
+	}
+
+	public void renderIcon(GuiGraphicsExtractor guiGraphics, int x, int y, int iconSize, float partialTicks, ImageData iconData, int color) {
 		if (iconData.height() == iconData.width()) {
-			guiGraphics.blit(RenderPipelines.GUI_TEXTURED,
+			guiGraphics.blit(
+					RenderPipelines.GUI_TEXTURED,
 					iconData.sprite(),
 					x, y, 0.0f, 0.0f,
 					iconSize, iconSize,
 					iconSize, iconSize,
-					ARGB.white(1.0F));
+					color
+			);
 		} else {
-			guiGraphics.blit(RenderPipelines.GUI_TEXTURED, iconData.sprite(),
-					(int) (x + (iconSize - iconData.width()) / 2f),
-					(int) (y + (iconSize - iconData.height()) / 2f),
+			guiGraphics.blit(
+					RenderPipelines.GUI_TEXTURED, iconData.sprite(),
+					(int) (x + (iconSize - iconData.width() * iconSize / 32f) / 2f),
+					(int) (y + (iconSize - iconData.height() * iconSize / 32f) / 2f),
 					0.0f, 0.0f,
-					iconData.width(), iconData.height(),
-					iconData.width(), iconData.height(),
-					ARGB.white(1.0F));
+					iconData.width() * iconSize / 32, iconData.height() * iconSize / 32,
+					iconData.width() * iconSize / 32, iconData.height() * iconSize / 32,
+					color
+			);
 		}
+	}
+
+	public boolean renderAnimatedIcon(GuiGraphicsExtractor guiGraphics, int x, int y, int iconSize, float partialTicks) {
+		if (!getAnimatedIcons().isEmpty()) {
+			int interval = ModMenu.getConfig().DUMMY_ANIMATION_INTERVAL.getAsInt();
+			int fade = ModMenu.getConfig().DUMMY_ANIMATION_FADE.getAsInt();
+			int current = list.getParent().iconAnimation / interval;
+			if (current != 0 && list.getParent().iconAnimation % interval < fade) {
+				float fadeProgress = Mth.clamp((list.getParent().iconAnimation % interval + partialTicks) / (fade - 1f), 0f, 1f);
+				renderIcon(guiGraphics, x, y, iconSize, partialTicks,
+						getAnimatedIcons().get((current - 1) % getAnimatedIcons().size()),
+						ARGB.white(1f - fadeProgress));
+				renderIcon(guiGraphics, x, y, iconSize, partialTicks,
+						getAnimatedIcons().get(current % getAnimatedIcons().size()),
+						ARGB.white(fadeProgress));
+			} else {
+				renderIcon(guiGraphics, x, y, iconSize, partialTicks, getAnimatedIcons().get(current % getAnimatedIcons().size()));
+			}
+			return true;
+		}
+		return false;
 	}
 
     @Override
@@ -237,8 +277,8 @@ public class ModListEntry extends ObjectSelectionList.Entry<ModListEntry> {
 		return mod;
 	}
 
-	public ImageData getBannerTexture() {
-		ImageData icon = NeoforgeIconHandler.createIcon(getMod().getId(), displayInfo, false);
+	public ImageData getBannerTexture(Mod mod) {
+		ImageData icon = NeoforgeIconHandler.createIcon(mod, displayInfo, false);
 
 		float multiplier = 32f / icon.height();
 		return new ImageData(icon.sprite(),
@@ -246,17 +286,16 @@ public class ModListEntry extends ObjectSelectionList.Entry<ModListEntry> {
 				(int) (icon.height() * multiplier), icon.unknown());
 	}
 
-	public ImageData getSquareIconTexture() {
-		ImageData icon = NeoforgeIconHandler.createIcon(getMod().getId(), displayInfo, true);
+	public ImageData getSquareIconTexture(Mod mod, ModDisplayInfo displayInfo) {
+		ImageData icon = NeoforgeIconHandler.createIcon(mod, displayInfo, true);
 		if (icon.width() == icon.height()) {
 			return icon;
 		} else {
 			float multiplier = 32f / icon.height();
-			float iconSize = ModMenu.getConfig().COMPACT_LIST.get() ? ModListEntry.COMPACT_ICON_SIZE : ModListEntry.FULL_ICON_SIZE;
 			float biggerValue = Math.max(icon.width(), icon.height()) * multiplier;
 			return new ImageData(icon.sprite(),
-					(int) (icon.width() * multiplier / biggerValue * iconSize),
-					(int) (icon.height() * multiplier / biggerValue * iconSize), icon.unknown());
+					(int) (icon.width() * multiplier / biggerValue * 32f),
+					(int) (icon.height() * multiplier / biggerValue * 32f), icon.unknown());
 		}
 	}
 
@@ -282,4 +321,13 @@ public class ModListEntry extends ObjectSelectionList.Entry<ModListEntry> {
     public int getYOffset() {
         return this.yOffset;
     }
+
+	@Override
+	public void close() {
+		list.getParent().getMinecraft().getTextureManager().release(iconData.sprite());
+	}
+
+	public List<ImageData> getAnimatedIcons() {
+		return Collections.emptyList();
+	}
 }

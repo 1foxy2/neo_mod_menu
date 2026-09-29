@@ -2,9 +2,11 @@ package com.terraformersmc.modmenu.gui.widget.entries;
 
 import com.terraformersmc.modmenu.ModMenu;
 import com.terraformersmc.modmenu.gui.widget.ModListWidget;
+import com.terraformersmc.modmenu.util.ImageData;
 import com.terraformersmc.modmenu.util.mod.Mod;
 import com.terraformersmc.modmenu.util.mod.ModBadge;
 import com.terraformersmc.modmenu.util.mod.ModSearch;
+import com.terraformersmc.modmenu.util.mod.neoforge.NeoforgeDummyParentMod;
 import net.minecraft.util.Util;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -15,6 +17,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import org.lwjgl.sdl.SDLScancode;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -24,12 +27,28 @@ public class ParentEntry extends ModListEntry {
 	protected List<Mod> children;
 	protected ModListWidget list;
 	protected boolean hoveringIcon = false;
+	public List<ImageData> childImages = new ArrayList<>();
 
 	public ParentEntry(Mod parent, List<Mod> children, ModListWidget list) {
 		super(parent, list);
 		this.children = children;
 		this.list = list;
+		if (mod instanceof NeoforgeDummyParentMod && iconData.unknown() &&
+				ModMenu.getConfig().DUMMY_ANIMATION_INTERVAL.getAsInt() != 0) {
+			for (Mod child : children) {
+				ImageData imageData = getSquareIconTexture(child, child.getDisplayInfo());
+				if (!imageData.unknown()) {
+					childImages.add(imageData);
+				}
+			}
+		}
 	}
+
+	@Override
+	public List<ImageData> getAnimatedIcons() {
+		return childImages;
+	}
+
 
 	@Override
 	public void extractContent(
@@ -152,7 +171,7 @@ public class ParentEntry extends ModListEntry {
 			list.getParent().showModChildren.add(id);
 		}
 
-		list.filter(list.getParent().getSearchInput(), false, false);
+		list.filter(list.getParent().getSearchInput(), false);
 	}
 
 	@Override
@@ -206,5 +225,13 @@ public class ParentEntry extends ModListEntry {
 	@Override
 	public boolean isMouseOver(double double_1, double double_2) {
 		return Objects.equals(this.list.getEntryAtPos(double_1, double_2), this);
+	}
+
+	@Override
+	public void close() {
+		super.close();
+		for (ImageData imageData : childImages) {
+			list.getParent().getMinecraft().getTextureManager().release(imageData.sprite());
+		}
 	}
 }

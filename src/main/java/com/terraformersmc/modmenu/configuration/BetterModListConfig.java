@@ -32,6 +32,7 @@ public class BetterModListConfig {
 //    public static final ModConfigSpec.BooleanValue UPDATE_CHANNEL;
     public final ModConfigSpec.BooleanValue QUICK_CONFIGURE;
     public final ModConfigSpec.BooleanValue USE_CATALOGUE_ICON;
+    public final ModConfigSpec.BooleanValue ALWAYS_USE_SQUARE_ICON;
 
     public final ModConfigSpec.BooleanValue MODIFY_TITLE_SCREEN;
     public final ModConfigSpec.BooleanValue MODIFY_GAME_MENU;
@@ -39,6 +40,8 @@ public class BetterModListConfig {
     public final ModConfigSpec.BooleanValue HIDE_SCREEN_TOP;
     public final ModConfigSpec.BooleanValue CONFIG_MODE;
     public final ModConfigSpec.BooleanValue EDITOR_MODE;
+    public final ModConfigSpec.IntValue DUMMY_ANIMATION_INTERVAL;
+    public final ModConfigSpec.IntValue DUMMY_ANIMATION_FADE;
     public final ModConfigSpec.BooleanValue DISABLE_DRAG_AND_DROP;
     public final ModConfigSpec.ConfigValue<List<? extends String>> HIDDEN_MODS;
     public final ModConfigSpec.ConfigValue<List<? extends String>> HIDDEN_CONFIGS;
@@ -84,6 +87,12 @@ public class BetterModListConfig {
                 .define("disable_drag_and_drop", false);
         USE_CATALOGUE_ICON = builder.comment("Will use catalogue's icon if present")
                 .define("use_catalogue_icon", true);
+        ALWAYS_USE_SQUARE_ICON = builder.comment("Will use square icon on the right")
+                .define("always_use_square_icon", false);
+        DUMMY_ANIMATION_INTERVAL = builder.comment("If above 0 and fake parent mod doesn't have an icon, will use icons of its children")
+                .defineInRange("dummy_animation_interval", 20, 0, 200);
+        DUMMY_ANIMATION_FADE = builder.comment("how fast new fades in")
+                .defineInRange("dummy_animation_fade", 5, 0, 200);
         builder.pop();
 
         builder.push("hide");

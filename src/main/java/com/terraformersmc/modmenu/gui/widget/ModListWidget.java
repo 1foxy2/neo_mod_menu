@@ -401,7 +401,7 @@ public class ModListWidget extends ObjectSelectionList<ModListEntry> implements 
 		super.extractWidgetRenderState(graphics, mouseX, mouseY, a);
 		if (!draggingEntries.isEmpty()) {
 			int iconSize = 40;
-			draggingEntries.forEach(entry -> entry.renderIcon(graphics, mouseX - iconSize / 2, mouseY - iconSize / 2, iconSize));
+			draggingEntries.forEach(entry -> entry.renderIcon(graphics, mouseX - iconSize / 2, mouseY - iconSize / 2, iconSize, a));
 		}
 	}
     public void ensureVisible(ModListEntry entry) {
@@ -480,7 +480,7 @@ public class ModListWidget extends ObjectSelectionList<ModListEntry> implements 
 	@Override
 	public void close() {
 		for (ModListEntry entry : children()) {
-			minecraft.getTextureManager().release(entry.iconData.sprite());
+			entry.close();
 		}
 	}
 
