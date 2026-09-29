@@ -227,7 +227,7 @@ public class ModListEntry extends ObjectSelectionList.Entry<ModListEntry> implem
 			int interval = ModMenu.getConfig().DUMMY_ANIMATION_INTERVAL.getAsInt();
 			int fade = ModMenu.getConfig().DUMMY_ANIMATION_FADE.getAsInt();
 			int current = list.getParent().iconAnimation / interval;
-			if (current != 0 && list.getParent().iconAnimation % interval < fade) {
+			if (getAnimatedIcons().size() > 1 && current != 0 && list.getParent().iconAnimation % interval < fade) {
 				float fadeProgress = Mth.clamp((list.getParent().iconAnimation % interval + partialTicks) / (fade - 1f), 0f, 1f);
 				renderIcon(guiGraphics, x, y, iconSize, partialTicks,
 						getAnimatedIcons().get((current - 1) % getAnimatedIcons().size()),
