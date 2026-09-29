@@ -202,7 +202,7 @@ public class ModListEntry extends ObjectSelectionList.Entry<ModListEntry> implem
 	}
 
 	public void renderIcon(GuiGraphicsExtractor guiGraphics, int x, int y, int iconSize, float partialTicks, ImageData iconData) {
-		renderIcon(guiGraphics, x, y, iconSize, partialTicks, iconData, -1);
+		renderIcon(guiGraphics, x, y, iconSize, partialTicks, iconData, ARGB.white(1.0F));
 	}
 	public void renderIcon(GuiGraphicsExtractor guiGraphics, int x, int y, int iconSize, float partialTicks, ImageData iconData, int color) {
 		if (iconData.height() == iconData.width()) {
@@ -236,10 +236,10 @@ public class ModListEntry extends ObjectSelectionList.Entry<ModListEntry> implem
 				float fadeProgress = Mth.clamp((list.getParent().iconAnimation % interval + partialTicks) / (fade - 1f), 0f, 1f);
 				renderIcon(guiGraphics, x, y, iconSize, partialTicks,
 						getAnimatedIcons().get((current - 1) % getAnimatedIcons().size()),
-						ARGB.colorFromFloat(1f - fadeProgress, 1f, 1f, 1f));
+						ARGB.white(1f - fadeProgress));
 				renderIcon(guiGraphics, x, y, iconSize, partialTicks,
 						getAnimatedIcons().get(current % getAnimatedIcons().size()),
-						ARGB.colorFromFloat(fadeProgress, 1f, 1f, 1f));
+						ARGB.white(fadeProgress));
 			} else {
 				renderIcon(guiGraphics, x, y, iconSize, partialTicks, getAnimatedIcons().get(current % getAnimatedIcons().size()));
 			}
