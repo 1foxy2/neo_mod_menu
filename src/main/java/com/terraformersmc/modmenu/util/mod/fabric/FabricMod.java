@@ -1,25 +1,19 @@
 package com.terraformersmc.modmenu.util.mod.fabric;
 
 import com.google.common.collect.Sets;
-import com.terraformersmc.modmenu.ModMenu;
 import com.terraformersmc.modmenu.util.VersionUtil;
 import com.terraformersmc.modmenu.util.mod.Mod;
 import com.terraformersmc.modmenu.util.mod.ModBadge;
-import com.terraformersmc.modmenu.util.mod.neoforge.NeoforgeIconHandler;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
 import net.fabricmc.loader.api.metadata.*;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.texture.DynamicTexture;
-import net.minecraft.util.Tuple;
 import net.neoforged.fml.ModList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.awt.*;
-import java.util.List;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -136,13 +130,7 @@ public class FabricMod implements Mod {
 
 	@Override
 	public @NotNull String getIconPath(boolean isSmall) {
-		String iconPath = metadata.getIconPath(64 * Minecraft.getInstance().options.guiScale().get()).orElse(getId() + ":icon.png");
-
-		if (isSmall) {
-			iconPath = iconPath.replace(".png", "_small.png");
-		}
-
-		return iconPath;
+		return metadata.getIconPath(64 * Minecraft.getInstance().options.guiScale().get()).orElse(getId() + ":icon.png");
 	}
 
 	@Override

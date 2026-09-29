@@ -1,6 +1,8 @@
 package com.terraformersmc.modmenu.gui.widget.entries;
 
 import com.mojang.blaze3d.platform.cursor.CursorTypes;
+import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.logging.LogUtils;
 import com.terraformersmc.modmenu.ModMenu;
 import com.terraformersmc.modmenu.gui.BadgeScreen;
 import com.terraformersmc.modmenu.gui.ModsScreen;
@@ -23,6 +25,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.ARGB;
+import net.minecraft.util.Mth;
 import net.minecraft.util.Tuple;
 import net.minecraft.util.Util;
 import net.neoforged.fml.ModList;
@@ -30,6 +33,8 @@ import net.neoforged.fml.ModList;
 import java.awt.*;
 import java.io.Closeable;
 import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
 
 public class ModListEntry extends ObjectSelectionList.Entry<ModListEntry> implements Closeable {
 	public static final Identifier UNKNOWN_ICON = Identifier.withDefaultNamespace("textures/misc/unknown_pack.png");
@@ -81,7 +86,7 @@ public class ModListEntry extends ObjectSelectionList.Entry<ModListEntry> implem
 			DrawingUtil.drawRandomVersionBackground(mod, guiGraphics, x, y, iconSize, iconSize);
 		}
 
-		renderIcon(guiGraphics, x, y, iconSize);
+		renderIcon(guiGraphics, x, y, iconSize, delta);
 
 		Component name = Component.literal(mod.getTranslatedName());
 		FormattedText trimmedName = name;
@@ -190,28 +195,59 @@ public class ModListEntry extends ObjectSelectionList.Entry<ModListEntry> implem
 		}
 	}
 
-	public void renderIcon(GuiGraphicsExtractor guiGraphics, int x, int y, int iconSize) {
-		renderIcon(guiGraphics, x, y, iconSize, iconData);
+	public void renderIcon(GuiGraphicsExtractor guiGraphics, int x, int y, int iconSize, float partialTicks) {
+		if (!renderAnimatedIcon(guiGraphics, x, y, iconSize, partialTicks)) {
+			renderIcon(guiGraphics, x, y, iconSize, partialTicks, iconData);
+		}
 	}
 
-	public void renderIcon(GuiGraphicsExtractor guiGraphics, int x, int y, int iconSize, ImageData iconData) {
+	public void renderIcon(GuiGraphicsExtractor guiGraphics, int x, int y, int iconSize, float partialTicks, ImageData iconData) {
+		renderIcon(guiGraphics, x, y, iconSize, partialTicks, iconData, -1);
+	}
+	public void renderIcon(GuiGraphicsExtractor guiGraphics, int x, int y, int iconSize, float partialTicks, ImageData iconData, int color) {
 		if (iconData.height() == iconData.width()) {
-			guiGraphics.blit(RenderPipelines.GUI_TEXTURED,
+			guiGraphics.blit(
+					RenderPipelines.GUI_TEXTURED,
 					iconData.sprite(),
 					x, y, 0.0f, 0.0f,
 					iconSize, iconSize,
 					iconSize, iconSize,
-					ARGB.white(1.0F));
+					color
+			);
 		} else {
-			guiGraphics.blit(RenderPipelines.GUI_TEXTURED, iconData.sprite(),
-					(int) (x + (iconSize - iconData.width()) / 2f),
-					(int) (y + (iconSize - iconData.height()) / 2f),
+			guiGraphics.blit(
+					RenderPipelines.GUI_TEXTURED, iconData.sprite(),
+					(int) (x + (iconSize - iconData.width() * iconSize / 32f) / 2f),
+					(int) (y + (iconSize - iconData.height() * iconSize / 32f) / 2f),
 					0.0f, 0.0f,
-					iconData.width(), iconData.height(),
-					iconData.width(), iconData.height(),
-					ARGB.white(1.0F));
+					iconData.width() * iconSize / 32, iconData.height() * iconSize / 32,
+					iconData.width() * iconSize / 32, iconData.height() * iconSize / 32,
+					color
+			);
 		}
 	}
+
+	public boolean renderAnimatedIcon(GuiGraphicsExtractor guiGraphics, int x, int y, int iconSize, float partialTicks) {
+		if (!getAnimatedIcons().isEmpty()) {
+			int interval = ModMenu.getConfig().DUMMY_ANIMATION_INTERVAL.getAsInt();
+			int fade = ModMenu.getConfig().DUMMY_ANIMATION_FADE.getAsInt();
+			int current = list.getParent().iconAnimation / interval;
+			if (current != 0 && list.getParent().iconAnimation % interval < fade) {
+				float fadeProgress = Mth.clamp((list.getParent().iconAnimation % interval + partialTicks) / (fade - 1f), 0f, 1f);
+				renderIcon(guiGraphics, x, y, iconSize, partialTicks,
+						getAnimatedIcons().get((current - 1) % getAnimatedIcons().size()),
+						ARGB.colorFromFloat(1f - fadeProgress, 1f, 1f, 1f));
+				renderIcon(guiGraphics, x, y, iconSize, partialTicks,
+						getAnimatedIcons().get(current % getAnimatedIcons().size()),
+						ARGB.colorFromFloat(fadeProgress, 1f, 1f, 1f));
+			} else {
+				renderIcon(guiGraphics, x, y, iconSize, partialTicks, getAnimatedIcons().get(current % getAnimatedIcons().size()));
+			}
+			return true;
+		}
+		return false;
+	}
+
     @Override
 	public boolean mouseClicked(MouseButtonEvent click, boolean doubleClick) {
 		list.select(this);
@@ -261,11 +297,10 @@ public class ModListEntry extends ObjectSelectionList.Entry<ModListEntry> implem
 			return icon;
 		} else {
 			float multiplier = 32f / icon.height();
-			float iconSize = ModMenu.getConfig().COMPACT_LIST.get() ? ModListEntry.COMPACT_ICON_SIZE : ModListEntry.FULL_ICON_SIZE;
 			float biggerValue = Math.max(icon.width(), icon.height()) * multiplier;
 			return new ImageData(icon.sprite(),
-					(int) (icon.width() * multiplier / biggerValue * iconSize),
-					(int) (icon.height() * multiplier / biggerValue * iconSize), icon.unknown());
+					(int) (icon.width() * multiplier / biggerValue * 32f),
+					(int) (icon.height() * multiplier / biggerValue * 32f), icon.unknown());
 		}
 	}
 
@@ -289,5 +324,9 @@ public class ModListEntry extends ObjectSelectionList.Entry<ModListEntry> implem
 	@Override
 	public void close() {
 		list.getParent().getMinecraft().getTextureManager().release(iconData.sprite());
+	}
+
+	public List<ImageData> getAnimatedIcons() {
+		return Collections.emptyList();
 	}
 }

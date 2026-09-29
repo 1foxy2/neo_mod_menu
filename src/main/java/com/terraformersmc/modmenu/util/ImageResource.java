@@ -15,8 +15,6 @@ import org.jspecify.annotations.Nullable;
 
 import java.io.InputStream;
 import java.util.regex.Pattern;
-
-/// An image resource. This is primarily used for [mod display info][ModDisplayInfo].
 ///
 /// @see #packRoot(String, String)
 /// @see #packAsset(Identifier)

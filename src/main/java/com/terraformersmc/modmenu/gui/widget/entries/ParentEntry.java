@@ -35,7 +35,7 @@ public class ParentEntry extends ModListEntry {
 		this.children = children;
 		this.list = list;
 		if (mod instanceof NeoforgeDummyParentMod && iconData.unknown() &&
-				ModMenu.getConfig().ICON_ANIMATION_INTERVAL.getAsInt() != 0) {
+				ModMenu.getConfig().DUMMY_ANIMATION_INTERVAL.getAsInt() != 0) {
 			for (Mod child : children) {
 				ImageData imageData = getSquareIconTexture(child);
 				if (!imageData.unknown()) {
@@ -46,13 +46,8 @@ public class ParentEntry extends ModListEntry {
 	}
 
 	@Override
-	public void renderIcon(GuiGraphicsExtractor guiGraphics, int x, int y, int iconSize) {
-		if (!childImages.isEmpty()) {
-			renderIcon(guiGraphics, x, y, iconSize, childImages.get((list.getParent().iconAnimation /
-					ModMenu.getConfig().ICON_ANIMATION_INTERVAL.getAsInt()) % childImages.size()));
-		} else {
-			super.renderIcon(guiGraphics, x, y, iconSize);
-		}
+	public List<ImageData> getAnimatedIcons() {
+		return childImages;
 	}
 
 	@Override
@@ -176,7 +171,7 @@ public class ParentEntry extends ModListEntry {
 			list.getParent().showModChildren.add(id);
 		}
 
-		list.filter(list.getParent().getSearchInput(), false, false);
+		list.filter(list.getParent().getSearchInput(), false);
 	}
 
 	@Override
@@ -230,5 +225,13 @@ public class ParentEntry extends ModListEntry {
 	@Override
 	public boolean isMouseOver(double double_1, double double_2) {
 		return Objects.equals(this.list.getEntryAtPos(double_1, double_2), this);
+	}
+
+	@Override
+	public void close() {
+		super.close();
+		for (ImageData imageData : childImages) {
+			list.getParent().getMinecraft().getTextureManager().release(imageData.sprite());
+		}
 	}
 }

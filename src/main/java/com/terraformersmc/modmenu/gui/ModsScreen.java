@@ -419,11 +419,16 @@ public class ModsScreen extends Screen {
 				DrawingUtil.drawRandomVersionBackground(mod, guiGraphics, x, rightPaneY, 32, 32);
 			}
 
-			int imageOffset = bannerData.width();
-			int imageHeight = bannerData.height();
-			guiGraphics.blit(RenderPipelines.GUI_TEXTURED, bannerData.sprite(), x, rightPaneY, 0.0F, 0.0F,
-					imageOffset, imageHeight,
-					imageOffset, imageHeight);
+			int imageOffset = 32;
+			if (ModMenu.getConfig().ALWAYS_USE_SQUARE_ICON.get()) {
+				selectedEntry.renderIcon(guiGraphics, x, rightPaneY, 32, delta);
+			} else if (!selectedEntry.renderAnimatedIcon(guiGraphics, x, rightPaneY, 32, delta)) {
+				imageOffset = bannerData.width();
+				int imageHeight = bannerData.height();
+				guiGraphics.blit(RenderPipelines.GUI_TEXTURED, bannerData.sprite(), x, rightPaneY, 0.0F, 0.0F,
+						imageOffset, imageHeight,
+						imageOffset, imageHeight);
+			}
 
 			imageOffset += 4;
 
