@@ -208,19 +208,20 @@ public class ModListEntry extends ObjectSelectionList.Entry<ModListEntry> implem
 	}
 
 	public boolean renderAnimatedIcon(GuiGraphics guiGraphics, int x, int y, int iconSize, float partialTicks) {
-		if (!getAnimatedIcons().isEmpty()) {
+		List<ImageData> icons = getAnimatedIcons();
+		if (!icons.isEmpty()) {
 			int interval = ModMenu.getConfig().DUMMY_ANIMATION_INTERVAL.getAsInt();
 			int fade = ModMenu.getConfig().DUMMY_ANIMATION_FADE.getAsInt();
 			int current = list.getParent().iconAnimation / interval;
-			if (current != 0 && list.getParent().iconAnimation % interval < fade) {
+			if (icons.size() > 1 && current != 0 && list.getParent().iconAnimation % interval < fade) {
 				float fadeProgress = (list.getParent().iconAnimation % interval + partialTicks) / (fade - 1f);
 				RenderSystem.setShaderColor(1f, 1f, 1f, 1f - fadeProgress);
-				renderIcon(guiGraphics, x, y, iconSize, partialTicks, getAnimatedIcons().get((current - 1) % getAnimatedIcons().size()));
+				renderIcon(guiGraphics, x, y, iconSize, partialTicks, icons.get((current - 1) % icons.size()));
 				RenderSystem.setShaderColor(1f, 1f, 1f, fadeProgress);
-				renderIcon(guiGraphics, x, y, iconSize, partialTicks, getAnimatedIcons().get(current % getAnimatedIcons().size()));
+				renderIcon(guiGraphics, x, y, iconSize, partialTicks, icons.get(current % icons.size()));
 				RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
 			} else {
-				renderIcon(guiGraphics, x, y, iconSize, partialTicks, getAnimatedIcons().get(current % getAnimatedIcons().size()));
+				renderIcon(guiGraphics, x, y, iconSize, partialTicks, icons.get(current % icons.size()));
 			}
 			return true;
 		}
