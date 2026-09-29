@@ -1,8 +1,6 @@
 package com.terraformersmc.modmenu.gui.widget.entries;
 
 import com.mojang.blaze3d.platform.cursor.CursorTypes;
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.logging.LogUtils;
 import com.terraformersmc.modmenu.ModMenu;
 import com.terraformersmc.modmenu.gui.BadgeScreen;
 import com.terraformersmc.modmenu.gui.ModsScreen;
@@ -32,7 +30,6 @@ import net.neoforged.fml.ModList;
 
 import java.awt.*;
 import java.io.Closeable;
-import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
@@ -204,6 +201,7 @@ public class ModListEntry extends ObjectSelectionList.Entry<ModListEntry> implem
 	public void renderIcon(GuiGraphicsExtractor guiGraphics, int x, int y, int iconSize, float partialTicks, ImageData iconData) {
 		renderIcon(guiGraphics, x, y, iconSize, partialTicks, iconData, ARGB.white(1.0F));
 	}
+
 	public void renderIcon(GuiGraphicsExtractor guiGraphics, int x, int y, int iconSize, float partialTicks, ImageData iconData, int color) {
 		if (iconData.height() == iconData.width()) {
 			guiGraphics.blit(
@@ -228,20 +226,21 @@ public class ModListEntry extends ObjectSelectionList.Entry<ModListEntry> implem
 	}
 
 	public boolean renderAnimatedIcon(GuiGraphicsExtractor guiGraphics, int x, int y, int iconSize, float partialTicks) {
-		if (!getAnimatedIcons().isEmpty()) {
+		List<ImageData> icons = getAnimatedIcons();
+		if (!icons.isEmpty()) {
 			int interval = ModMenu.getConfig().DUMMY_ANIMATION_INTERVAL.getAsInt();
 			int fade = ModMenu.getConfig().DUMMY_ANIMATION_FADE.getAsInt();
 			int current = list.getParent().iconAnimation / interval;
-			if (current != 0 && list.getParent().iconAnimation % interval < fade) {
+			if (icons.size() > 1 && current != 0 && list.getParent().iconAnimation % interval < fade) {
 				float fadeProgress = Mth.clamp((list.getParent().iconAnimation % interval + partialTicks) / (fade - 1f), 0f, 1f);
 				renderIcon(guiGraphics, x, y, iconSize, partialTicks,
-						getAnimatedIcons().get((current - 1) % getAnimatedIcons().size()),
+						icons.get((current - 1) % icons.size()),
 						ARGB.white(1f - fadeProgress));
 				renderIcon(guiGraphics, x, y, iconSize, partialTicks,
-						getAnimatedIcons().get(current % getAnimatedIcons().size()),
+						icons.get(current % icons.size()),
 						ARGB.white(fadeProgress));
 			} else {
-				renderIcon(guiGraphics, x, y, iconSize, partialTicks, getAnimatedIcons().get(current % getAnimatedIcons().size()));
+				renderIcon(guiGraphics, x, y, iconSize, partialTicks, icons.get(current % icons.size()));
 			}
 			return true;
 		}
