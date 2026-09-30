@@ -89,11 +89,11 @@ public class ModMenuConfig {
                 .define("disable_drag_and_drop", false);
         USE_CATALOGUE_ICON = builder.comment("Will use catalogue's icon if present")
                 .define("use_catalogue_icon", true);
-        ALWAYS_USE_SQUARE_ICON = builder.comment("Will use square icon on the right")
+        ALWAYS_USE_SQUARE_ICON = builder.comment("Will use the square icon on the right instead of banner")
                 .define("always_use_square_icon", false);
-        DUMMY_ANIMATION_INTERVAL = builder.comment("If above 0 and fake parent mod doesn't have an icon, will use icons of its children")
+        DUMMY_ANIMATION_INTERVAL = builder.comment("If above 0 and fake parent mod doesn't have an icon it will cycle through icons of it's children")
                 .defineInRange("dummy_animation_interval", 20, 0, 200);
-        DUMMY_ANIMATION_FADE = builder.comment("how fast new fades in")
+        DUMMY_ANIMATION_FADE = builder.comment("how fast next icon fades in")
                 .defineInRange("dummy_animation_fade", 5, 0, 200);
         builder.pop();
 

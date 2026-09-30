@@ -212,6 +212,14 @@
   "option.modmenu.use_catalogue_icon": "Use Catalogue's icon",
   "option.modmenu.use_catalogue_icon.true": "On",
   "option.modmenu.use_catalogue_icon.false": "Off",
-  "option.modmenu.use_catalogue_icon.tooltip": "will use catalogue's icon for mods if present"
+  "option.modmenu.use_catalogue_icon.tooltip": "will use catalogue's icon for mods if present",
+  "option.modmenu.always_use_square_icon": "Always use square icon",
+  "option.modmenu.always_use_square_icon.true": "On",
+  "option.modmenu.always_use_square_icon.false": "Off",
+  "option.modmenu.always_use_square_icon.tooltip": "Will use the square icon on the right instead of banner",
+  "option.modmenu.dummy_animation_interval": "Dummy animation interval",
+  "option.modmenu.dummy_animation_interval.tooltip": "If above 0 and fake parent mod doesn't have an icon it will cycle through icons of it's children",
+  "option.modmenu.dummy_animation_fade": "Dummy animation fade",
+  "option.modmenu.dummy_animation_fade.tooltip": "How fast next icon fades in"
 
 }
