@@ -50,7 +50,9 @@ public class NeoforgeIconHandler {
 		String type = small ? "icon" : "banner";
 		IoSupplier<InputStream> resource = null;
 		if (imageResource != null) {
-			resource = imageResource.get(Minecraft.getInstance().getResourceManager());
+			try {
+				resource = imageResource.get(Minecraft.getInstance().getResourceManager());
+			} catch (Throwable ignored) {}
 		}
 
 		boolean unknown = false;

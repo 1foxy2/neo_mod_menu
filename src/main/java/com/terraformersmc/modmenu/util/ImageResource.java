@@ -54,7 +54,11 @@ public sealed interface ImageResource {
             //noinspection resource
             PackResources packResources = resourceManager.listPacks().filter(resource -> resource.packId().equals(packId)).findAny().orElse(null);
             if (packResources == null) return null;
-            return packResources.getRootResource(PATH_SPLITTER.split(path));
+            try {
+                return packResources.getRootResource(PATH_SPLITTER.split(path));
+            } catch (IllegalArgumentException throwable) {
+                return packResources.getRootResource(PATH_SPLITTER.split(path.replace("../", "").replace("./", "")));
+            }
         }
 
         @Override
