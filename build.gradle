@@ -84,6 +84,7 @@ dependencies {
     //runtimeOnly "curse.maven:placebo-283644:6446766"
     compileOnly "curse.maven:aether-255308:7043502"
     implementation "curse.maven:cumulus-915473:6888301"
+    implementation "curse.maven:not-enough-crashes-forge-442354:6598103"
 }
 
 var generateModMetadata = tasks.register("generateModMetadata", ProcessResources) {

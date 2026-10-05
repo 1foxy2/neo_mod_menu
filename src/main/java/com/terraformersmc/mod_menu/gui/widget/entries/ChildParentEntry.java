@@ -13,38 +13,41 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.neoforged.neoforge.common.util.Lazy;
 import org.lwjgl.glfw.GLFW;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 public class ChildParentEntry extends ChildEntry {
 	private static final ResourceLocation PARENT_MOD_TEXTURE = ResourceLocation.fromNamespaceAndPath(ModMenu.MOD_ID, "textures/gui/parent_mod.png");
 	protected List<Mod> children;
 	protected ModListWidget list;
 	protected boolean hoveringIcon = false;
-	public List<ImageData> childImages = new ArrayList<>();
+	public final Lazy<List<ImageData>>  childImages;
 
 	public ChildParentEntry(Mod mod, ParentEntry parent, List<ModListEntry> parents, List<Mod> children, ModListWidget list, boolean bottomChild) {
 		super(mod, parent, parents, list, bottomChild);
 		this.children = children;
 		this.list = list;
-		if (mod instanceof NeoforgeDummyParentMod && iconData.unknown() &&
-				ModMenu.getConfig().DUMMY_ANIMATION_INTERVAL.getAsInt() != 0) {
-			for (Mod child : children) {
-				ImageData imageData = getSquareIconTexture(child);
-				if (!imageData.unknown()) {
-					childImages.add(imageData);
+		childImages = Lazy.of(() -> {
+			if (mod instanceof NeoforgeDummyParentMod && iconData.get().unknown() &&
+					ModMenu.getConfig().DUMMY_ANIMATION_INTERVAL.getAsInt() != 0) {
+				List<ImageData> childImages = new ArrayList<>();
+				for (Mod child : children) {
+					ImageData imageData = getSquareIconTexture(child);
+					if (!imageData.unknown()) {
+						childImages.add(imageData);
+					}
 				}
+				return childImages;
 			}
-		}
+			return Collections.emptyList();
+		});
 	}
 
 	@Override
 	public List<ImageData> getAnimatedIcons() {
-		return childImages;
+		return childImages.get();
 	}
 
 	@Override
@@ -214,13 +217,5 @@ public class ChildParentEntry extends ChildEntry {
 	@Override
 	public boolean isMouseOver(double double_1, double double_2) {
 		return Objects.equals(this.list.getEntryAtPos(double_1, double_2), this);
-	}
-
-	@Override
-	public void close() {
-		super.close();
-		for (ImageData imageData : childImages) {
-			list.getParent().getMinecraft().getTextureManager().release(imageData.sprite());
-		}
 	}
 }

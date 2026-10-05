@@ -488,9 +488,7 @@ public class ModListWidget extends ObjectSelectionList<ModListEntry> implements 
 
 	@Override
 	public void close() {
-		for (ModListEntry entry : children()) {
-			entry.close();
-		}
+		NeoforgeIconHandler.close(minecraft.getTextureManager());
 	}
 
 	@Override

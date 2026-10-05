@@ -20,14 +20,13 @@ import net.minecraft.locale.Language;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.Tuple;
+import net.neoforged.neoforge.common.util.Lazy;
 
 import java.awt.*;
-import java.io.Closeable;
 import java.util.Collections;
 import java.util.List;
 
-public class ModListEntry extends ObjectSelectionList.Entry<ModListEntry> implements Closeable {
+public class ModListEntry extends ObjectSelectionList.Entry<ModListEntry> {
 	public static final ResourceLocation UNKNOWN_ICON = ResourceLocation.withDefaultNamespace("textures/misc/unknown_pack.png");
 	private static final ResourceLocation MOD_CONFIGURATION_ICON = ResourceLocation.fromNamespaceAndPath(ModMenu.MOD_ID,
 		"textures/gui/mod_configuration.png"
@@ -38,18 +37,16 @@ public class ModListEntry extends ObjectSelectionList.Entry<ModListEntry> implem
 	protected final Minecraft client;
 	public final Mod mod;
 	protected final ModListWidget list;
-	protected Tuple<ResourceLocation, Dimension> iconLocation;
-	protected Tuple<ResourceLocation, Dimension> smallIconLocation;
 	public static final int FULL_ICON_SIZE = 32;
 	public static final int COMPACT_ICON_SIZE = 19;
 	protected long sinceLastClick;
-	public final ImageData iconData;
+	public final Lazy<ImageData> iconData;
 
 	public ModListEntry(Mod mod, ModListWidget list) {
 		this.mod = mod;
 		this.list = list;
 		this.client = Minecraft.getInstance();
-		this.iconData = getSquareIconTexture(mod);
+		this.iconData = Lazy.of(() -> getSquareIconTexture(mod));
 	}
 
 	@Override
@@ -184,7 +181,7 @@ public class ModListEntry extends ObjectSelectionList.Entry<ModListEntry> implem
 
 	public void renderIcon(GuiGraphics guiGraphics, int x, int y, int iconSize, float partialTicks) {
 		if (!renderAnimatedIcon(guiGraphics, x, y, iconSize, partialTicks)) {
-			renderIcon(guiGraphics, x, y, iconSize, partialTicks, iconData);
+			renderIcon(guiGraphics, x, y, iconSize, partialTicks, iconData.get());
 		}
 	}
 
@@ -290,11 +287,6 @@ public class ModListEntry extends ObjectSelectionList.Entry<ModListEntry> implem
 	@Override
 	public String toString() {
 		return "ModListEntry{mod_id=\"" + getMod().getId() + "\"}";
-	}
-
-	@Override
-	public void close() {
-		list.getParent().getMinecraft().getTextureManager().release(iconData.sprite());
 	}
 
 	public List<ImageData> getAnimatedIcons() {
