@@ -77,7 +77,7 @@ public class ModListWidget extends ObjectSelectionList<ModListEntry> implements 
 
 	@Override
 	public void setSelected(ModListEntry entry) {
-		super.setSelected(entry);
+		this.selected = entry;
 		if (entry == null) {
 			selectedModId = null;
 		} else {
@@ -234,8 +234,9 @@ public class ModListWidget extends ObjectSelectionList<ModListEntry> implements 
 			}
 		}
 
-		if (scrollAmount() > Math.max(0, this.contentHeight() - (this.getBottom() - this.getY() - 4))) {
-			setScrollAmount(Math.max(0, this.contentHeight() - (this.getBottom() - this.getY() - 4)));
+		int maxScroll = Math.max(0, this.contentHeight() - (this.getBottom() - this.getY() - 4));
+		if (scrollAmount() > maxScroll) {
+			setScrollAmount(maxScroll);
 		}
 	}
 
