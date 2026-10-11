@@ -38,8 +38,13 @@ import java.util.List;
 @EventBusSubscriber(modid = ModMenu.MOD_ID, value = Dist.CLIENT)
 public class ModMenuEventHandler {
 	public static final ResourceLocation MODS_BUTTON_TEXTURE = ResourceLocation.fromNamespaceAndPath(ModMenu.MOD_ID, "textures/gui/mods_button.png");
-	private static final Lazy<KeyMapping> MENU_KEY_BIND = Lazy.of(() -> new KeyMapping("key.modmenu.open_menu",
-			KeyConflictContext.IN_GAME, InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_UNKNOWN, "key.categories.misc"));
+	private static final Lazy<KeyMapping> MENU_KEY_BIND = Lazy.of(() -> new KeyMapping("key.better_modlist.open_menu",
+			KeyConflictContext.IN_GAME, InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_UNKNOWN, "key.categories.misc") {
+		@Override
+		public Component getDisplayName() {
+			return Component.translatable("key.modmenu.open_menu");
+		}
+	});
 	;
 
 	@SubscribeEvent
