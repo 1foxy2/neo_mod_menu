@@ -150,11 +150,6 @@ public class ModListWidget extends ObjectSelectionList<ModListEntry> implements 
 			return !mod.isHidden();
 		}).collect(Collectors.toSet());
 
-		if (DEBUG) {
-			mods = new ArrayList<>(mods);
-			//			mods.addAll(TestModContainer.getTestModContainers());
-		}
-
 		if (this.mods == null || refresh) {
 			this.mods = new ArrayList<>();
 			this.mods.addAll(mods);

@@ -25,6 +25,7 @@ jobs:
           files: build/libs/*.jar
           github-files: build/libs/*.jar
           version-type: release
+          environment: client
           game-versions: 1.21.1
           game-version-filter: releases
           dependencies: |
