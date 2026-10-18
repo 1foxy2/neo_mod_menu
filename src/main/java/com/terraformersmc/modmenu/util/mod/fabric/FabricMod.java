@@ -132,13 +132,7 @@ public class FabricMod implements Mod {
 
 	@Override
 	public @NotNull String getIconPath(boolean isSmall) {
-		String iconPath = metadata.getIconPath(64 * Minecraft.getInstance().options.guiScale().get()).orElse(getId() + ":icon.png");
-
-		if (isSmall) {
-			iconPath = iconPath.replace(".png", "_small.png");
-		}
-
-		return iconPath;
+		return metadata.getIconPath(64 * Minecraft.getInstance().options.guiScale().get()).orElse(getId() + ":icon.png");
 	}
 
 	@Override

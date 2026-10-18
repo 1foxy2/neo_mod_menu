@@ -2,9 +2,12 @@ package com.terraformersmc.modmenu.gui.widget.entries;
 
 import com.terraformersmc.modmenu.ModMenu;
 import com.terraformersmc.modmenu.gui.widget.ModListWidget;
+import com.terraformersmc.modmenu.util.ImageData;
 import com.terraformersmc.modmenu.util.mod.Mod;
 import com.terraformersmc.modmenu.util.mod.ModBadge;
 import com.terraformersmc.modmenu.util.mod.ModSearch;
+import com.terraformersmc.modmenu.util.mod.neoforge.NeoforgeDummyParentMod;
+import com.terraformersmc.modmenu.util.mod.neoforge.NeoforgeIconHandler;
 import net.minecraft.util.Util;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -13,22 +16,41 @@ import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
+import net.neoforged.neoforge.common.util.Lazy;
 import org.lwjgl.glfw.GLFW;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 public class ParentEntry extends ModListEntry {
 	private static final Identifier PARENT_MOD_TEXTURE = Identifier.fromNamespaceAndPath(ModMenu.NAMESPACE, "textures/gui/parent_mod.png");
 	protected List<Mod> children;
 	protected ModListWidget list;
 	protected boolean hoveringIcon = false;
+	public final Lazy<List<ImageData>> childImages;
 
 	public ParentEntry(Mod parent, List<Mod> children, ModListWidget list) {
 		super(parent, list);
 		this.children = children;
 		this.list = list;
+		childImages = Lazy.of(() -> {
+			if (mod instanceof NeoforgeDummyParentMod && iconData.get().unknown() &&
+					ModMenu.getConfig().DUMMY_ANIMATION_INTERVAL.getAsInt() != 0) {
+				List<ImageData> childImages = new ArrayList<>();
+				for (Mod child : children) {
+					ImageData imageData = getSquareIconTexture(child);
+					if (!imageData.unknown()) {
+						childImages.add(imageData);
+					}
+				}
+				return childImages;
+			}
+			return Collections.emptyList();
+		});
+	}
+
+	@Override
+	public List<ImageData> getAnimatedIcons() {
+		return childImages.get();
 	}
 
 	@Override
@@ -129,7 +151,7 @@ public class ParentEntry extends ModListEntry {
 		}
 	}
 
-    @Override
+	@Override
 	public boolean mouseClicked(MouseButtonEvent click, boolean doubleClick) {
 		int iconSize = ModMenu.getConfig().COMPACT_LIST.get() ? COMPACT_ICON_SIZE : FULL_ICON_SIZE;
 		boolean quickConfigure = ModMenu.getConfig().QUICK_CONFIGURE.get();
@@ -152,7 +174,7 @@ public class ParentEntry extends ModListEntry {
 			list.getParent().showModChildren.add(id);
 		}
 
-		list.filter(list.getParent().getSearchInput(), false, false);
+		list.filter(list.getParent().getSearchInput(), false);
 	}
 
 	@Override

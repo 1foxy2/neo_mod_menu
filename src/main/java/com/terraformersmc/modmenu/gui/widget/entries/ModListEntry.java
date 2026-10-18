@@ -41,14 +41,14 @@ public class ModListEntry extends ObjectSelectionList.Entry<ModListEntry> {
 	public static final int COMPACT_ICON_SIZE = 19;
 	protected long sinceLastClick;
     protected int yOffset = 0;
-	public final ImageData iconData;
+	public final Lazy<ImageData> iconData;
 
 	public ModListEntry(Mod mod, ModListWidget list) {
 		this.mod = mod;
 		this.displayInfo = mod.getDisplayInfo();
 		this.list = list;
 		this.client = Minecraft.getInstance();
-		this.iconData = getSquareIconTexture();
+		this.iconData = Lazy.of(() -> getSquareIconTexture(mod));
 	}
 
 	@Override
@@ -75,7 +75,7 @@ public class ModListEntry extends ObjectSelectionList.Entry<ModListEntry> {
 			DrawingUtil.drawRandomVersionBackground(mod, guiGraphics, x, y, iconSize, iconSize);
 		}
 
-		renderIcon(guiGraphics, x, y, iconSize);
+		renderIcon(guiGraphics, x, y, iconSize, delta);
 
 		Component name = displayInfo.displayName();
 		FormattedText trimmedName = name;
@@ -184,23 +184,59 @@ public class ModListEntry extends ObjectSelectionList.Entry<ModListEntry> {
 		}
 	}
 
-	public void renderIcon(GuiGraphicsExtractor guiGraphics, int x, int y, int iconSize) {
+	public void renderIcon(GuiGraphicsExtractor guiGraphics, int x, int y, int iconSize, float partialTicks) {
+		if (!renderAnimatedIcon(guiGraphics, x, y, iconSize, partialTicks)) {
+			renderIcon(guiGraphics, x, y, iconSize, partialTicks, iconData.get());
+		}
+	}
+
+	public void renderIcon(GuiGraphicsExtractor guiGraphics, int x, int y, int iconSize, float partialTicks, ImageData iconData) {
+		renderIcon(guiGraphics, x, y, iconSize, partialTicks, iconData, ARGB.white(1.0F));
+	}
+
+	public void renderIcon(GuiGraphicsExtractor guiGraphics, int x, int y, int iconSize, float partialTicks, ImageData iconData, int color) {
 		if (iconData.height() == iconData.width()) {
-			guiGraphics.blit(RenderPipelines.GUI_TEXTURED,
+			guiGraphics.blit(
+					RenderPipelines.GUI_TEXTURED,
 					iconData.sprite(),
 					x, y, 0.0f, 0.0f,
 					iconSize, iconSize,
 					iconSize, iconSize,
-					ARGB.white(1.0F));
+					color
+			);
 		} else {
-			guiGraphics.blit(RenderPipelines.GUI_TEXTURED, iconData.sprite(),
-					(int) (x + (iconSize - iconData.width()) / 2f),
-					(int) (y + (iconSize - iconData.height()) / 2f),
+			guiGraphics.blit(
+					RenderPipelines.GUI_TEXTURED, iconData.sprite(),
+					(int) (x + (iconSize - iconData.width() * iconSize / 32f) / 2f),
+					(int) (y + (iconSize - iconData.height() * iconSize / 32f) / 2f),
 					0.0f, 0.0f,
-					iconData.width(), iconData.height(),
-					iconData.width(), iconData.height(),
-					ARGB.white(1.0F));
+					iconData.width() * iconSize / 32, iconData.height() * iconSize / 32,
+					iconData.width() * iconSize / 32, iconData.height() * iconSize / 32,
+					color
+			);
 		}
+	}
+
+	public boolean renderAnimatedIcon(GuiGraphicsExtractor guiGraphics, int x, int y, int iconSize, float partialTicks) {
+		List<ImageData> icons = getAnimatedIcons();
+		if (!icons.isEmpty()) {
+			int interval = ModMenu.getConfig().DUMMY_ANIMATION_INTERVAL.getAsInt();
+			int fade = ModMenu.getConfig().DUMMY_ANIMATION_FADE.getAsInt();
+			int current = list.getParent().iconAnimation / interval;
+			if (icons.size() > 1 && current != 0 && list.getParent().iconAnimation % interval < fade) {
+				float fadeProgress = Mth.clamp((list.getParent().iconAnimation % interval + partialTicks) / (fade - 1f), 0f, 1f);
+				renderIcon(guiGraphics, x, y, iconSize, partialTicks,
+						icons.get((current - 1) % icons.size()),
+						ARGB.white(1f - fadeProgress));
+				renderIcon(guiGraphics, x, y, iconSize, partialTicks,
+						icons.get(current % icons.size()),
+						ARGB.white(fadeProgress));
+			} else {
+				renderIcon(guiGraphics, x, y, iconSize, partialTicks, icons.get(current % icons.size()));
+			}
+			return true;
+		}
+		return false;
 	}
 
     @Override
@@ -237,8 +273,8 @@ public class ModListEntry extends ObjectSelectionList.Entry<ModListEntry> {
 		return mod;
 	}
 
-	public ImageData getBannerTexture() {
-		ImageData icon = NeoforgeIconHandler.createIcon(getMod().getId(), displayInfo, false);
+	public ImageData getBannerTexture(Mod mod) {
+		ImageData icon = NeoforgeIconHandler.createIcon(mod, false);
 
 		float multiplier = 32f / icon.height();
 		return new ImageData(icon.sprite(),
@@ -246,25 +282,24 @@ public class ModListEntry extends ObjectSelectionList.Entry<ModListEntry> {
 				(int) (icon.height() * multiplier), icon.unknown());
 	}
 
-	public ImageData getSquareIconTexture() {
-		ImageData icon = NeoforgeIconHandler.createIcon(getMod().getId(), displayInfo, true);
+	public ImageData getSquareIconTexture(Mod mod) {
+		ImageData icon = NeoforgeIconHandler.createIcon(mod, true);
 		if (icon.width() == icon.height()) {
 			return icon;
 		} else {
 			float multiplier = 32f / icon.height();
-			float iconSize = ModMenu.getConfig().COMPACT_LIST.get() ? ModListEntry.COMPACT_ICON_SIZE : ModListEntry.FULL_ICON_SIZE;
 			float biggerValue = Math.max(icon.width(), icon.height()) * multiplier;
 			return new ImageData(icon.sprite(),
-					(int) (icon.width() * multiplier / biggerValue * iconSize),
-					(int) (icon.height() * multiplier / biggerValue * iconSize), icon.unknown());
+					(int) (icon.width() * multiplier / biggerValue * 32f),
+					(int) (icon.height() * multiplier / biggerValue * 32f), icon.unknown());
 		}
 	}
 
-	public void updatePlacement(int leftX, int width, int y) {
-		this.setX(leftX);
-		this.setWidth(width);
-		this.setY(y);
-	}
+    public void updatePlacement(int leftX, int width, int y) {
+        this.setX(leftX);
+        this.setWidth(width);
+        this.setY(y);
+    }
 
 	public int getXOffset() {
 		return 0;
@@ -282,4 +317,8 @@ public class ModListEntry extends ObjectSelectionList.Entry<ModListEntry> {
     public int getYOffset() {
         return this.yOffset;
     }
+
+	public List<ImageData> getAnimatedIcons() {
+		return Collections.emptyList();
+	}
 }
