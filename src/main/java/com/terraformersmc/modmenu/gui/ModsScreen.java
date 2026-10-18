@@ -542,7 +542,6 @@ public class ModsScreen extends Screen {
 	@Override
 	public void onClose() {
 		this.modList.close();
-		minecraft.getTextureManager().release(bannerData.sprite());
 		this.minecraft.gui.setScreen(this.previousScreen);
 	}
 
@@ -561,11 +560,8 @@ public class ModsScreen extends Screen {
 			return;
 		}
 
-		if (bannerData != null) {
-			minecraft.getTextureManager().release(bannerData.sprite());
-		}
 		this.selected = entry;
-		bannerData = selected.getBannerTexture();
+		bannerData = selected.getBannerTexture(selected.getMod());
 		String modId = selected.getMod().getId();
 
 		this.descriptionListWidget.updateSelectedMod(selected);

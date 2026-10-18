@@ -7,7 +7,6 @@ import com.google.gson.*;
 import com.terraformersmc.modmenu.configuration.BetterModListConfig;
 import com.terraformersmc.modmenu.configuration.BetterModListConfigScreen;
 import com.terraformersmc.modmenu.util.EnumToLowerCaseJsonConverter;
-import com.terraformersmc.modmenu.util.ImageResource;
 import com.terraformersmc.modmenu.util.ModMenuScreenTexts;
 import com.terraformersmc.modmenu.util.mod.Mod;
 import com.terraformersmc.modmenu.util.mod.ModBadge;

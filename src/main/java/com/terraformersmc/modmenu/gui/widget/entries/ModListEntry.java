@@ -22,8 +22,13 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.ARGB;
+import net.minecraft.util.Mth;
 import net.minecraft.util.Util;
 import net.neoforged.neoforge.client.gui.modlist.ModDisplayInfo;
+import net.neoforged.neoforge.common.util.Lazy;
+
+import java.util.Collections;
+import java.util.List;
 
 public class ModListEntry extends ObjectSelectionList.Entry<ModListEntry> {
 	public static final Identifier UNKNOWN_ICON = Identifier.withDefaultNamespace("textures/misc/unknown_pack.png");
@@ -274,7 +279,7 @@ public class ModListEntry extends ObjectSelectionList.Entry<ModListEntry> {
 	}
 
 	public ImageData getBannerTexture(Mod mod) {
-		ImageData icon = NeoforgeIconHandler.createIcon(mod, false);
+		ImageData icon = NeoforgeIconHandler.createIcon(mod, displayInfo, false);
 
 		float multiplier = 32f / icon.height();
 		return new ImageData(icon.sprite(),
@@ -283,7 +288,7 @@ public class ModListEntry extends ObjectSelectionList.Entry<ModListEntry> {
 	}
 
 	public ImageData getSquareIconTexture(Mod mod) {
-		ImageData icon = NeoforgeIconHandler.createIcon(mod, true);
+		ImageData icon = NeoforgeIconHandler.createIcon(mod, displayInfo, true);
 		if (icon.width() == icon.height()) {
 			return icon;
 		} else {
