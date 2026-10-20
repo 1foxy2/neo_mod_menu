@@ -552,7 +552,6 @@ public class ModsScreen extends Screen {
 	@Override
 	public void onClose() {
 		this.modList.close();
-		minecraft.getTextureManager().release(bannerData.sprite());
 		this.minecraft.setScreen(this.previousScreen);
 	}
 
