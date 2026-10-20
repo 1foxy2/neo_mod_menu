@@ -41,12 +41,17 @@ import java.util.List;
 public class ModMenuEventHandler {
 	public static final Identifier MODS_BUTTON_TEXTURE = Identifier.fromNamespaceAndPath(ModMenu.NAMESPACE, "textures/gui/mods_button.png");
 	private static final Lazy<KeyMapping> MENU_KEY_BIND = Lazy.of(() -> new KeyMapping(
-			"key.modmenu.open_menu",
+			"key.better_modlist.open_menu",
 			KeyConflictContext.IN_GAME,
 			InputConstants.Type.KEYSYM,
 			GLFW.GLFW_KEY_UNKNOWN,
 			KeyMapping.Category.MISC
-	));
+	) {
+		@Override
+		public Component getDisplayName() {
+			return Component.translatable("key.modmenu.open_menu");
+		}
+	});
 
 	@SubscribeEvent
 	public static void onScreenInit(ScreenEvent.Init.Post event) {
