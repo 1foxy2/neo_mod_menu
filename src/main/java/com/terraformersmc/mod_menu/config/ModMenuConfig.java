@@ -1,5 +1,7 @@
 package com.terraformersmc.mod_menu.config;
 
+import com.electronwill.nightconfig.core.Config;
+import com.electronwill.nightconfig.core.concurrent.SynchronizedConfig;
 import com.google.gson.annotations.SerializedName;
 import com.terraformersmc.mod_menu.ModMenu;
 import com.terraformersmc.mod_menu.util.mod.Mod;
@@ -45,17 +47,20 @@ public class ModMenuConfig {
     public final ModConfigSpec.ConfigValue<List<? extends String>> HIDDEN_MODS;
     public final ModConfigSpec.ConfigValue<List<? extends String>> HIDDEN_CONFIGS;
     public final ModConfigSpec.ConfigValue<List<? extends String>> LIBRARY_LIST;
-    public final ModConfigSpec.ConfigValue<List<? extends String>> MOD_BADGES;
-    public final ModConfigSpec.ConfigValue<List<? extends String>> MOD_PARENTS;
+    private final ModConfigSpec.ConfigValue<List<? extends String>> MOD_BADGES;
+    private final ModConfigSpec.ConfigValue<List<? extends String>> MOD_PARENTS;
     public final ModConfigSpec.ConfigValue<List<? extends String>> DISABLE_DEFAULT_BADGES;
     public final ModConfigSpec.BooleanValue DISABLE_DEFAULT_BADGES_ALL;
     public final ModConfigSpec.ConfigValue<List<? extends String>> HIDE_BADGE;
   //  public static final ModConfigSpec.BooleanValue DISABLE_UPDATE_CHECKER;
+  public final ModConfigSpec.ConfigValue<Config> BADGES;
+  public final ModConfigSpec.ConfigValue<Config> PARENTS;
 
     public final Map<String, Set<String>> mod_badges = new HashMap<>();
     public final Map<String, Set<String>> disabled_mod_badges = new HashMap<>();
 
     public ModMenuConfig(ModConfigSpec.Builder builder) {
+
         builder.push("main");
         SORTING = builder
                 .defineEnum("sorting", Sorting.ASCENDING);
@@ -83,8 +88,6 @@ public class ModMenuConfig {
                 .define("modify_game_menu", true);
         CONFIG_MODE = builder.comment("Will only show mods with config available")
                 .define("config_mode", false);
-        EDITOR_MODE = builder.comment("Allows to edit mod badges and parents ingame by dragging or button")
-                .define("editor_mode", false);
         DISABLE_DRAG_AND_DROP = builder.comment("Disables drag and drop mods adding")
                 .define("disable_drag_and_drop", false);
         USE_CATALOGUE_ICON = builder.comment("Will use catalogue's icon if present")
@@ -139,9 +142,19 @@ public class ModMenuConfig {
 
         MOD_BADGES = builder.comment("Adds badge to mod in this format \"modid=badge1, badge2\"")
                 .defineList("mod_badges", ArrayList::new, String::new, object -> object instanceof String);
-        MOD_PARENTS = builder.comment("Make mods apear under another mod in this format \"parenModId=childId1, childId2\", add ! at the beginning of parentId to prevent creating a fake parent")
+        MOD_PARENTS = builder.comment("Make mods appear under another mod in this format \"parenModId=childId1, childId2\", add ! at the beginning of parentId to prevent creating a fake parent")
                 .defineList("mod_parents", ArrayList::new, String::new, object -> object instanceof String);
 
+        builder.push("mod");
+        EDITOR_MODE = builder.comment("Allows to edit mod badges and parents ingame by dragging or button")
+                .define("editor_mode", false);
+        Config config = new SynchronizedConfig();
+        config.set("example_mod1", List.of("example_badge1", "example_badge2"));
+        BADGES = builder.define("badges", config);
+        config = new SynchronizedConfig();
+        config.set("example_mod1", List.of("example_mod2", "example_mod3"));
+        PARENTS = builder.define("parents", config);
+        builder.pop();
         //    UPDATE_CHECKER = builder
         //            .define("translate_descriptions", true);
         //    BUTTON_UPDATE_BADGE = builder
@@ -150,21 +163,28 @@ public class ModMenuConfig {
     }
 
     public void onLoad() {
-        this.MOD_BADGES.get().forEach(badge -> {
-            String[] badgeKeyValue = badge.split("=");
-            if (badgeKeyValue.length != 1) {
-                Set<String> badges = new LinkedHashSet<>();
-                Set<String> disabledBadges = new LinkedHashSet<>();
-                Arrays.stream(badgeKeyValue[1].split(", ")).toList().forEach(badgeId -> {
-                    if (badgeId.startsWith("!"))
-                        disabledBadges.add(badgeId.substring(1));
-                    else
-                        badges.add(badgeId);
-                });
-                this.mod_badges.put(badgeKeyValue[0], badges);
-                this.disabled_mod_badges.put(badgeKeyValue[0], disabledBadges);
-            }
-        });
+        if (!this.MOD_BADGES.get().isEmpty()) {
+            this.MOD_BADGES.get().forEach(badge -> {
+                String[] badgeKeyValue = badge.split("=");
+                if (badgeKeyValue.length != 1) {
+                    BADGES.get().set(badgeKeyValue[0], Arrays.stream(badgeKeyValue[1].split(", ")).toList());
+                }
+            });
+            this.MOD_BADGES.set(List.of());
+            ModMenu.CONFIG.getRight().save();
+        }
+        for (Config.Entry entry : BADGES.get().entrySet()) {
+            Set<String> badges = new LinkedHashSet<>();
+            Set<String> disabledBadges = new LinkedHashSet<>();
+            entry.<List<String>>getValue().forEach(badgeId -> {
+                if (badgeId.startsWith("!"))
+                    disabledBadges.add(badgeId.substring(1));
+                else
+                    badges.add(badgeId);
+            });
+            this.mod_badges.put(entry.getKey(), badges);
+            this.disabled_mod_badges.put(entry.getKey(), disabledBadges);
+        }
         if (!this.LIBRARY_LIST.get().isEmpty()) {
             this.LIBRARY_LIST.get().forEach(string -> {
                 this.mod_badges.putIfAbsent(string, new LinkedHashSet<>());
@@ -176,20 +196,29 @@ public class ModMenuConfig {
 
         // Initialize parent map
         HashSet<String> modParentSet = new HashSet<>();
-        Map<String, List<String>> modParents = new HashMap<>();
-        this.MOD_PARENTS.get().forEach(parentToMods -> {
-            if (parentToMods.isEmpty())
-                return;
+        if (!this.MOD_PARENTS.get().isEmpty()) {
+            this.MOD_PARENTS.get().forEach(parentToMods -> {
+                if (parentToMods.isEmpty())
+                    return;
 
-            String[] parentToMod = parentToMods.split("=");
-            modParents.put(parentToMod[0], Arrays.stream(parentToMod[1].split(",\\s*")).toList());
-        });
-        modParents.forEach((parentString, children) -> {
-            for (String id : children) {
+                String[] parentToMod = parentToMods.split("=");
+
+                if (PARENTS.get().contains(parentToMod[0])) {
+                    PARENTS.get().<List<String>>get(parentToMod[0]).addAll(Arrays.stream(parentToMod[1].split(",\\s*")).toList());
+                } else {
+                    PARENTS.get().set(parentToMod[0], Arrays.stream(parentToMod[1].split(",\\s*")).toList());
+                }
+            });
+            this.MOD_PARENTS.set(List.of());
+            ModMenu.CONFIG.getRight().save();
+        }
+        for (Config.Entry entry : PARENTS.get().entrySet()) {
+            String parentString = entry.getKey();
+            for (String id : entry.<List<String>>getValue()) {
                 Mod mod = ModMenu.MODS.getOrDefault(id, dummyParents.get(id));
 
                 if (mod == null) {
-                    Mod fakeModHost = getModHost(modParents, dummyParents, id);
+                    Mod fakeModHost = getModHost(PARENTS.get(), dummyParents, id);
                     if (fakeModHost == null) {
                         continue;
                     }
@@ -233,15 +262,15 @@ public class ModMenuConfig {
                 ModMenu.ROOT_MODS.remove(mod.getId(), mod);
                 ModMenu.PARENT_MAP.put(parent, mod);
             }
-        });
+        }
         ModMenu.MODS.putAll(dummyParents);
     }
 
-    private Mod getModHost(Map<String, List<String>> modParents, Map<String, Mod> dummyParents, String id) {
-        if (!modParents.containsKey(id)) {
+    private Mod getModHost(Config modParents, Map<String, Mod> dummyParents, String id) {
+        if (!modParents.contains(id)) {
             return null;
         }
-        String hostId = modParents.get(id).getFirst();
+        String hostId = modParents.<List<String>>get(id).getFirst();
         if (hostId == null) {
             return null;
         }
@@ -260,64 +289,48 @@ public class ModMenuConfig {
     }
 
     public void save() {
-        List<String> list = new ArrayList<>();
+        Config config = new SynchronizedConfig();
         this.mod_badges.forEach((key, values) -> {
             Set<String> disabledBadges = disabled_mod_badges.get(key);
             if (values.isEmpty() && disabledBadges == null)
                 return;
 
-            StringBuilder string = new StringBuilder();
-            for (String value : values) {
-                if (!string.isEmpty())
-                    string.append(", ");
-
-                string.append(value);
-            }
+            List<String> badges = new ArrayList<>(values);
 
             if (disabledBadges != null)
                 for (String value : disabledBadges) {
-                    if (!string.isEmpty())
-                        string.append(", ");
-
-                    string.append("!").append(value);
+                    badges.add("!" + value);
                 }
 
-            if (!string.isEmpty())
-                list.add(key + "=" + string);
+            if (!badges.isEmpty()) {
+                config.set(key, badges);
+            }
         });
 
-        this.MOD_BADGES.set(list);
+        this.BADGES.set(config);
         ModMenu.CONFIG.getRight().save();
     }
 
     public void saveParents() {
-        List<String> list = new ArrayList<>();
+        Config config = new SynchronizedConfig();
         ModMenu.PARENT_MAP.asMap().forEach((parent, childs) -> {
-            StringBuilder string = new StringBuilder();
+            String string = "";
             if (!(parent instanceof NeoforgeDummyParentMod)) {
-                string.append("!");
+                string = "!";
             }
-            string.append(parent.getId()).append("=");
-            boolean hasChild = false;
-            for (Mod mod : childs) {
+            string += parent.getId();
+            List<String> children = childs.stream().filter(mod -> {
                 String originalParent = mod.getParent();
-                if (originalParent == null || !originalParent.equals(parent.getId())) {
-                    if (hasChild) {
-                        string.append(", ");
-                    } else {
-                        hasChild = true;
-                    }
-                    string.append(mod.getId());
-                }
-            }
+                return originalParent == null || !originalParent.equals(parent.getId());
+            }).map(Mod::getId).toList();
 
-            if (hasChild) {
-                list.add(string.toString());
+            if (!children.isEmpty()) {
+                config.set(string, children);
             }
 
         });
 
-        this.MOD_PARENTS.set(list);
+        this.PARENTS.set(config);
         ModMenu.CONFIG.getRight().save();
     }
 

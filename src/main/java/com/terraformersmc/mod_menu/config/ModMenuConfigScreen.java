@@ -111,7 +111,7 @@ public class ModMenuConfigScreen extends ConfigurationScreen.ConfigurationSectio
     @Nullable
     @Override
     protected <T> Element createList(String key, ModConfigSpec.ListValueSpec spec, ModConfigSpec.ConfigValue<List<T>> list) {
-        if (key.equals("mod_badges") || key.equals("library_list") || key.equals("mod_parents")) return null;
+        if (key.equals("mod_badges") || key.equals("library_list") || key.equals("mod_parents") || key.equals("parents") || key.equals("badges")) return null;
 
         return super.createList(key, spec, list);
     }

@@ -1,5 +1,7 @@
 package com.terraformersmc.mod_menu.event;
 
+import com.electronwill.nightconfig.core.io.WritingMode;
+import com.electronwill.nightconfig.toml.TomlWriter;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.terraformersmc.mod_menu.ModMenu;
 import com.terraformersmc.mod_menu.config.ModMenuConfig;
@@ -24,6 +26,8 @@ import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.fml.config.ModConfig;
+import net.neoforged.fml.event.config.ModConfigEvent;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.RegisterClientReloadListenersEvent;
 import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
@@ -45,7 +49,7 @@ public class ModMenuEventHandler {
 			return Component.translatable("key.modmenu.open_menu");
 		}
 	});
-	;
+	private static boolean loaded = false;
 
 	@SubscribeEvent
 	public static void onScreenInit(ScreenEvent.Init.Post event) {
@@ -54,6 +58,29 @@ public class ModMenuEventHandler {
 			removeModsButton(screen);
 			afterTitleScreenInit(screen);
 		}
+	}
+
+	@SubscribeEvent
+	public static void onScreenInit(ModConfigEvent.Reloading event) {
+		ModConfig config = event.getConfig();
+		if (config.getSpec() != ModMenu.CONFIG.getRight()) {
+			return;
+		}
+		if (loaded) {
+			loaded = false;
+			return;
+		}
+
+		if (config.getLoadedConfig() == null) {
+			return;
+		}
+		TomlWriter writer = new TomlWriter();
+		writer.setIndentArrayElementsPredicate(list -> true);
+		try {
+			writer.write(config.getLoadedConfig().config(), config.getFullPath(), WritingMode.REPLACE_ATOMIC);
+			loaded = true;
+        } catch (Throwable ignored) {}
+
 	}
 
 	private static void removeModsButton(Screen screen) {
